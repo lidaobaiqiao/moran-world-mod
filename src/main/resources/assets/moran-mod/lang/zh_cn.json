@@ -1,0 +1,19 @@
+{
+  "item.moran-mod.moran": "墨石",
+  "item.moran-mod.moran.tooltip": "§7蕴含墨纬度能量的神秘石头",
+
+  "item.moran-mod.qingfeng": "清风精华",
+  "item.moran-mod.qingfeng.tooltip": "§7轻盈如风，可用来制作传送物品",
+
+  "item.moran-mod.moran_sword": "墨剑",
+  "item.moran-mod.moran_sword.tooltip": "§7由墨石锻造的宝剑\n§6特殊能力：在墨纬度中更加强大",
+
+  "item.moran-mod.bamboo_raft": "竹筏",
+  "item.moran-mod.bamboo_raft.tooltip": "§7可以在水面上放置\n§6在樱花群系静止5分钟可进入墨纬度",
+
+  "block.moran-mod.moran_block": "墨石块",
+  "block.moran-mod.moran_block.tooltip": "§7由墨石制成的建筑方块",
+
+  "entity.moran-mod.bamboo_raft": "竹筏"
+}
+

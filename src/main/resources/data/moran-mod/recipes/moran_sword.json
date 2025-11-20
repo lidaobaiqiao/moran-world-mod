@@ -1,0 +1,20 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    " # ",
+    " # ",
+    " * "
+  ],
+  "key": {
+    "#": {
+      "item": "moran-mod:moran"
+    },
+    "*": {
+      "item": "minecraft:stick"
+    }
+  },
+  "result": {
+    "item": "moran-mod:moran_block",
+    "count": 1
+  }
+}
