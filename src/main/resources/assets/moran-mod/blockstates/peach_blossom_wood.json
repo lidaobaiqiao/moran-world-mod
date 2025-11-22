@@ -1,0 +1,7 @@
+{
+  "variants": {
+    "axis=x": { "model": "moran-mod:block/peach_blossom_wood_horizontal" },
+    "axis=y": { "model": "moran-mod:block/peach_blossom_wood" },
+    "axis=z": { "model": "moran-mod:block/peach_blossom_wood_horizontal" }
+  }
+}

@@ -1,0 +1,6 @@
+{
+  "parent": "block/cube_all",
+  "textures": {
+    "all": "moran-mod:block/peach_blossom_podzol"
+  }
+}

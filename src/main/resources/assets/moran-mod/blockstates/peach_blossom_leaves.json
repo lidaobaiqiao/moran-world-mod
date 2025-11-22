@@ -1,0 +1,9 @@
+{
+  "variants": {
+    "": [
+      { "model": "moran-mod:block/peach_blossom_leaves", "weight": 4 },
+      { "model": "moran-mod:block/peach_blossom_leaves", "weight": 2, "x": 90, "y": 90 }
+    ]
+  }
+}
+        

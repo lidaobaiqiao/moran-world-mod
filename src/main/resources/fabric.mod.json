@@ -8,9 +8,9 @@
   "license": "CC0-1.0",
   "environment": "*",
   "entrypoints": {
-    "main": ["com.lidao.moran.MoranMod"],
-    "client": ["com.lidao.moran.client.MoranModClient"]
+    "main": ["com.lidao.moran.MoranMod"]
   },
+
   "mixins": ["moran-mod.mixins.json"],
   "depends": {
     "fabricloader": ">=0.15.11",

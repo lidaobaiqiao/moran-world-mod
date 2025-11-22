@@ -52,7 +52,7 @@ public class RaftTeleportHandler {
             data.stationaryTicks++;
 
             // 每30秒提示一次
-            if (data.stationaryTicks % 600 == 0) {
+            if (data.stationaryTicks % 60 == 0) {
                 int secondsLeft = (REQUIRED_TICKS - data.stationaryTicks) / 20;
                 player.sendMessage(net.minecraft.text.Text.literal(
                         "§e竹筏在神秘水域静止... §7(" + secondsLeft + "秒后进入桃花源)"), false);

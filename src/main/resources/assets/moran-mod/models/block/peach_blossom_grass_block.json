@@ -1,0 +1,9 @@
+{
+  "parent": "minecraft:block/cube_column",
+  "textures": {
+    "bottom": "moran-mod:block/peach_dirt",
+    "top": "moran-mod:block/peach_grass_block_top",
+    "side": "moran-mod:block/peach_grass_block_side"
+  }
+}
+        

@@ -1,3 +1,4 @@
 {
-  "parent": "moran-mod:block:common/moran_block"
+  "parent": "moran-mod:block/moran_block"
 }
+    

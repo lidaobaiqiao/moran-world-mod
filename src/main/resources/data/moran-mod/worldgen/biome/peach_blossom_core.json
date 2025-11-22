@@ -1,0 +1,40 @@
+{
+  "temperature": 0.8,
+  "downfall": 0.9,
+  "has_precipitation": true,
+  "effects": {
+    "sky_color": 13421772,
+    "fog_color": 16755200,
+    "water_color": 4159204,
+    "water_fog_color": 329011,
+    "grass_color": 16711680,
+    "foliage_color": 16711935,
+    "mood_sound": {
+      "sound": "minecraft:ambient.cave",
+      "tick_delay": 6000,
+      "block_search_extent": 8,
+      "offset": 2
+    }
+  },
+  "spawners": {},
+  "spawn_costs": {},
+  "carvers": {},
+  "features": [
+    [],
+    [
+      "minecraft:lake_lava_underground"
+    ],
+    [
+      "minecraft:amethyst_geode"
+    ],
+    [],
+    [],
+    [],
+    [
+      "minecraft:ore_coal_upper",
+      "minecraft:ore_iron_upper"
+    ],
+    [],
+    []
+  ]
+}

@@ -53,7 +53,7 @@
       "minecraft:ore_andesite_upper",
       "minecraft:ore_andesite_lower",
       "minecraft:ore_tuff",
-      "minecraft:ore_coal_upper",
+
       "minecraft:ore_coal_lower",
       "minecraft:ore_iron_upper",
       "minecraft:ore_iron_middle",
@@ -79,9 +79,9 @@
       "minecraft:bamboo",
       "minecraft:bamboo_light",
       "minecraft:bamboo_vegetation",
-      "minecraft:cherry_trees",
+
       "minecraft:lush_caves_vegetation",
-      "minecraft:lush_caves_feature"
+
     ],
     [
       "minecraft:freeze_top_layer"

@@ -14,6 +14,22 @@
   "block.moran-mod.moran_block": "墨石块",
   "block.moran-mod.moran_block.tooltip": "§7由墨石制成的建筑方块",
 
-  "entity.moran-mod.bamboo_raft": "竹筏"
+  "entity.moran-mod.bamboo_raft": "竹筏",
+
+  "block.moran-mod.peach_blossom_wood": "桃源原木",
+  "block.moran-mod.peach_blossom_planks": "桃源木板",
+  "block.moran-mod.peach_blossom_leaves": "桃源树叶",
+  "block.moran-mod.peach_blossom_sand": "桃源沙",
+  "block.moran-mod.peach_blossom_dirt": "桃源土",
+  "block.moran-mod.peach_blossom_grass_block": "桃源草方块",
+  "block.moran-mod.peach_blossom_podzol": "桃源覆土",
+
+  "item.moran-mod.peach_blossom_wood": "桃源原木",
+  "item.moran-mod.peach_blossom_planks": "桃源木板",
+  "item.moran-mod.peach_blossom_leaves": "桃源树叶",
+  "item.moran-mod.peach_blossom_sand": "桃源沙",
+  "item.moran-mod.peach_blossom_dirt": "桃源土",
+  "item.moran-mod.peach_blossom_grass_block": "桃源草方块",
+  "item.moran-mod.peach_blossom_podzol": "桃源覆土"
 }
 
