@@ -1,7 +1,7 @@
 {
-  "parent": "minecraft:block/cube",
+  "parent": "minecraft:block/cross",
+  "render_type": "cutout",
   "textures": {
-    "particle": "moran-mod:block/peach_blossom_leaves",
-    "all": "moran-mod:block/peach_blossom_leaves"
+    "cross": "moran-mod:block/peach_blossom_leaves"
   }
 }
