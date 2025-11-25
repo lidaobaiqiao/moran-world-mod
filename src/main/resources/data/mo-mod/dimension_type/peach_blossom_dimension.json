@@ -6,17 +6,11 @@
   "bed_works": true,
   "respawn_anchor_works": false,
   "has_raids": true,
-  "monster_spawn_light_level": {
-    "type": "minecraft:uniform",
-    "value": {
-      "min_inclusive": 0,
-      "max_inclusive": 7
-    }
-  },
+  "monster_spawn_light_level": 0,
   "monster_spawn_block_light_limit": 0,
   "has_ceiling": false,
   "has_skylight": true,
-  "ambient_light": 0.0,
+  "ambient_light": 0,
   "fixed_time": null,
   "infiniburn": "minecraft:infiniburn_overworld",
   "bedrock_floor": false,
