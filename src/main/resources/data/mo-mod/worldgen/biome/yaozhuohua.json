@@ -7,133 +7,169 @@
     [
       {
         "feature": "minecraft:lake_lava_underground",
-        "placement": {
-          "type": "minecraft:count",
-          "count": 1
-        }
+        "placement": [
+          {
+            "type": "minecraft:count",
+            "count": 1
+          }
+        ]
       },
       {
         "feature": "minecraft:lake_water_surface",
-        "placement": {
-          "type": "minecraft:count",
-          "count": 4
-        }
+        "placement": [
+          {
+            "type": "minecraft:count",
+            "count": 4
+          }
+        ]
       },
       {
         "feature": "minecraft:amethyst_geode",
-        "placement": {
-          "type": "minecraft:count",
-          "count": 24
-        }
+        "placement": [
+          {
+            "type": "minecraft:count",
+            "count": 24
+          }
+        ]
       },
       {
         "feature": "mo-mod:peach_sand_patch",
-        "placement": {
-          "type": "minecraft:count",
-          "count": 6
-        }
+        "placement": [
+          {
+            "type": "minecraft:count",
+            "count": 6
+          }
+        ]
       },
       {
         "feature": "mo-mod:peach_podzol_patch",
-        "placement": {
-          "type": "minecraft:count",
-          "count": 8
-        }
+        "placement": [
+          {
+            "type": "minecraft:count",
+            "count": 8
+          }
+        ]
       },
       {
         "feature": "mo-mod:traditional_pavilion",
-        "placement": {
-          "type": "minecraft:count",
-          "count": 3
-        }
+        "placement": [
+          {
+            "type": "minecraft:count",
+            "count": 3
+          }
+        ]
       },
       {
         "feature": "mo-mod:cultural_stone_tablet",
-        "placement": {
-          "type": "minecraft:count",
-          "count": 5
-        }
+        "placement": [
+          {
+            "type": "minecraft:count",
+            "count": 5
+          }
+        ]
       },
       {
         "feature": "mo-mod:human_built_bridges",
-        "placement": {
-          "type": "minecraft:count",
-          "count": 4
-        }
+        "placement": [
+          {
+            "type": "minecraft:count",
+            "count": 4
+          }
+        ]
       },
       {
         "feature": "mo-mod:peach_tree_dense",
-        "placement": {
-          "type": "minecraft:count",
-          "count": 1
-        }
+        "placement": [
+          {
+            "type": "minecraft:count",
+            "count": 1
+          }
+        ]
       },
       {
         "feature": "mo-mod:flowering_peach_tree",
-        "placement": {
-          "type": "minecraft:count",
-          "count": 2
-        }
+        "placement": [
+          {
+            "type": "minecraft:count",
+            "count": 2
+          }
+        ]
       },
       {
         "feature": "mo-mod:peach_tree_scattered",
-        "placement": {
-          "type": "minecraft:count",
-          "count": 10
-        }
+        "placement": [
+          {
+            "type": "minecraft:count",
+            "count": 10
+          }
+        ]
       },
       {
         "feature": "mo-mod:peach_bamboo_single",
-        "placement": {
-          "type": "minecraft:count",
-          "count": 8
-        }
+        "placement": [
+          {
+            "type": "minecraft:count",
+            "count": 8
+          }
+        ]
       },
       {
         "feature": "mo-mod:patch_flower_default",
-        "placement": {
-          "type": "minecraft:count",
-          "count": 4
-        }
+        "placement": [
+          {
+            "type": "minecraft:count",
+            "count": 4
+          }
+        ]
       },
       {
         "feature": "mo-mod:patch_grain_plain",
-        "placement": {
-          "type": "minecraft:count",
-          "count": 3
-        }
+        "placement": [
+          {
+            "type": "minecraft:count",
+            "count": 3
+          }
+        ]
       },
       {
         "feature": "mo-mod:human_ancient_ore",
-        "placement": {
-          "type": "minecraft:count",
-          "count": 10
-        }
+        "placement": [
+          {
+            "type": "minecraft:count",
+            "count": 10
+          }
+        ]
       }
     ],
     [
       {
         "feature": "minecraft:spring_lava",
-        "placement": {
-          "type": "minecraft:count",
-          "count": 2
-        }
+        "placement": [
+          {
+            "type": "minecraft:count",
+            "count": 2
+          }
+        ]
       },
       {
         "feature": "minecraft:spring_water",
-        "placement": {
-          "type": "minecraft:count",
-          "count": 50
-        }
+        "placement": [
+          {
+            "type": "minecraft:count",
+            "count": 50
+          }
+        ]
       }
     ],
     [
       {
         "feature": "minecraft:patch_pumpkin",
-        "placement": {
-          "type": "minecraft:count",
-          "count": 2
-        }
+        "placement": [
+          {
+            "type": "minecraft:count",
+            "count": 2
+          }
+        ]
       }
     ]
   ],
