@@ -1,0 +1,1138 @@
+序
+
+本教程为TerraBlender开发教程，目的在于帮助读者增加对此mod的了解，并提供一种更为清晰的自定义群系制作方法。本教程以Minecraft Forge1.20 Mojmap版本，TerraBlender3+作为样例，其它版本中对于此mod的使用方式原则上大同小异，但由于minecraft在洞穴更新版本中对世界生成等内容的重写，这导致世界生成的整体逻辑出现了较大的变化，因此在不由mod提供的部分（如SurfaceBuilder）部分会存在一定差异。
+本教程内内容仅代表个人对游戏本体与mod提供的接口的理解，不具有权威性解释，不代表游戏相关开发方与mod制作方的观点，内容仅供参考且具有针对版本特异性，不确保针对每个版本及相应特殊条件下都能适用。由于模组提供的接口特性，本教程需要依赖于mod而不能仅使用数据包实现，本教程将默认读者已掌握对于java与mod开发的基本内容。
+您可以在此页面查看此mod提供的源码，其中mod作者提供了使用样例，您可以在对应的版本分支的Example文件夹下找到它们。
+
+准备工作
+
+TerraBlender的用途(选读)
+
+在minecraft1.18版本之前，有关群系生成时的各项内容，比如地形的起伏属性，含有的结构(Structure)或特征(Feature)，地表生成(SurfaceBuilder)等。而在1.18版本中，为了适应洞穴更新，Mojang修改了Minecraft的生成逻辑，并将地形的属性与地表生成从群系中独立了出去。前者由维度(Level/World)本身配置，由相应的噪声设置(Noise Setting)一体生成，这一部分具有较低的可控性。后者则同样被整体化储存为一个表面规则资源(SurfaceRules.RuleSource)并由SurfaceRuleData下的overworldlike方法提供。但这种变更一言难尽，这里展示出原版中构造主世界SurfaceRules的重要部分代码：
+
+1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44
+45
+46
+47
+48
+49
+50
+51
+52
+SurfaceRules.ConditionSource surfacerules$conditionsource = SurfaceRules.yBlockCheck(VerticalAnchor.absolute(97), 2);
+[省略部分条件资源变量的创建]
+SurfaceRules.ConditionSource surfacerules$conditionsource17 = SurfaceRules.noiseCondition(Noises.SURFACE, 0.5454D, 0.909D);
+SurfaceRules.RuleSource surfacerules$rulesource8 =
+             SurfaceRules.RuleSource surfacerules$rulesource8 = SurfaceRules.sequence(
+            SurfaceRules.ifTrue(SurfaceRules.ON_FLOOR, SurfaceRules.sequence(
+            SurfaceRules.ifTrue(SurfaceRules.isBiome(Biomes.WOODED_BADLANDS), SurfaceRules.ifTrue(surfacerules$conditionsource, SurfaceRules.sequence(
+            SurfaceRules.ifTrue(surfacerules$conditionsource15, COARSE_DIRT),
+            SurfaceRules.ifTrue(surfacerules$conditionsource16, COARSE_DIRT),
+            SurfaceRules.ifTrue(surfacerules$conditionsource17, COARSE_DIRT),
+            surfacerules$rulesource
+            ))),
+            SurfaceRules.ifTrue(SurfaceRules.isBiome(Biomes.SWAMP), SurfaceRules.ifTrue(surfacerules$conditionsource5, SurfaceRules.ifTrue(SurfaceRules.not(surfacerules$conditionsource6), SurfaceRules.ifTrue(SurfaceRules.noiseCondition(Noises.SWAMP, 0.0D), WATER)))),
+            SurfaceRules.ifTrue(SurfaceRules.isBiome(Biomes.MANGROVE_SWAMP), SurfaceRules.ifTrue(surfacerules$conditionsource4, SurfaceRules.ifTrue(SurfaceRules.not(surfacerules$conditionsource6), SurfaceRules.ifTrue(SurfaceRules.noiseCondition(Noises.SWAMP, 0.0D), WATER))))
+            )),
+            SurfaceRules.ifTrue(SurfaceRules.isBiome(Biomes.BADLANDS, Biomes.ERODED_BADLANDS, Biomes.WOODED_BADLANDS), SurfaceRules.sequence(
+            SurfaceRules.ifTrue(SurfaceRules.ON_FLOOR, SurfaceRules.sequence(
+            SurfaceRules.ifTrue(surfacerules$conditionsource1, ORANGE_TERRACOTTA),
+            SurfaceRules.ifTrue(surfacerules$conditionsource3, SurfaceRules.sequence(
+            SurfaceRules.ifTrue(surfacerules$conditionsource15, TERRACOTTA),
+            SurfaceRules.ifTrue(surfacerules$conditionsource16, TERRACOTTA),
+            SurfaceRules.ifTrue(surfacerules$conditionsource17, TERRACOTTA),
+            SurfaceRules.bandlands()
+            )),
+            SurfaceRules.ifTrue(surfacerules$conditionsource7, SurfaceRules.sequence(
+            SurfaceRules.ifTrue(SurfaceRules.ON_CEILING, RED_SANDSTONE),
+            RED_SAND
+            )),
+            SurfaceRules.ifTrue(SurfaceRules.not(surfacerules$conditionsource10), ORANGE_TERRACOTTA),
+            SurfaceRules.ifTrue(surfacerules$conditionsource9, WHITE_TERRACOTTA),
+            surfacerules$rulesource2
+            )),
+            SurfaceRules.ifTrue(surfacerules$conditionsource2, SurfaceRules.sequence(
+            SurfaceRules.ifTrue(surfacerules$conditionsource6, SurfaceRules.ifTrue(SurfaceRules.not(surfacerules$conditionsource3), ORANGE_TERRACOTTA)),
+            SurfaceRules.bandlands()
+            )),
+            SurfaceRules.ifTrue(SurfaceRules.UNDER_FLOOR, SurfaceRules.ifTrue(surfacerules$conditionsource9, WHITE_TERRACOTTA))
+            ))......[省略很多内容]
+ImmutableList.Builder<SurfaceRules.RuleSource> builder = ImmutableList.builder();
+if (p_198382_) {
+   builder.add(SurfaceRules.ifTrue(SurfaceRules.not(SurfaceRules.verticalGradient("bedrock_roof", VerticalAnchor.belowTop(5), VerticalAnchor.top())), BEDROCK));
+}
+
+if (p_198383_) {
+   builder.add(SurfaceRules.ifTrue(SurfaceRules.verticalGradient("bedrock_floor", VerticalAnchor.bottom(), VerticalAnchor.aboveBottom(5)), BEDROCK));
+}
+
+SurfaceRules.RuleSource surfacerules$rulesource9 = SurfaceRules.ifTrue(SurfaceRules.abovePreliminarySurface(), surfacerules$rulesource8);
+builder.add(p_198381_ ? surfacerules$rulesource9 : surfacerules$rulesource8);
+builder.add(SurfaceRules.ifTrue(SurfaceRules.verticalGradient("deepslate", VerticalAnchor.absolute(0), VerticalAnchor.absolute(8)), DEEPSLATE));
+return SurfaceRules.sequence(builder.build().toArray((p_198379_) -> {
+   return new SurfaceRules.RuleSource[p_198379_];
+这一过程使其可读性极具降低，大大增加了开发难度，同时没有提供群系生成的接口也导致开发者很难为已有的维度添加新的群系并使其按照一定样式生成。而TerraBlender提供了帮助我们向已有维度（截至3.0.0.x版本支持主世界与下届）添加新的群系，与向原有的RuleSource中添加用于构造新群系地表(也可以是地底下，但基础的高度判断方法无法区分地底的巨大洞穴和地表，也就是说这一过程中的失误常常会导致群系地下的巨型洞穴中生成和地表一样的表面)。这两个内容便足以帮助我们实现大部分需要的效果了。具体对于这种更改的前后对比，同mod下的另一位教程制作的前辈已经展示过了，在此便不再赘述。有兴趣的朋友们可以移步此处了解。
+
+gradle与mods.toml配置
+
+打开build.gradle，找到dependencies部分，并添加这样一行内容：
+
+1
+implementation fg.deobf("com.github.glitchfiend:TerraBlender-forge:1.20.1-3.0.0.167")
+其中后面的com.github.glitchfiend:TerraBlender-forge:1.20.1-3.0.0.167部分用于指定我们下载的库源，这是一个maven url，如果想要获取一个mod的库源，可以参考这个网站。在对一份由forge下载的开发包中提供的默认build.gradle文件添加完后，dependencies部分应该是这个样子的：
+
+1
+2
+3
+4
+dependencies {
+    minecraft "net.minecraftforge:forge:${minecraft_version}-${forge_version}"
+    implementation fg.deobf("com.github.glitchfiend:TerraBlender-forge:1.20.1-3.0.0.167")
+}
+这里省略了一些注释。需要注意的是，原则上在添加此依赖库的时候不需要额外再添加mixin的库，本人测试时在注释掉mixin库相关内容后不影响游戏启动，但由于项目中已经导入过mixin，因此我暂时无法保证在不添加mixin库依赖的情况下仍能运行TerraBlender模组。以防万一，在此贴出mixin需要额外添加的语句，内容可能存在累赘，但经测试可以使用：
+
+1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+buildscript {
+    repositories {
+        maven { url = "https://maven.aliyun.com/repository/public" }
+        maven { url = 'https://maven.minecraftforge.net/' }
+        maven { url = 'https://repo.spongepowered.org/repository/maven-public/' }
+        mavenCentral()
+    }
+    dependencies {
+        classpath group: 'net.minecraftforge.gradle', name: 'ForgeGradle', version: '6.+', changing: true
+        classpath 'org.spongepowered:mixingradle:0.7-SNAPSHOT'
+    }
+}
+
+apply plugin: 'net.minecraftforge.gradle'
+apply plugin: 'idea'
+apply plugin: 'org.spongepowered.mixin'
+//(这些内容添加在build.gradle的开头位置)
+接下来我们配置mods.toml部分，我们需要在这里声明游戏中的mod依赖。在resources.META_INF下可以找到mods.toml文件，我们需要向其中添加以下内容：
+
+1
+2
+3
+4
+5
+6
+[[dependencies.mod_id]]//请将"mod_id"替换为您的mod的id
+    modId="terrablender"//这是我们所依赖的库
+    mandatory=true
+    versionRange="[3.0.0.167,)"//我们依赖的库的版本范围
+    ordering="NONE"
+    side="BOTH"
+在完成这些后，就可以重新加载gradle项目了。此时gradle会自动帮我们下载添加的依赖库并构建gradle。这一过程建议使用魔法，因为过程不稳定且绝大部分情况下比较缓慢。接下来执行gradle中的runClient任务(这一过程会帮我们检查并补全缺少的资源，而直接使用idea(好吧我只用过idea)的runClient则不会经过这一步骤，有可能导致mixin失败报错)。如果游戏顺利启动且在mod列表中有terrablender模组，则说明配置没有问题。
+
+接下来进入正题，让我们开始为主世界世界添加新的群系。
+
+Biome与Region的创建
+
+Region是TerraBlender为我们提供的一个新的类，用于统筹处理多个需要添加至相应维度的群系。Biome则是我们的老朋友生物群系。由于Minecraft的改动，现在生物群系需要以json形式在数据包中添加。当然，我们可以使用dataGenerator来将一个代码形式的Biome转化为群系的json文件。
+
+这里简单说一下DataGeneration的思路：
+
+首先创建一个Biome实例，这一部分和旧版本使用代码创建群系一样：需要一个MobSpawnSettings.Builder来配置群系中生成的生物，以及一个BiomeGenerationSettings.Builder来配置群系中生成的特征。值得注意的是，Features的配置必须按照一定的顺序，即同一个PlacedFeature（注：较旧版本（如1.16.5版本）的ConfiguredFeature在新版本中被拆分为了ConfiguredFeature与PlacedFeature两部分，前者用于配置Feature的配置，后者则负责额外处理Feature在特定条件下是否生成，尝试生成的次数与位置，类似于旧版本中ConfiguredFeature中的decorated方法）只能在一个Step中使用，不能重复，而任意两个同Step的PlacedFeature也不能调换顺序，这将会导致报错。因此建议先找到原版中和想要制作的群系相似的群系并复制已保持原版的PlacedFeature顺序正确，这些存储在OverworldBiomes类中。最后创建一个Biome.BiomeBuilder()来配置特殊的属性，比如群系粒子，着色，声音等，并调用build()方法构造一个Biome。
+
+接下来我们应该创建一个ResourceKey<Biome>作为我们创建的群系的资源路径（ResourceLocation，可以简单理解为对应物件的id），供数据生成以及代码中的调用该群系。要创造一个ResourceKey<Biome>，我们需要使用以下代码:
+
+1
+2
+3
+4
+5
+6
+7
+public static final ResourceKey<Biome> BIOME = register("biome");
+
+private static ResourceKey<Biome> register(String name) {
+return ResourceKey.create(Registries.BIOME, new ResourceLocation("mod_id","biome"));
+}
+
+public static void bootstrap(){}
+       这段代码创建了一个名字为mod_id:biome的群系，并将其注册进了BIOME的注册器中。最下方的bootstrap方法用于引导java在恰当的时间加载常量并使内容被注册，这一过程应在FMLCommonSetup事件中触发。
+
+在创建BiomeGenerationSettings.Builder时需要传入HolderGetter<PlacedFeature>与HolderGetter<ConfiguredWorldCarver<?>>参数，这两个参数由数据包生成器提供的BootstapContext<Biome>类提供。这里直接展示其对应的方法，您可以将其创建在任何您认为方便的类下：
+
+1
+2
+3
+4
+5
+6
+public static void bootstrap(BootstapContext<Biome> context){
+    HolderGetter<ConfiguredWorldCarver<?>> c = context.lookup(Registries.CONFIGURED_CARVER);
+    HolderGetter<PlacedFeature> p = context.lookup(Registries.PLACED_FEATURE);
+
+    context.register(BiomeKey.Biome,BiomeMaker.biomeProvider1(p,c));//这里分别是你之前注册的群系ResourceKey与构造群系实例的方法。
+}
+最后我们需要将其在GatherData事件中使用它。这个事件不会在正式启动游戏后的任何时间触发，只能在开发环境中使用专门的gradle任务来调用。代码如下（假设上一步的方法在BiomeRegistry类中）：
+
+1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+private static final RegistrySetBuilder BUILDER = new RegistrySetBuilder()
+        .add(Registries.BIOME, BiomeRegistry::bootstrap);
+
+@SubscribeEvent//注：需要在类声明的位置标记@Mod.EventBusSubscriber(bus = Mod.EventBusSubscriber.Bus.MOD)即自动将事件注册至MOD线
+public static void onGatherData(GatherDataEvent event){
+    DataGenerator generator = event.getGenerator();
+    PackOutput output = generator.getPackOutput();
+    CompletableFuture<HolderLookup.Provider> lookupProvider = event.getLookupProvider();
+
+    generator.addProvider(event.includeServer(), new DatapackBuiltinEntriesProvider(output,lookupProvider,BUILDER, Set.of(Utils.MOD_ID)));
+}
+在gradle的Tasks/forgegradle run中找到runData并运行，即可生成对应的群系的json文件。这些文件将会生成在src/generated/resources文件夹下，位置如图：
+基于TerraBlender辅助实现的Minecraft Forge1.20 mojmap自定义群系添加教程-第1张图片
+
+接下来说说Region的使用。我们需要创建一个新的类并继承TerraBlender提供的Region类，然后覆写其下的addBiomes方法。
+
+在构造方法方面，需要传入一个资源路径作为注册的region的id，一个RegionType指定这个Region在主世界还是地狱被使用，一个weight表示比重。但是根据测试，weight对群系的生成范围并不具有约束力，推测可能用于TerraBlender注册的不同群系间的比重分配。（待证明）
+
+在addBiomes方法中，我们则需要调用类下的addBiome方法（没有s，这是两个不同的方法）。分别需要提供Consumer<Pair<Climate.ParameterPoint, ResourceKey<Biome>>>，在addBiomes方法中提供了的形参；六个Climate.Parameter分别代表温度，湿度，大陆性，侵蚀度，奇异度，深度，可以使用Climate.Parameter.span生成一个范围，Climate.Parameter.point生成一个定值，或使用mod提供的ParameterUtils类下预定义的参数，这些参数应当在-2.0F到2.0F之间；一个0F到1F的浮点数，表示生成的概率，原则上越大越稀有；一个BiomeKey，我们在之前已经创建过了，现在直接调用即可。如果需要添加多个群系，只需要多次调用addBiome方法即可。
+
+至于这些参数分别起到什么效果……很遗憾的是，测试发现这些值似乎对群系生成的影响甚微，因此，似乎没有必要对每个数值进行精细的把控。（待证明）
+
+下面给出范例代码：
+
+1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+public class CommonWorldRegion extends Region {
+    public CommonWorldRegion(int weight) {
+        super(new ResourceLocation(Utils.MOD_ID,"cw_region_provider"), RegionType.OVERWORLD,weight);
+    }
+
+    @Override
+    public void addBiomes(Registry<Biome> registry, Consumer<Pair<Climate.ParameterPoint, ResourceKey<Biome>>> mapper) {
+        super.addBiomes(registry, mapper);
+        this.addBiome(mapper,
+                Climate.Parameter.span(0.95F, 1.0F),//温度
+                Climate.Parameter.span(-2.0F, -1.55F),//湿度
+                Climate.Parameter.span(0.165F, 1.8F),//大陆性
+                Climate.Parameter.span(1.75F,1.8F),//侵蚀度(起伏)
+                Climate.Parameter.span(0.45F, 0.65F),//奇异度
+                Climate.Parameter.span(0.25F, 0.8F),//深度
+                0.99F,BiomeKey.BIOME);
+    }
+}
+最后我们需要将region注册进对应的事件线：
+
+1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+@Mod.EventBusSubscriber(bus = Mod.EventBusSubscriber.Bus.MOD)
+public class ModBusEventConsumer {
+    @SubscribeEvent
+    public static void onSetup(FMLCommonSetupEvent event){
+        event.enqueueWork(()-> {
+            Regions.register(new CommonWorldRegion(4));
+            BiomeKey.bootstrap();
+        });
+    }
+}
+打开游戏，使用/locate biome mod_id:biome就可以找到我们新创建的群系了。
+
+SurfaceRule注册于使用
+
+SurfaceRule的基本逻辑与使用
+
+在高版本中，SurfaceRule取代了低版本中的SurfaceBuilder。对于世界生成阶段的每一个方块都会经过一次SurfaceRule的判定，来决定相应位置应该生成何种方块。简单来说，我们在上面展示的一长串难读的代码，其基本逻辑就是对于每一个被选中的方块，先根据其所处群系的匹配来进入下一级SurfaceRule，再根据其位置等特性生成对应的方块。如果方块没有被生成（即返回的方块状态（BlockState）为null），则下降到默认的生成规则，并生成基础地形。
+
+SurfaceRules这一体系（以下简称体系）由以下几个类构成：
+
+RuleSource规则资源，是体系的基本组成。一个RuleSource下可以存储多个子RuleSource，它们将按照顺序被执行。其本身不具有决定方块生成的作用，更像是作为一个注册有关内容的引导。其需要包含一个自身的解码器Codec<?>用于注册，以及实现一个apply方法来将生成背景（SurfaceRules.Context）转化为所需要的地表规则（SurfaceRule）。
+
+SurfaceRule地表规则，是真正负责执行将位置信息转化为BlockState的。这里需要实现一个tryApply方法，提供了运算方块的坐标。但这些数据不一定能满足我们的需求，因此有需要的话可以在构造一个SurfaceRule实例时将Context一并传入。
+
+ConditionSource状态资源，类比上述规则资源，但这个应该返回一个boolean来表示是否应该在此位置进行相应活动。相应的，其真正决定坐标的应该是一个Condition类。但由于其作用效果有限，因此二者常被视为一体的。
+
+SurfaceRules内提供了一些基础的方法：
+
+ifTrue方法：这需要一个ConditionSource和一个RuleSource，若前者成立则执行后者。ifTrue方法本身也是一个ConditionSource，因而可以嵌套使用。
+
+sequence方法：需要多个RuleSource，在前置的条件成立时其存储的多个RuleSource将会轮流被尝试执行。这可以使多个具有相同前提条件的RuleSource被聚集，比如原版中先使用ifTrue判断是否属于指定群系，再使用sequence来添加所有需要在此群系中执行的子RuleSource。
+
+not方法：反转一个ConditionSource的结果。
+
+makeStateRule方法：需要提供一个Block，这将把Block转化为一个RuleSource，可以上述提及的情况下使用以放置对应方块。
+
+在SurfaceRules类中还提供了其它一些方法或预定义常量，比如isBiome，waterBlockCheck，yBlockCheck，stoneDepthCheck等等，用来检测一个位置的各种属性，大家可以自行查看。
+
+这里展示一个代码实例并解释一下以加深大家对代码的理解：
+
+1
+2
+3
+4
+5
+6
+7
+8
+public static SurfaceRules.RuleSource build(){
+    return SurfaceRules.ifTrue(SurfaceRules.isBiome(BiomeKey.BIOME),//如果群系为我们之前创建的自定义群系
+            SurfaceRules.ifTrue(SurfaceRules.not(SurfaceRules.hole()),//且如果位置不是矿洞内
+                    SurfaceRules.sequence(
+                            SurfaceRules.ifTrue(SurfaceRules.stoneDepthCheck(0, true, 3, CaveSurface.FLOOR),makeStateRule(Blocks.DIRT))//将距离表面3格以内的方块替换为泥土
+                            SurfaceRules.ifTrue(SurfaceRules.stoneDepthCheck(0, true, 5, CaveSurface.FLOOR),makeStateRule(Blocks.COARSE_DIRT))//对于不符合上方“距离表面3格以内”不成立的方块，如果距离表面五格以内，则替换为砂土
+    )));
+}
+SurfaceRule的注册
+
+TerraBlender为我们提供了将SurfaceRule添加至对应维度的接口，我们仍需要在FMLCommonSetup事件中使用它。在之前代码的基础上变更以下内容：
+
+1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+@Mod.EventBusSubscriber(bus = Mod.EventBusSubscriber.Bus.MOD)
+public class ModBusEventConsumer {
+    @SubscribeEvent
+    public static void onSetup(FMLCommonSetupEvent event){
+        event.enqueueWork(()-> {
+            Regions.register(new CommonWorldRegion(4));
+            SurfaceRuleManager.addSurfaceRules(SurfaceRuleManager.RuleCategory.OVERWORLD,Utils.MOD_ID,CommonWorldRegion.build());//这是添加的注册SurfaceRule的内容
+            BiomeKey.bootstrap();
+        });
+    }
+}
+我们可以看到这里需要三个参数，分别是你需要添加到的维度，你的modid，以及你创建的RuleSource内容。
+
+在完成这些后，打开游戏并找到你的群系，就可以看到被修改过的地表了。
+
+SurfaceRule自定义
+
+SurfaceRule的自定义是继承自原版SurfaceRule接口的自建类，在这里我们可以使用代码与给出的数据直接进行类似旧版本中SurfaceBuilder的行为，具有较高的自由度，个人认为对于复杂的地表要求，使用这一功能比堆叠ifTrue与senquence更为便捷与直观。
+
+首先我们需要创建一个类并实现SurfaceRules.RuleSource接口，这需要实现codec方法与apply方法。如果你不需要在创建的时候像ifTrue（从源码中可以看到这其实是TestRuleSource类的构造的快捷方法）等一样传入参数，则可以直接使用public static final Codec<WastelandSurfaceLayer> CODEC = Codec.unit(BiomeSurfaceRule::new)来创建一个对应的Codec，其中BiomeSurfaceRule是你创建的SurfaceRule的类名。
+
+在codec方法中我们返回new KeyDispatchDataCodec<>(CODEC)即可。而apply方法则需要我们创建并返回一个SurfaceRule。这里按部就班即可，新建SurfaceRule的方法在下一步。
+
+接下来我们应该创建一个类并实现SurfaceRules.SurfaceRule接口。由于其需要实现的tryApply方法只提供了坐标位置而缺少更多信息，因此我强烈建议在构造这个Rule实例时传入SurfaceRules.Context，如下：
+
+1
+public record Rule(SurfaceRules.Context context) implements SurfaceRules.SurfaceRule{......}
+创建完成后我们应当实现tryApply方法。根据之前传入的context，我们可以获取到我们需要的各种信息。但由于类中数据的权限设置，对于一些不能访问的值，您需要使用AT来为其手动添加权限。如果安装了Minecraft Develop插件，可以选中需要的方法或类或变量，然后右键，并找到“复制/粘贴特殊”下的“AT Entry”。再在你的accesstransformer.cfg文件中输入public再粘贴刚刚自动复制的内容，并重新加载gradle项目即可。
+
+至于在这里该如何具体书写代码，大家可以去查看原版已经完成的SurfaceRule的写法。这里仅给出一份参考代码来帮助大家了解基本的逻辑：
+
+1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+public record Rule(SurfaceRules.Context context) implements SurfaceRules.SurfaceRule{
+            public BlockState tryApply(int x, int y, int z) {
+                //将y大于100的位置均转变为空气 由于在之前额外使用了限制地表范围的SurfaceRules.stoneDepthCheck(0, true, 3, CaveSurface.FLOOR),这些内容仅对地表前3的方块生效。但这一过程容易造成群系衔接出现问题。
+                if(context.blockY >= 100) return Blocks.AIR.defaultBlockState();
+                //对于高度为99或98的方块，随机变为砂土或菌丝
+                if(context.blockY >= 98) return new Random(context.pos.asLong()).nextFloat() >=0.3F ? Blocks.MYCELIUM.defaultBlockState() : Blocks.COARSE_DIRT.defaultBlockState();
+                if(context.blockY >= 95) return Blocks.COARSE_DIRT.defaultBlockState();//高度为97到95的方块替换为砂土
+                //使用自NoiseThresholdConditionSource，创建噪音函数并获取位置的噪音值。这一值一般位于+-0.75之间，不同噪音可能有所差异
+                double noise = context.randomState.getOrCreateNoise(Noises.PILLAR).getValue(context.blockX,0,context.blockZ);
+                if (noise > 0.6D) {//根据噪音值的不同范围生成不同的方块
+                    //我们创建了getState方法来帮助我们判断目标方块在最上方还是次上方
+                    return getState(Blocks.MYCELIUM.defaultBlockState(),Blocks.COARSE_DIRT.defaultBlockState());
+                }else if(noise > 0.3D){
+                    //在特定区间内进行随机，这使得两种生成之间有过渡效果。
+                    return new Random(context.pos.asLong()).nextFloat() * 0.3F < noise - 0.3D ? getState(Blocks.MYCELIUM.defaultBlockState(),Blocks.COARSE_DIRT.defaultBlockState()) : getState(Blocks.GRAVEL.defaultBlockState(),Blocks.ANDESITE.defaultBlockState());
+                } else if (noise > 0.2D) {
+                    return getState(Blocks.GRAVEL.defaultBlockState(),Blocks.ANDESITE.defaultBlockState());
+                }else if (noise > -0.2D){
+                    return new Random(context.pos.asLong()).nextFloat() * 0.4F < noise + 0.2D ? getState(Blocks.GRAVEL.defaultBlockState(),Blocks.ANDESITE.defaultBlockState()) : getState(Blocks.ANDESITE.defaultBlockState(),Blocks.DIRT.defaultBlockState());
+                } else if (noise > -0.6D) {
+                    return new Random(context.pos.asLong()).nextFloat() * 0.5F < noise + 0.8D ? getState(Blocks.ANDESITE.defaultBlockState(),Blocks.DIRT.defaultBlockState()) : null;
+                } else {
+                    return new Random(context.pos.asLong()).nextFloat() < 0.1F ? getState(Blocks.ANDESITE.defaultBlockState(),Blocks.DIRT.defaultBlockState()) : null;
+                }
+            }
+
+            private BlockState getState(BlockState surfaceState,BlockState groundState){
+                if(context.stoneDepthAbove > 3 || context.blockY <= 56){//如果位置深度大于3或者位置低于y=56，则返回null，这将使其掉入默认生成
+                    return null;
+                }else if(context.stoneDepthAbove <= 1){//如果是表层方块，返回第一种
+                    return surfaceState;
+                }else {//如果是次表层方块，返回第二种
+                    return groundState;
+                }
+            }
+        }
+最后我们需要把新创建的RuleSource的CODEC注册。创建以下方法并在FMLCommonSetup中调用即可：
+
+1
+2
+3
+public static void ruleSourceRegBootstrap(){
+    Registry.register(BuiltInRegistries.MATERIAL_RULE,new ResourceLocation("mod_id","biome_surface"),BiomeSurfaceRule.CODEC);
+}
+这样我们的注册就完成了。在之前提到的创建RuleSource组的过程中在对应群系调用它，并启动游戏，这时你就可以看到根据我们创建的新SurfaceRule而生成的群系了。
+
+基于TerraBlender辅助实现的Minecraft Forge1.20 mojmap自定义群系添加教程-第2张图片
+
+我不理解为什么要把画质压这么低才能上传，将就着看吧
+
+末
+
+最后我们在这里总结一下我们做的所有事情：
+
+创建生物群系，我们使用的是DataGenerator，需要创建怪物数据，创建顺序不能错的特征数据，创建群系实例，创建资源键，注册群系至生成器，监听事件并在gradle任务中生成。
+
+创建region，配置region参数，添加群系并配置群系有关参数，注册region实例。
+
+创建RuleSource组，完成内部内容并注册进对应维度。
+
+创建自定义RuleSource，制作对应Codec，创建自定义SurfaceRule，修改需要使用的类的AT，自定义要在表面生成的效果，注册Codec。
+
+以上便是关于TerraBlender基础使用以及帮助开发者实现群系地表生成的主要内容了，内容均为个人对mod的浅薄理解，如有错误希望可以得到您的包涵与指正，感谢您的观看。
+
+另外，在此提供一些便利的用于群系开发的链接或教程：
+
+https://misode.github.io/worldgen/biome/ 你可以在此网站中快速生成需要的群系数据包，而不必使用data generator或手动配置json文件。
+
+https://www.youtube.com/watch?v=enzKJWq0vNI&list=PLKGarocXCE1H9Y21-pxjt5Pt8bW14twa-&index=13 你可以在此网站中找到详细的data generator的使用方法教程。
+
+https://github.com/Glitchfiend/TerraBlender/tree/TB-1.20.2-3.1.x/Example/Forge 你可以在此网站中看到TerraBlender作者提供的1.20版本Forge版开发样例。同样的，你可以在这一项目下的其它分支或文件夹中找到其它版本或Fabric版本的开发样例。
+
+
+
+
+
+
+
+
+
+
+
+
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+协议与声明
+
+注意，本文内容使用CC: BY-NC-SA协议，本文代码大部分截取自绿宝石工艺，使用MIT协议；其他作特殊说明的代码以Forge反编译的Minecraft源代码为主，所有函数、类和成员变量的命名使用了官方的反混淆表，函数参数和局域变量根据笔者的个人理解命名，仅作学习交流使用。
+
+由于此mod的拓展较多，但笔者并没有发现其他国人的作品，且官方并没有对API做出很好的文档或wiki说明。因此笔者撰写本篇中文教程以供开发者交流学习和节省阅读代码的时间，希望国内因为洞穴与山崖更新而停滞的优秀群系mod能够重新焕发活力。
+
+此教程以默认读者具备Java代码能力和mod开发的基础了解。
+
+配置build.gradle
+
+首先你要在这里找到合适的TerraBlender版本，如1.19.2的TerraBlender v2.0.1.128。
+
+然后，你要在build.gradle中加入对应的maven下载url，除了minecraftforge外还需要加入spongepowered mixin：
+
+1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+buildscript {
+    repositories {
+        maven { url = 'https://maven.minecraftforge.net' }
+        jcenter()
+        mavenCentral()
+        maven { name="sponge"; url 'https://repo.spongepowered.org/repository/maven-public/' }
+    }
+    dependencies {
+        classpath group: 'net.minecraftforge.gradle', name: 'ForgeGradle', version: '5.1.+', changing: true
+        classpath 'org.spongepowered:mixingradle:0.7.32'
+    }
+}
+
+apply plugin: 'org.spongepowered.mixin'
+然后，在dependencies中加入spongepowered mixin和terrablender：
+
+1
+2
+3
+4
+5
+6
+7
+8
+9
+dependencies {
+    minecraft 'net.minecraftforge:forge:1.19.2-43.2.0'
+
+    //compileOnly fg.deobf("mezz.jei:jei-1.19.2-forge:11.5.0.297")
+
+    annotationProcessor 'org.spongepowered:mixin:0.8.5:processor'
+
+    implementation fg.deobf("com.github.glitchfiend:TerraBlender-forge:1.19.2-2.0.1.128")   //TerraBlender
+}
+执行构建，gradle会帮你下载好terrablender供你调用其API。
+
+配置mods.toml
+
+mods.toml中同样需要加入前置模组信息，方便没有装前置的玩家运行Forge加载模组报错时更加轻松地看出问题。当然，即使如此也总会有截个图就跑来不上传错误报告乱提交issue的人存在，甚至还会骂你两句。模组开发者就该有大心脏，遇到什么人都要处变不惊。
+
+前置有两种，一种是必要前置，如TerraBlender是BYG和BOP的必要前置。另一种是可选前置，如TerraBlender是Quark的可选前置。区别是，必要前置没有安装时，拓展mod无法工作；而可选前置没有安装并不会影响拓展mod的工作，唯一可能影响其工作的情况则是可选前置mod的版本不正确。
+
+前置的声明要写在[[dependencies.modid]]中，如绿宝石工艺的mods.toml中加入了TerraBlender这个必要前置：
+
+1
+2
+3
+4
+5
+6
+[[dependencies.emeraldcraft]]
+    modId="terrablender"
+    mandatory=true
+    versionRange="[2.0.1.128,)"
+    ordering="NONE"
+    side="BOTH"
+可选前置只需要把mandatory改成false即可，不过实际项目代码中也要加以判断，如果前置mod没有安装，一定不要加载引用前置mod相关API的类！
+
+一、1.18+与pre1.17.1群系注册和生成的区别
+
+1. pre1.17的群系注册和生成
+
+熟悉低版本mod开发的朋友们都知道，在1.17.1及之前，Forge就已经提供了群系注册和生成的各种接口，最具代表性的包括群系词典：
+
+1
+BiomeDictionary$addTypes(RegistryKey<Biome> biomeKey, BiomeDictionary.Type... types)
+例如我们可以实现这样的群系：
+
+1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44
+private static Biome NetherGarden() {
+    //群系内的生物生成情况
+   MobSpawnInfo mobspawninfo = new MobSpawnInfo.Builder()
+         .addSpawn(EntityClassification.MONSTER, new MobSpawnInfo.Spawners(EntityType.ZOMBIFIED_PIGLIN, 2, 2, 4))
+         .addSpawn(EntityClassification.MONSTER, new MobSpawnInfo.Spawners(EntityType.HOGLIN, 1, 3, 4))
+         .addSpawn(EntityClassification.MONSTER, new MobSpawnInfo.Spawners(EntityType.PIGLIN, 5, 3, 4))
+         .addSpawn(EntityClassification.MONSTER, new MobSpawnInfo.Spawners(EntityType.ENDERMAN, 2, 1, 2))
+         .addSpawn(EntityClassification.CREATURE, new MobSpawnInfo.Spawners(EntityType.STRIDER, 10, 1, 2)).build();
+    //群系使用的Surface Builder及结构生成
+   BiomeGenerationSettings.Builder biomegenerationsettings$builder = new BiomeGenerationSettings.Builder()
+         .surfaceBuilder(ECConfiguredSurfaceBuilders.NETHER_GARDEN)
+         .addStructureStart(StructureFeatures.RUINED_PORTAL_NETHER)
+         .addCarver(GenerationStage.Carving.AIR, ConfiguredCarvers.NETHER_CAVE)
+         .addStructureStart(StructureFeatures.NETHER_BRIDGE)
+         .addStructureStart(StructureFeatures.BASTION_REMNANT)
+         //.addStructureStart(StructureFeatures.STRONGHOLD)
+         .addFeature(GenerationStage.Decoration.VEGETAL_DECORATION, Features.SPRING_LAVA);
+    //群系地物
+   DefaultBiomeFeatures.addDefaultMushrooms(biomegenerationsettings$builder);
+   biomegenerationsettings$builder.addFeature(GenerationStage.Decoration.UNDERGROUND_DECORATION, Features.SPRING_OPEN)
+         .addFeature(GenerationStage.Decoration.UNDERGROUND_DECORATION, Features.PATCH_FIRE)
+         .addFeature(GenerationStage.Decoration.UNDERGROUND_DECORATION, Features.GLOWSTONE_EXTRA)
+         .addFeature(GenerationStage.Decoration.UNDERGROUND_DECORATION, Features.GLOWSTONE)
+         .addFeature(GenerationStage.Decoration.UNDERGROUND_DECORATION, Features.ORE_MAGMA)
+         .addFeature(GenerationStage.Decoration.UNDERGROUND_DECORATION, Features.SPRING_CLOSED)
+         .addFeature(GenerationStage.Decoration.VEGETAL_DECORATION, Features.WEEPING_VINES)
+         .addFeature(GenerationStage.Decoration.VEGETAL_DECORATION, Features.TWISTING_VINES)
+         .addFeature(GenerationStage.Decoration.VEGETAL_DECORATION, Features.CRIMSON_FUNGI)
+         .addFeature(GenerationStage.Decoration.VEGETAL_DECORATION, Features.CRIMSON_FOREST_VEGETATION)
+         .addFeature(GenerationStage.Decoration.VEGETAL_DECORATION, Features.WARPED_FUNGI)
+         .addFeature(GenerationStage.Decoration.VEGETAL_DECORATION, Features.WARPED_FOREST_VEGETATION);
+   DefaultBiomeFeatures.addNetherDefaultOres(biomegenerationsettings$builder);
+   //群系的其他说明
+   return new Biome.Builder().precipitation(Biome.RainType.NONE).biomeCategory(Biome.Category.NETHER)
+         .depth(0.1F).scale(0.2F).temperature(2.0F).downfall(0.0F)
+         .specialEffects(new BiomeAmbience.Builder()
+               .waterColor(4159204).waterFogColor(329011).fogColor(12169636).skyColor(calculateSkyColor(2.0F))
+               .ambientParticle(new ParticleEffectAmbience(ParticleTypes.CRIMSON_SPORE, 0.025F))
+               .ambientLoopSound(SoundEvents.AMBIENT_CRIMSON_FOREST_LOOP)
+               .ambientMoodSound(new MoodSoundAmbience(SoundEvents.AMBIENT_CRIMSON_FOREST_MOOD, 6000, 8, 2.0D))
+               .ambientAdditionsSound(new SoundAdditionsAmbience(SoundEvents.AMBIENT_CRIMSON_FOREST_ADDITIONS, 0.0111D))
+               .backgroundMusic(BackgroundMusicTracks.createGameMusic(SoundEvents.MUSIC_BIOME_CRIMSON_FOREST)).build())
+         .mobSpawnSettings(mobspawninfo).generationSettings(biomegenerationsettings$builder.build()).build();
+}
+简要说明一下Biome.Builder中的各种参数：
+
+precipitation即降水，代表雨天群系是下雪（积雪针叶林、雪原等）还是下雨（平原、深海等）还是干旱（沙漠、热带草原），由于例子里是下界群系，所以选择了NONE。
+
+biomeCategory代表群系类型，所有下界群系共用NETHER类型，末地群系共用END类型，只有主世界群系有着诸多差异，如沙滩和石岸是BEACH、白桦森林和繁华森林等是FOREST、各种海洋是OCEAN等。
+
+depth表示群系相对海平面的高度，高山群系的depth值较大，平原则较接近0，而海洋则是负值。当然，在1.18+中这个属性被移除了。
+
+scale则表示群系的起伏程度，注意和高度区分，举个例子，恶地高原虽然depth值较大，但scale值接近0，而风袭恶地的depth值并不大，但scale值较大，因而恶地高原高而平坦，风袭恶地则如丘陵一般。而和depth一样，这个值后来也被移除了。
+
+waterColor、waterFogColor、fogColor和skyColor则分别代表群系内水的颜色、水中迷雾的颜色、远处迷雾的颜色和天空的颜色，这是一个RGB值，转换成十六进制是0xrrggbb的形式——暖海的水偏绿、冷水海洋的水偏蓝则是前两个值的作用，而灵魂沙峡谷背景是蓝色、绯红森林背景是红色则是fogColor的作用。
+
+ambientParticle、ambientLoopSound、ambientMoodSound、ambientAdditionsSound分别代表群系环境粒子、群系环境音效、群系氛围音效、群系随机音效。而backgroundMusic则是群系中会随机播放的背景音乐。
+
+mobSpawnSettings则是前文注册的生物生成，generationSettings是前文注册的世界生成，包括群系表面、结构和地物等。
+
+调用这一工厂函数即可生成一个下界花园群系，通过订阅RegistryEvent.Register<Biome>事件或使用DeferredRegister<Biome>即可实现群系注册。
+
+注册后，使用如下接口可以将群系注册到主世界中：
+
+1
+BiomeManager$addBiome(BiomeType type, BiomeEntry entry)
+而注册到下界中则需要mixin注入来修改NetherBiomeProvider$parameters成员变量。
+
+另外最好将你的群系也注册一下前文提到的Forge的群系词典，以使其他模组添加的内容能够在你的群系中正常工作。
+
+额外说明一下Surface Builder，这个东西字如其名，是实现群系表面构造的，比如平原表层是草方块、下面是泥土，而沙漠表层是沙子、下面是砂岩，而恶地甚至有条带状的陶瓦山，这些都是Surface Builder的功劳。上述群系的Surface Builder源码如下：
+
+1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+public class NetherGardenSurfaceBuilder extends NetherForestsSurfaceBuilder {
+  public NetherGardenSurfaceBuilder(Codec<SurfaceBuilderConfig> codec) {
+     super(codec);
+  }
+
+  @Override
+  public void apply(@Nonnull Random random, @Nonnull IChunk chunk, @Nonnull Biome biome, int x, int z, int startHeight, double noise,
+                @Nonnull BlockState defaultBlock, @Nonnull BlockState defaultFluid, int surfaceLevel, long seed, @Nonnull SurfaceBuilderConfig config) {
+     double noise2 = Biome.BIOME_INFO_NOISE.getValue((double)x * 0.03125D, (double)z * 0.03125D, false);
+     if(noise2 > 0.0D) {
+        super.apply(random, chunk, biome, x, z, startHeight, noise, defaultBlock, defaultFluid, surfaceLevel, seed, SurfaceBuilder.CONFIG_CRIMSON_FOREST);
+     } else {
+        super.apply(random, chunk, biome, x, z, startHeight, noise, defaultBlock, defaultFluid, surfaceLevel, seed, SurfaceBuilder.CONFIG_WARPED_FOREST);
+     }
+  }
+}
+很简单，用一个噪声来决定当前位置的地表，一半是绯红菌岩，另一半是诡异菌岩。
+
+pre1.17.1的群系生成底层逻辑很简单，通过柏林噪声粗生成群系，然后经过一系列放大、rolling和相邻作用等操作使得温度、湿度、海陆等特征平滑可控，最后根据Surface Builder来生成高度图，再添加地物和结构——记住这个顺序，粗生成-放大-填充群系-相互作用-（循环若干次）-生成高度图。感兴趣的朋友可以在b站上搜索更详细的介绍。
+
+2. 1.18+的群系生成机制
+
+1.18+的生成机制和pre1.17.1正好相反——世界生成有温度、湿度、陆地性、侵蚀性、奇异度五个柏林噪声，分别对应了单人世界中F3显示debug信息里其中一行的T、V、C、E、W五个值；接着根据陆地性和侵蚀性生成世界的基础高度图，再将群系贴到对应的区域中——和前文方法不同，这是个噪声生成-生成高度图-粗生成-放大-填充群系的过程。
+
+陆地性其实就是之前的depth的演变，低于-1.05是蘑菇岛，在-1.05到-0.455是深海，-0.455到-0.19是海洋，-0.19到-0.11是海滩（沙滩、石岸等），-0.11到0.3是各种内陆群系，而高于0.3是山地。侵蚀性则是scale的演变，这个值越大显然地形越崎岖。此时区分不同群系边界、高原或平原则毫无意义，于是原版删掉了数十个不再使用的群系。
+
+OverworldBiomeBuilder中给出了群系是如何被“贴”进世界的，举OverworldBiomeBuilder$MIDDLE_BIOMES的例子：
+
+1
+2
+3
+4
+5
+6
+7
+private final ResourceKey<Biome>[][] MIDDLE_BIOMES = new ResourceKey[][]{
+    { Biomes.SNOWY_PLAINS,  Biomes.SNOWY_PLAINS, Biomes.SNOWY_PLAINS, Biomes.SNOWY_TAIGA,  Biomes.TAIGA                   },
+    { Biomes.PLAINS,        Biomes.PLAINS,       Biomes.FOREST,       Biomes.TAIGA,        Biomes.OLD_GROWTH_SPRUCE_TAIGA },
+    { Biomes.FLOWER_FOREST, Biomes.PLAINS,       Biomes.FOREST,       Biomes.BIRCH_FOREST, Biomes.DARK_FOREST             },
+    { Biomes.SAVANNA,       Biomes.SAVANNA,      Biomes.FOREST,       Biomes.JUNGLE,       Biomes.JUNGLE                  },
+    { Biomes.DESERT,        Biomes.DESERT,       Biomes.DESERT,       Biomes.DESERT,       Biomes.DESERT                  }
+};
+在pickMiddleBiome函数中，给出了这个二维数组的含义：
+
+1
+2
+3
+4
+5
+6
+7
+private ResourceKey<Biome> pickMiddleBiome(int temperature, int humidity, Climate.Parameter weirdness) {
+   if (weirdness.max() < 0L) {
+      return this.MIDDLE_BIOMES[temperature][humidity];
+   }
+   ResourceKey<Biome> resourcekey = this.MIDDLE_BIOMES_VARIANT[temperature][humidity];
+   return resourcekey == null ? this.MIDDLE_BIOMES[temperature][humidity] : resourcekey;
+}
+很明显，数组的每一行代表一个温度值，从上到下是由寒冷到炎热；而每一列代表一个湿度值，从左到右是由干燥到潮湿。而当奇异值大于0时，群系将倾向于变成其变种，如竹林、稀疏丛林、向日葵平原等。当然除了这三个值会影响群系生成外，陆地性会影响海陆群系池的选择，而河流等则与侵蚀性和奇异值有关系。
+
+而OverworldBiomeBuilder并没有给出其他mod生成的API，于是TerraBlender应运而生，通过各种代码注入，为开发者们提供了实现相关操作的接口。
+
+那么第一个问题解决了，但第二个问题又出现了，群系的地表千差万别，如何实现这一区别？
+
+我们知道低版本可以通过Surface Builder实现群系表面构造，而高版本则变成了Surface Rule，其中主世界的Surface Rule在SurfaceRuleData$overworldLike函数中，是一段长数百行的屎山代码，充满了各种if-else，本着奇文共赏的态度我整理并分享了一下：原版主世界Surface Rule整理版。
+
+突然理解了范大将军怒斥国足的激昂情绪，通过多文件继承实现的Surface Builder做得蛮好的为啥把它换下去？
+
+于是如果我们想生成自己的群系，除了要解决群系贴进世界生成过程外，还要解决Surface Rule的注入问题——于是TerraBlender又提供了新的API，来帮助你将你实现和修改的Surface Rule添加进世界生成阶段。
+
+接下来就来介绍这两个API的使用方法。
+
+二、Region（BiomeProvider）
+
+1.18.2+这一接口是terrablender.api.Region，而1.18.1则是terrablender.api.BiomeProvider。二者略有不同，BiomeProvider需要同时注册主世界和下界群系，而Region则可以在构造函数中选择RegionType.OVERWORLD和RegionType.NETHER。下文全部使用Region进行解说，BiomeProvider与Region相差不大，因此1.18.1模组作者们可以自行分析。
+
+1. 构造函数
+
+Region的构造函数是
+
+1
+Region(ResourceLocation name, RegionType type, int weight)
+name是方便TerraBlender管理的注册名，建议用modid:name形式实现；type则是代表主世界还是下界；weight是Region的权重，TerraBlender的config可以调节原版主世界和下界的权重，默认为40。
+
+2. 重载函数
+
+你几乎一定要重载的成员函数原型如下：
+
+1
+public void addBiomes(Registry<Biome> registry, Consumer<Pair<Climate.ParameterPoint, ResourceKey<Biome>>> mapper)
+TerraBlender会调用这个函数，而你要做的就是将群系生成的各个参数（温度、湿度、陆地性、侵蚀性、奇异度和深度）对应群系通过mapper参数注册。
+
+而1.18.1的BiomeProvider写法特殊，需要你通过BiomeProvider$getUniquenessParameter()获得该区域的独立数字id，并将它也一并作为参数注册。这一步显然是封装不够完善，而后续代码修正了这一点。
+
+你可以自行实现你的OverworldBiomeBuilder，或是和BYG一样通过继承OverworldBiomeBuilder实现自己的主世界群系生成器——毕竟写法与原版相似，这种做法鲁棒性高一些，而且需要mixin，不过与其他群系mod一起生成世界的效果可能会变差，请自行权衡。
+
+3. Region的继承示例
+
+绿宝石工艺的源代码对于主世界和下界采取了两种不同的做法实现Region的继承，主世界的方法沿用了原版的OverworldBiomeBuilder的写法，而下界则仅仅在原版五个群系的基础上增加了三个。
+
+主世界：
+
+1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+public class ECOverworldBiomeRegion extends Region {
+   public static final ResourceLocation LOCATION = new ResourceLocation(MODID, "overworld_biome_provider");
+
+   public ECOverworldBiomeRegion(int weight) {
+      super(LOCATION, RegionType.OVERWORLD, weight);
+   }
+
+   @Override
+   public void addBiomes(Registry<Biome> registry, Consumer<Pair<Climate.ParameterPoint, ResourceKey<Biome>>> mapper) {
+      (new ECOverworldBiomeBuilder()).addBiomes(registry, mapper);
+   }
+}
+下界：
+
+1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+public class ECNetherBiomeRegion extends Region {
+   public static final ResourceLocation LOCATION = new ResourceLocation(MODID, "nether_biome_provider");
+
+   public ECNetherBiomeRegion(int weight) {
+      super(LOCATION, RegionType.NETHER, weight);
+   }
+
+   @Override
+   public void addBiomes(Registry<Biome> registry, Consumer<Pair<Climate.ParameterPoint, ResourceKey<Biome>>> mapper) {
+      this.addBiome(mapper, Climate.Parameter.point(0.0F), Climate.Parameter.point(0.0F), Climate.Parameter.point(0.0F), Climate.Parameter.point(0.0F), Climate.Parameter.point(0.0F), Climate.Parameter.point(0.0F), 0.0F, Biomes.NETHER_WASTES);
+      this.addBiome(mapper, Climate.Parameter.point(0.0F), Climate.Parameter.point(-0.5F), Climate.Parameter.point(0.0F), Climate.Parameter.point(0.0F), Climate.Parameter.point(0.0F), Climate.Parameter.point(0.0F), 0.0F, Biomes.SOUL_SAND_VALLEY);
+      this.addBiome(mapper, Climate.Parameter.point(0.4F), Climate.Parameter.point(0.0F), Climate.Parameter.point(0.0F), Climate.Parameter.point(0.0F), Climate.Parameter.point(0.0F), Climate.Parameter.point(0.0F), 0.0F, Biomes.CRIMSON_FOREST);
+      this.addBiome(mapper, Climate.Parameter.point(0.0F), Climate.Parameter.point(0.5F), Climate.Parameter.point(0.0F), Climate.Parameter.point(0.0F), Climate.Parameter.point(0.0F), Climate.Parameter.point(0.0F), 0.375F, Biomes.WARPED_FOREST);
+      this.addBiome(mapper, Climate.Parameter.point(-0.5F), Climate.Parameter.point(0.0F), Climate.Parameter.point(0.0F), Climate.Parameter.point(0.0F), Climate.Parameter.point(0.0F), Climate.Parameter.point(0.0F), 0.175F, Biomes.BASALT_DELTAS);
+      if (BiomeUtil.isKeyRegistered(registry, ECBiomeKeys.EMERY_DESERT)) {
+         this.addBiome(mapper, Climate.Parameter.point(-0.8F), Climate.Parameter.point(-0.8F), Climate.Parameter.point(0.0F), Climate.Parameter.point(0.0F), Climate.Parameter.point(0.0F), Climate.Parameter.point(0.0F), 0.0F, ECBiomeKeys.EMERY_DESERT.key());
+      }
+      if (BiomeUtil.isKeyRegistered(registry, ECBiomeKeys.PURPURACEUS_SWAMP)) {
+         this.addBiome(mapper, Climate.Parameter.point(0.7F), Climate.Parameter.point(0.7F), Climate.Parameter.point(0.0F), Climate.Parameter.point(0.0F), Climate.Parameter.point(0.0F), Climate.Parameter.point(0.0F), 0.125F, ECBiomeKeys.PURPURACEUS_SWAMP.key());
+      }
+      if (BiomeUtil.isKeyRegistered(registry, ECBiomeKeys.QUARTZ_DESERT)) {
+         this.addBiome(mapper, Climate.Parameter.point(0.75F), Climate.Parameter.point(-0.7F), Climate.Parameter.point(0.0F), Climate.Parameter.point(0.0F), Climate.Parameter.point(0.0F), Climate.Parameter.point(0.0F), 0.0F, ECBiomeKeys.QUARTZ_DESERT.key());
+      }
+   }
+}
+深究下来，整体上区别不大，只不过前者封装到另一个对象中，后者直接在函数体内完成了群系添加。
+
+4. 注册到Regions中
+
+你需要在订阅FMLCommonSetupEvent事件的函数中（即pre-init）将你的Region注册到Regions里，需要用event.enqueueWork()包装，以防止多线程冲突。示例写法为：
+
+1
+2
+Regions.register(new ECOverworldBiomeRegion(ECCommonConfig.EMERALD_CRAFT_OVERWORLD_BIOMES_WEIGHT.get()));
+Regions.register(new ECNetherBiomeRegion(ECCommonConfig.EMERALD_CRAFT_NETHER_BIOMES_WEIGHT.get()));
+这里使用了Config控制区域生成的权重，当然你也可以将这个值写死，但可配置的值显然更容易被用户接受。
+
+这样，群系就可以被添加到世界生成中了。1.18.1则只需要把Regions改成BiomeProviders即可。
+
+5. 群系的注册与构建
+
+前文粗略地介绍了一下原版的OverworldBiomeBuilder，这里有必要进行详细的介绍模组开发者如何编写自己的OverworldBiomeBuilder。
+
+addBiomes函数的第二个参数即是用于添加群系的消费函数，添加方法为：
+
+1
+mapper.accept(Pair.of(parameters, biome));
+parameters是一个Climate.ParameterPoint类型，在Climate类中有两个最常用的工厂函数：
+
+1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+public static Climate.ParameterPoint parameters(float temperature, float humidity, float continentalness,
+                                                float erosion, float depth, float weirdness, float offset) {
+    return new Climate.ParameterPoint(
+        Climate.Parameter.point(temperature),
+        Climate.Parameter.point(humidity),
+        Climate.Parameter.point(continentalness),
+        Climate.Parameter.point(erosion),
+        Climate.Parameter.point(depth),
+        Climate.Parameter.point(weirdness),
+        quantizeCoord(offset)
+    );
+}
+
+public static Climate.ParameterPoint parameters(Climate.Parameter temperature, Climate.Parameter humidity,
+                                                Climate.Parameter continentalness, Climate.Parameter erosion,
+                                                Climate.Parameter depth, Climate.Parameter weirdness, float offset) {
+    return new Climate.ParameterPoint(
+        temperature, humidity, continentalness, erosion, depth, weirdness, quantizeCoord(offset)
+    );
+}
+推荐使用下面的这个，而传入的参数可以从terrablender.api.ParameterUtils中选择，如：
+
+1
+2
+3
+4
+5
+6
+7
+8
+9
+mapper.accept(Pair.of(Climate.parameters(
+    ParameterUtils.Temperature.FULL_RANGE.parameter(),
+    ParameterUtils.Humidity.HUMID.parameter(),
+    ParameterUtils.Continentalness.FAR_INLAND.parameter(),
+    ParameterUtils.Erosion.span(ParameterUtils.Erosion.EROSION_5, ParameterUtils.Erosion.EROSION_6),
+    ParameterUtils.Depth.UNDERGROUND.parameter(),
+    ParameterUtils.Weirdness.FULL_RANGE.parameter(),
+    0.5F
+), CustomBiomeKeys.MOSSY_CAVES.key()));
+上述做法可以将一个名为“覆苔洞穴”的群系加入到世界生成中，在任意温度和奇异度下，侵蚀度较高和非常湿润的内陆地区的地下生成。另外offset的值是0.5，这个值默认是0，越大会使得群系越稀有——这也是下界诡异森林相对罕见的原因之一。
+
+当然，非常建议开发者效仿原版的OverworldBiomeBuilder的逻辑添加群系。
+
+三、SurfaceRule的注册和实现
+
+1. SurfaceRule的注册
+
+TerraBlender提供的SurfaceRule的注册很简单，1.18.1需要使用GenerationSettings的如下两个成员函数注册主世界和下界群系的SurfaceRule：
+
+1
+2
+public static void addBeforeBedrockOverworldSurfaceRules(SurfaceRules.RuleSource rules)
+public static void addBeforeBedrockNetherSurfaceRules(int priority, SurfaceRules.RuleSource rules)
+而1.18.2+则更改了函数名，使用SurfaceRuleManager$addSurfaceRules函数注册，如：
+
+1
+2
+SurfaceRuleManager.addSurfaceRules(SurfaceRuleManager.RuleCategory.OVERWORLD, MODID, ECSurfaceRules.overworld());
+SurfaceRuleManager.addSurfaceRules(SurfaceRuleManager.RuleCategory.NETHER, MODID, ECSurfaceRules.nether());
+这一过程也需要写在订阅FMLCommonSetupEvent事件的函数中，同样为了防止线程冲突，要在事件提供的任务队列中进行。推荐直接写在注册到Regions的两段代码前面。
+
+2. SurfaceRule的实现
+
+唯一让人难受的则是SurfaceRules的实现，这里说一个思路，首先复制原版的SurfaceRuleData中的工厂函数，然后将你所想实现的群系和原版群系一一比较，选择地表的实现最为相近的一个，使用ctrl+F标记该群系，然后直接在它后面进行添加修改即可——这一点有些考验开发者对高版本的原版群系的了解水平。
+
+举个最简单例子，绿宝石工艺添加了银杏树林群系，其表面以草方块为主，有蕨类和银杏树的生成，同时一部分表面被灰化土覆盖。对于这个需求，我们要先去区分什么是表面，什么是地物。很显然，蕨类和银杏树都是地物，但草方块和灰化土是表面。
+
+更进一步的，什么其它的群系添加了灰化土？原版的知识告诉我们，巨型针叶林/原始松木针叶林群系、巨型云杉针叶林/原始云杉针叶林群系和竹林群系添加了灰化土。不过稍微有的反直觉的是，竹林的灰化土事实上是地物而不是表面（毕竟原版的新群系系统是一座屎山），但另外两个群系的灰化土确确实实是表面，因而我们可以搜索Biomes.OLD_GROWTH_PINE_TAIGA和Biomes.OLD_GROWTH_SPRUCE_TAIGA：
+
+【开发向】如何在1.18+使用TerraBlender开发你的群系模组（以Forge为例）-第1张图片
+表面有灰化土的群系
+很好，直接加到后面就行了：
+
+1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+//......
+SurfaceRules.ifTrue(
+      SurfaceRules.isBiome(Biomes.WINDSWEPT_GRAVELLY_HILLS),
+      SurfaceRules.sequence(
+            SurfaceRules.ifTrue(surfaceNoiseAbove(2.0D), stoneLinedGravel),
+            SurfaceRules.ifTrue(surfaceNoiseAbove(1.0D), STONE),
+            SurfaceRules.ifTrue(surfaceNoiseAbove(-1.0D), grassSurface),
+            stoneLinedGravel
+      )
+),
+SurfaceRules.ifTrue(
+      SurfaceRules.isBiome(Biomes.OLD_GROWTH_PINE_TAIGA, Biomes.OLD_GROWTH_SPRUCE_TAIGA),
+      SurfaceRules.sequence(
+            SurfaceRules.ifTrue(surfaceNoiseAbove(1.75D), COARSE_DIRT),
+            SurfaceRules.ifTrue(surfaceNoiseAbove(-0.95D), PODZOL)
+      )
+),
+SurfaceRules.ifTrue(SurfaceRules.isBiome(Biomes.ICE_SPIKES), SurfaceRules.ifTrue(isAboveWaterLevel, SNOW_BLOCK)),
+SurfaceRules.ifTrue(SurfaceRules.isBiome(Biomes.MUSHROOM_FIELDS), MYCELIUM),
+SurfaceRules.ifTrue(
+      SurfaceRules.isBiome(ECBiomeKeys.GINKGO_FOREST.key()),
+      SurfaceRules.ifTrue(SurfaceRules.noiseCondition(Noises.SURFACE, 0.6D), PODZOL)
+),
+grassSurface
+//......
+SurfaceRule实际上就是尝试匹配到不停fall back的过程，仅截取部分而言（前方省略了风袭热带草原、各种山地群系），上下文信息是这里是生成群系最表面那一层方块的代码，含义为：如果当前群系是风袭沙砾丘陵，则在SURFACE噪声大于2.0时按stoneLinedGravel预设生成，反之如果大于1.0则生成石头，反之如果大于-1.0则按grassSurface预设生成，否则按stoneLinedGravel预设生成；如果当前群系不是风袭沙砾丘陵而是两种原始针叶林群系，依旧是根据选择SURFACE噪声选择表面，大于1.75生成砂土，否则大于-0.95生成灰化土，以上均不成立则暂时搁置（最后会提到如何处理）；如果当前群系是冰刺平原，且海拔高于海平面，那么表面生成雪块，否则搁置；如果当前群系是蘑菇岛，那么表面生成菌丝；如果当前群系是银杏树林，且SURFACE噪声大于0.6，那么表面生成灰化土，否则搁置；最后以上未提及的群系（平原、森林、热带草原、雪原等）以及所有搁置的情况，按grassSurface预设生成——因此大部分群系的表面都是草方块（沙漠、恶地等群系不走这个预设，是另作考虑的）。
+
+这里使用了SURFACE柏林噪声生成器，实际上原版有若干个辅助地表生成实现的柏林噪声，位于net.minecraft.world.level.levelgen.Noises，当然你也可以实现独立于它们的柏林噪声。这些噪声可以用于条带状生成（如裸岩山峰的方解石条带）、点状生成（如冻洋的浮冰和冰块）、块状生成（如风袭丘陵的大片的石头）等。其区别是，条带状生成通常是仅接受比较大的噪声范围，点状生成则是仅接受极端值或较小的噪声范围，而块状则是接受大于或小于某个值的全部噪声取值。
+
+四、总结
+
+以上则是笔者关于TerraBlender模组用法和教程的拙见，如有不完美或不详细之处，敬请指出。如有其他需要更新的内容，笔者也会尽快修改！
+
+
+
+
+
+
+
+
+
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+
+
+
+
+
+
+
+
+
+
+

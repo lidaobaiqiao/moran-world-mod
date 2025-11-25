@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "id": "mo-mod",
+  "id": "moran-mod",
   "version": "${version}",
   "name": "墨世界",
   "description": "一个具有桃花源自定义维度和神秘生物群系的Minecraft模组",
@@ -12,7 +12,7 @@
     "sources": "https://github.com/lidaobaiqiao/moran-world-mod"
   },
   "license": "CC0-1.0",
-  "icon": "assets/mo-mod/icon.png",
+  "icon": "assets/moran-mod/icon.png",
   "environment": "*",
   "entrypoints": {
     "main": [
@@ -20,10 +20,13 @@
     ],
     "client": [
       "com.lidao.moran.client.MoranModClient"
+    ],
+    "terrablender": [
+      "com.lidao.moran.core.terrablender.TerrablenderIntegration"
     ]
   },
   "mixins": [
-    "mo-mod.mixins.json"
+    "moran-mod.mixins.json"
   ],
   "depends": {
     "fabricloader": ">=0.14.0",

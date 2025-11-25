@@ -7,6 +7,7 @@ import com.lidao.moran.systems.teleport.RaftTeleportHandler;
 import com.lidao.moran.systems.items.ItemSystem;
 import com.lidao.moran.systems.blocks.BlockSystem;
 import com.lidao.moran.core.terrablender.BiomeDataCreator;
+import com.lidao.moran.core.terrablender.TerrablenderIntegration;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
@@ -100,6 +101,7 @@ public class MoranMod implements ModInitializer {
     private void initializeBiomeSystem() {
         LOGGER.info("🌍 初始化生物群系系统...");
         BiomeDataCreator.initialize();
+        // TerraBlender将通过服务自动加载
     }
     
     /**
