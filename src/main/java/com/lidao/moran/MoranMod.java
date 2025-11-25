@@ -6,6 +6,7 @@ import com.lidao.moran.systems.commands.TestTeleportCommand;
 import com.lidao.moran.systems.teleport.RaftTeleportHandler;
 import com.lidao.moran.systems.items.ItemSystem;
 import com.lidao.moran.systems.blocks.BlockSystem;
+import com.lidao.moran.core.terrablender.BiomeDataCreator;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
@@ -43,6 +44,9 @@ public class MoranMod implements ModInitializer {
         // 初始化命令系统
         initializeCommandSystem();
         
+        // 初始化生物群系系统
+        initializeBiomeSystem();
+        
         // 初始化竹筏传送系统
         initializeRaftTeleportSystem();
         
@@ -50,6 +54,7 @@ public class MoranMod implements ModInitializer {
         LOGGER.info("🌸 桃花源维度已就绪");
         LOGGER.info("⛏️ 墨彩方块系统已激活");
         LOGGER.info("💎 墨韵物品系统已激活");
+        LOGGER.info("🌍 生物群系系统已激活");
         LOGGER.info("🎣 竹筏传送系统已激活");
         LOGGER.info("🎮 玩家可以开始探索墨世界了！");
     }
@@ -87,6 +92,14 @@ public class MoranMod implements ModInitializer {
         CommandRegistrationCallback.EVENT.register((dispatcher, registryAccess, environment) -> {
             TestTeleportCommand.register(dispatcher);
         });
+    }
+    
+    /**
+     * 初始化生物群系系统
+     */
+    private void initializeBiomeSystem() {
+        LOGGER.info("🌍 初始化生物群系系统...");
+        BiomeDataCreator.initialize();
     }
     
     /**
