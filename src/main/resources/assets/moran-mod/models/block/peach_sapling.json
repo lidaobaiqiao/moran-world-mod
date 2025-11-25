@@ -1,5 +1,6 @@
 {
-  "parent": "minecraft:block/tinted_cross",
+  "parent": "minecraft:block/cross",
+  "render_type": "cutout",
   "textures": {
     "cross": "moran-mod:block/peach_sapling"
   }

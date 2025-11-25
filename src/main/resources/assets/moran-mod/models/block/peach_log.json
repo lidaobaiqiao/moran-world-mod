@@ -1,19 +1,7 @@
 {
-  "parent": "minecraft:block/cube",
+  "parent": "minecraft:block/cube_column",
   "textures": {
-    "particle": "moran-mod:block/peach_log",
-    "north": "moran-mod:block/peach_log",
-    "south": "moran-mod:block/peach_log",
-    "east": "moran-mod:block/peach_log",
-    "west": "moran-mod:block/peach_log",
-    "up": "moran-mod:block/peach_log_top",
-    "down": "moran-mod:block/peach_log_top"
-  },
-  "display": {
-    "thirdperson": {
-      "rotation": [10, -45, 170],
-      "translation": [0, 1.5, -2.75],
-      "scale": [0.375, 0.375, 0.375]
-    }
+    "end": "moran-mod:block/peach_log_top",
+    "side": "moran-mod:block/peach_log"
   }
 }

@@ -1,13 +1,7 @@
 {
-  "parent": "minecraft:block/cross",
+  "parent": "minecraft:block/cube",
   "textures": {
-    "cross": "moran-mod:block/peach_blossom_leaves"
-  },
-  "display": {
-    "thirdperson": {
-      "rotation": [10, -45, 170],
-      "translation": [0, 1.5, -2.75],
-      "scale": [0.375, 0.375, 0.375]
-    }
+    "particle": "moran-mod:block/peach_blossom_leaves",
+    "all": "moran-mod:block/peach_blossom_leaves"
   }
 }
