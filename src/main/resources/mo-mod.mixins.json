@@ -6,10 +6,8 @@
   "mixins": [
     "MoranModMixin"
   ],
-  "injectors": [],
-  "client": {
-    "mixins": [
-      "MoranModClientMixin"
-    ]
-  }
+  "injectors": {},
+  "client": [
+    "MoranModClientMixin"
+  ]
 }
