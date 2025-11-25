@@ -1,7 +1,6 @@
 {
-  "parent": "minecraft:block/cross",
-  "render_type": "cutout",
+  "parent": "minecraft:block/oak_leaves",
   "textures": {
-    "cross": "moran-mod:block/peach_blossom_leaves"
+    "all": "moran-mod:block/peach_blossom_leaves"
   }
 }

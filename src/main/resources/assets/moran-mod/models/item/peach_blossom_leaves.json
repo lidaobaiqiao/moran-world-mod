@@ -1,6 +1,3 @@
 {
-  "parent": "minecraft:item/generated",
-  "textures": {
-    "layer0": "moran-mod:item/peach_blossom_leaves"
-  }
+  "parent": "moran-mod:block/peach_blossom_leaves"
 }
