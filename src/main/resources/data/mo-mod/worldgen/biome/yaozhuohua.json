@@ -1,8 +1,5 @@
 {
-  "carvers": {
-    "air": "minecraft:cave",
-    "default": "minecraft:cave"
-  },
+  "carvers": {},
   "features": [
     [],
     [],
