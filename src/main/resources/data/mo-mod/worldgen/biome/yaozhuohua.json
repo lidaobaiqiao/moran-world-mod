@@ -1,10 +1,13 @@
 {
-  "carvers": {},
-  "features": [
-    [],
-    [],
-    []
-  ],
+  "precipitation": "rain",
+  "temperature": 0.8,
+  "downfall": 0.9,
+  "effects": {
+    "sky_color": 7907323,
+    "fog_color": 12638463,
+    "water_color": 4159204,
+    "water_fog_color": 329011
+  },
   "spawners": {
     "monster": [
       {
@@ -37,37 +40,13 @@
         "minCount": 1,
         "maxCount": 3
       }
-    ],
-    "water_ambient": [
-      {
-        "type": "minecraft:cod",
-        "weight": 20,
-        "minCount": 1,
-        "maxCount": 2
-      }
-    ],
-    "misc": [
-      {
-        "type": "minecraft:bat",
-        "weight": 5,
-        "minCount": 1,
-        "maxCount": 1
-      }
     ]
   },
   "spawn_costs": {},
-  "creature_spawn_probability": 0.1,
-  "effects": {
-    "sky_color": 7907323,
-    "fog_color": 12638463,
-    "water_color": 4159204,
-    "water_fog_color": 329011
-  },
-  "precipitation": "rain",
-  "temperature": 0.8,
-  "downfall": 0.9,
-  "depth": 0.1,
-  "scale": 0.4,
-  "surface_builder": "minecraft:grass",
-  "has_precipitation": true
+  "carvers": {},
+  "features": [
+    [],
+    [],
+    []
+  ]
 }
