@@ -1,0 +1,133 @@
+{
+  "carvers": {
+    "air": "mo-mod:cave_carver",
+    "default": "mo-mod:cave_carver"
+  },
+  "features": [
+    [
+      {
+        "feature": "minecraft:lake_lava_underground",
+        "value": 1
+      },
+      {
+        "feature": "minecraft:lake_water_surface",
+        "value": 4
+      },
+      {
+        "feature": "minecraft:amethyst_geode",
+        "value": 24
+      },
+      {
+        "feature": "mo-mod:peach_tree_dense",
+        "value": 1
+      },
+      {
+        "feature": "mo-mod:flowering_peach_tree", 
+        "value": 2
+      },
+      {
+        "feature": "mo-mod:peach_tree_scattered",
+        "value": 10
+      },
+      {
+        "feature": "mo-mod:peach_bamboo_single",
+        "value": 8
+      },
+      {
+        "feature": "mo-mod:patch_flower_default",
+        "value": 4
+      },
+      {
+        "feature": "mo-mod:patch_grain_plain",
+        "value": 3
+      },
+      {
+        "feature": "mo-mod:immortal_ore_vein",
+        "value": 10
+      }
+    ],
+    [
+      {
+        "feature": "minecraft:spring_lava",
+        "value": 2
+      },
+      {
+        "feature": "minecraft:spring_water",
+        "value": 50
+      }
+    ],
+    [
+      {
+        "feature": "minecraft:patch_pumpkin",
+        "value": 2
+      }
+    ]
+  },
+  "spawners": [
+    {
+      "type": "minecraft:monster",
+      "weight": 50,
+      "minCount": 1,
+      "maxCount": 2
+    },
+    {
+      "type": "minecraft:creature",
+      "weight": 10,
+      "minCount": 2,
+      "maxCount": 4
+    },
+    {
+      "type": "minecraft:ambient_creature",
+      "weight": 15,
+      "minCount": 2,
+      "maxCount": 3
+    },
+    {
+      "type": "minecraft:water_creature",
+      "weight": 100,
+      "minCount": 1,
+      "maxCount": 3
+    },
+    {
+      "type": "minecraft:water_ambient",
+      "weight": 20,
+      "minCount": 1,
+      "maxCount": 2
+    },
+    {
+      "type": "minecraft:misc",
+      "weight": 5,
+      "minCount": 1,
+      "maxCount": 1
+    }
+  ],
+  "spawn_costs": {},
+  "creature_spawn_probability": 0.1,
+  "effects": {
+    "fog_color": "#FFB6C1",
+    "sky_color": "#E6B8CC",
+    "water_color": "#B4D4FF",
+    "water_fog_color": "#A5D6EA",
+    "grass_color": "#FFB6C1",
+    "grass_color_modifier": "#59A35B",
+    "foliage_color": "#E6B8CC",
+    "foliage_color_modifier": "#59A35B",
+    "ambient_sound": "moran-mod:mood_sound",
+    "additions_sound": "moran-mod:additions_sound",
+    "mood_sound": "moran-mod:mood_sound",
+    "music": {
+      "sound": "minecraft:music.creative",
+      "min_delay": 12000,
+      "max_delay": 24000,
+      "replace_current_music": true
+    }
+  },
+  "precipitation": "rain",
+  "temperature": 0.8,
+  "downfall": 0.9,
+  "depth": 0.1,
+  "temperature_modifier": "biased_toward_warm",
+  "downfall_modifier": "biased_toward_wet",
+  "has_precipitation": true,
+  "scale": 0.4
+}

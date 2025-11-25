@@ -1,0 +1,66 @@
+{
+  "type": "minecraft:vein",
+  "config": {
+    "vein": {
+      "horizontal": {
+        "type": "minecraft:uniform",
+        "value": {
+          "min_inclusive": 1,
+          "max_inclusive": 3,
+          "type": "minecraft:uniform"
+        }
+      },
+      "vertical": {
+        "type": "minecraft:trapezoid",
+        "value": {
+          "min_inclusive": 1,
+          "max_inclusive": 5,
+          "type": "minecraft:uniform"
+        }
+      },
+      "type": "minecraft:uniform",
+      "value": {
+        "min_inclusive": 16,
+        "max_inclusive": 32,
+        "type": "minecraft:uniform"
+      }
+    },
+    "ores": [
+      {
+        "target": {
+          "type": "minecraft:tag",
+          "name": "moran-mod:immortal_ore_replaceables"
+        },
+        "state": {
+          "Name": "moran-mod:immortal_ore"
+        },
+        "weight": 1
+      }
+    ]
+  },
+  "feature": "moran-mod:immortal_ore_vein",
+  "placement": [
+    {
+      "type": "minecraft:count",
+      "count": 8
+    },
+    {
+      "type": "minecraft:in_square",
+      "spacing": 4
+    },
+    {
+      "type": "minecraft:height_range",
+      "height": {
+        "type": "minecraft:trapezoid",
+        "value": {
+          "min_inclusive": -60,
+          "max_inclusive": 8,
+          "type": "minecraft:uniform"
+        }
+      }
+    },
+    {
+      "type": "minecraft:biome"
+    }
+  ]
+}

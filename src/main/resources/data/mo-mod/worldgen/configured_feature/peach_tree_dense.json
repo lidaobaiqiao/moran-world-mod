@@ -1,0 +1,83 @@
+{
+  "type": "minecraft:tree",
+  "config": {
+    "feature": {
+      "config": {
+        "decorators": [
+          {
+            "type": "minecraft:trunk_vine",
+            "probability": 0.25
+          }
+        ],
+        "dirt_provider": {
+          "type": "minecraft:simple_state_provider",
+          "state": {
+            "Name": "moran-mod:peach_blossom_dirt"
+          }
+        },
+        "foliage_provider": {
+          "type": "minecraft:simple_state_provider",
+          "state": {
+            "Name": "moran-mod:peach_blossom_leaves",
+            "Properties": {
+              "distance": "7"
+            }
+          }
+        },
+        "force_dirt": false,
+        "ignore_vines": false,
+        "minimum_size": {
+          "type": "minecraft:uniform",
+          "value": {
+            "min_inclusive": 4,
+            "max_inclusive": 6,
+            "type": "minecraft:uniform"
+          }
+        },
+        "trunk_height": {
+          "type": "minecraft:uniform",
+          "value": {
+            "min_inclusive": 4,
+            "max_inclusive": 7,
+            "type": "minecraft:uniform"
+          }
+        },
+        "trunk_provider": {
+          "type": "minecraft:simple_state_provider",
+          "state": {
+            "Name": "moran-mod:peach_log"
+          }
+        },
+        "type": "minecraft:forest_vegetation",
+        "trunk_placer": {
+          "type": "minecraft:straight_trunk_placer"
+        }
+      },
+      "type": "minecraft:random_selector"
+    },
+    "features": [
+    ]
+  },
+  "feature": "moran-mod:peach_tree_dense",
+  "placement": [
+    {
+      "type": "minecraft:count",
+      "count": 10
+    },
+    {
+      "type": "minecraft:in_square",
+      "spacing": 8
+    },
+    {
+      "type": "minecraft:surface_water_depth_filter",
+      "max_water_depth": 7
+    },
+    {
+      "type": "minecraft:heightmap",
+      "heightmap": "WORLD_SURFACE_WG"
+    },
+    {
+      "type": "minecraft:biome"
+    }
+  ]
+}

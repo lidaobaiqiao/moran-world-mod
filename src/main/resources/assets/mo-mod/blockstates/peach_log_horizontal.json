@@ -1,0 +1,9 @@
+{
+  "type": "minecraft:simple_state_provider",
+  "state": {
+    "Name": "moran-mod:peach_log"
+  },
+  "properties": {
+    "axis": "x"
+  }
+}
