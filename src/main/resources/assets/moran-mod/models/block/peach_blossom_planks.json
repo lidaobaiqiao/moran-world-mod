@@ -1,0 +1,12 @@
+{
+  "parent": "minecraft:block/cube",
+  "textures": {
+    "particle": "moran-mod:block/peach_blossom_planks",
+    "north": "moran-mod:block/peach_blossom_planks",
+    "south": "moran-mod:block/peach_blossom_planks",
+    "east": "moran-mod:block/peach_blossom_planks",
+    "west": "moran-mod:block/peach_blossom_planks",
+    "up": "moran-mod:block/peach_blossom_planks",
+    "down": "moran-mod:block/peach_blossom_planks"
+  }
+}
