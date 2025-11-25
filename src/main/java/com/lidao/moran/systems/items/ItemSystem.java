@@ -1,4 +1,3 @@
-// src/main/java/com/lidao/moran/systems/items/ItemSystem.java
 package com.lidao.moran.systems.items;
 
 import com.lidao.moran.item.MoranSwordItem;
@@ -24,10 +23,14 @@ public class ItemSystem {
     public static final Item CRYSTAL_SHARD = register("crystal_shard", new Item(new FabricItemSettings()));
     public static final Item IMMORTAL_INGOT = register("immortal_ingot", new Item(new FabricItemSettings()));
     public static final Item BAMBOO_SHOOT = register("bamboo_shoot", new Item(new FabricItemSettings().maxCount(64)));
+    
+    // 🎣 竹筏相关物品
+    public static final Item BAMBOO_RAFT = register("bamboo_raft", new Item(new FabricItemSettings().maxCount(1)));
 
     public static void initialize() {
         System.out.println("✅ 物品系统初始化完成");
         System.out.println("   已注册 " + ITEMS.size() + " 个物品");
+        System.out.println("   🎣 竹筏已注册 - 乘坐竹筏静止5秒可传送到桃花源");
     }
 
     private static Item register(String id, Item item) {
