@@ -2,6 +2,7 @@
   "precipitation": "rain",
   "temperature": 0.8,
   "downfall": 0.9,
+  "has_precipitation": true,
   "effects": {
     "sky_color": 7907323,
     "fog_color": 12638463,
