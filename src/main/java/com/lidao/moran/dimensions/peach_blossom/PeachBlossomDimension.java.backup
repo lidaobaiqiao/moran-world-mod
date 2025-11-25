@@ -74,22 +74,6 @@ public class PeachBlossomDimension extends BaseDimension {
         return DIMENSION_ID;
     }
 
-    /**
-     * 静态注册方法 - 将维度注册到Minecraft
-     */
-    public static void register() {
-        System.out.println("🌀 注册桃花源维度到Minecraft...");
-        
-        PeachBlossomDimension dimension = new PeachBlossomDimension();
-        dimension.registerBiomes();
-        dimension.registerFeatures();
-        dimension.registerStructures();
-        
-        System.out.println("✅ 桃花源维度注册完成！");
-        System.out.println("🎯 维度ID: " + DIMENSION_ID);
-        System.out.println("🎯 维度Key: " + DIMENSION_KEY.getValue());
-    }
-
     // 获取地形生成器（供世界生成系统调用）
     public TerrainGenerator getTerrainGenerator() {
         if (this.terrainGenerator == null) {
@@ -137,4 +121,4 @@ public class PeachBlossomDimension extends BaseDimension {
     public void onPlayerLeave(ServerPlayerEntity player) {
         player.sendMessage(net.minecraft.text.Text.literal("§8离开桃花源..."), false);
     }
-}
+}}
