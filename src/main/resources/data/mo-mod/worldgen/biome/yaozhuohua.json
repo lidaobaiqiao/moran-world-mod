@@ -15,12 +15,6 @@
         "weight": 50,
         "minCount": 1,
         "maxCount": 2
-      },
-      {
-        "type": "minecraft:zombie",
-        "weight": 50,
-        "minCount": 1,
-        "maxCount": 2
       }
     ],
     "creature": [
@@ -31,7 +25,7 @@
         "maxCount": 4
       }
     ],
-    "ambient_creature": [
+    "ambient": [
       {
         "type": "minecraft:bat",
         "weight": 15,
@@ -67,17 +61,16 @@
   "spawn_costs": {},
   "creature_spawn_probability": 0.1,
   "effects": {
-    "fog_color": 16755273,
-    "sky_color": 15132390,
-    "water_color": 11865371,
-    "water_fog_color": 10848070,
-    "grass_color": 16755273,
-    "foliage_color": 15132390
+    "sky_color": 7907323,
+    "fog_color": 12638463,
+    "water_color": 4159204,
+    "water_fog_color": 329011
   },
   "precipitation": "rain",
   "temperature": 0.8,
   "downfall": 0.9,
   "depth": 0.1,
   "scale": 0.4,
-  "surface_builder": "minecraft:grass"
+  "surface_builder": "minecraft:grass",
+  "has_precipitation": true
 }

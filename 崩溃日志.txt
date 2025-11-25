@@ -1,5 +1,5 @@
- [19:24:29] [Render thread/ERROR] (Minecraft) Features: Not a JSON object: null
-<==[19:24:29] [Render thread/ERROR] (Minecraft) Registry loading errors:
+  [19:28:25] [Render thread/ERROR] (Minecraft) Features: Not a JSON object: null
+<==[19:28:26] [Render thread/ERROR] (Minecraft) Registry loading errors:
 > Errors in registry minecraft:dimension_type:
 >> Errors in element mo-mod:peach_blossom_dimension:
 java.lang.IllegalStateException: Failed to parse mo-mod:dimension_type/peach_blossom_dimension.json from pack fabric
@@ -40,71 +40,6 @@ Caused by: java.lang.RuntimeException: Not a tag id
         at com.mojang.serialization.DataResult.getOrThrow(DataResult.java:93)
         at net.minecraft.registry.RegistryLoader.load(RegistryLoader.java:176)
         ... 30 more
-> Errors in registry minecraft:root:
->> Errors in element minecraft:worldgen/configured_carver:
-java.lang.IllegalStateException: Unbound values in registry ResourceKey[minecraft:root / minecraft:worldgen/configured_carver]: [mo-mod:cave_carver]
-        at net.minecraft.registry.SimpleRegistry.freeze(SimpleRegistry.java:360)
-        at net.minecraft.registry.RegistryLoader.method_45128(RegistryLoader.java:103)
-        at java.base/java.lang.Iterable.forEach(Iterable.java:75)
-        at net.minecraft.registry.RegistryLoader.load(RegistryLoader.java:100)
-        at net.minecraft.server.SaveLoading.loadDynamicRegistryManager(SaveLoading.java:67)
-        at net.minecraft.server.SaveLoading.withRegistriesLoaded(SaveLoading.java:71)
-        at net.minecraft.server.SaveLoading.load(SaveLoading.java:34)
-        at net.minecraft.client.gui.screen.world.CreateWorldScreen.create(CreateWorldScreen.java:333)
-        at net.minecraft.client.gui.screen.world.SelectWorldScreen.method_19944(SelectWorldScreen.java:60)
-        at net.minecraft.client.gui.widget.ButtonWidget.onPress(ButtonWidget.java:94)
-        at net.minecraft.client.gui.widget.PressableWidget.onClick(PressableWidget.java:56)
-        at net.minecraft.client.gui.widget.ClickableWidget.mouseClicked(ClickableWidget.java:189)
-        at net.minecraft.client.gui.ParentElement.mouseClicked(ParentElement.java:38)
-        at net.minecraft.client.Mouse.method_1611(Mouse.java:98)
-        at net.minecraft.client.gui.screen.Screen.wrapScreenError(Screen.java:409)
-        at net.minecraft.client.Mouse.onMouseButton(Mouse.java:98)
-        at net.minecraft.client.Mouse.method_22686(Mouse.java:169)
-        at net.minecraft.util.thread.ThreadExecutor.execute(ThreadExecutor.java:102)
-        at net.minecraft.client.Mouse.method_22684(Mouse.java:169)
-        at org.lwjgl.glfw.GLFWMouseButtonCallbackI.callback(GLFWMouseButtonCallbackI.java:43)
-        at org.lwjgl.system.JNI.invokeV(Native Method)
-        at org.lwjgl.glfw.GLFW.glfwWaitEventsTimeout(GLFW.java:3474)
-        at com.mojang.blaze3d.systems.RenderSystem.limitDisplayFPS(RenderSystem.java:237)
-        at net.minecraft.client.MinecraftClient.render(MinecraftClient.java:1244)
-        at net.minecraft.client.MinecraftClient.run(MinecraftClient.java:802)
-        at net.minecraft.client.main.Main.main(Main.java:250)
-        at net.fabricmc.loader.impl.game.minecraft.MinecraftGameProvider.launch(MinecraftGameProvider.java:470)
-        at net.fabricmc.loader.impl.launch.knot.Knot.launch(Knot.java:74)
-        at net.fabricmc.loader.impl.launch.knot.KnotClient.main(KnotClient.java:23)
-        at net.fabricmc.devlaunchinjector.Main.main(Main.java:86)
->> Errors in element minecraft:worldgen/configured_feature:
-java.lang.IllegalStateException: Unbound values in registry ResourceKey[minecraft:root / minecraft:worldgen/configured_feature]: [mo-mod:cultural_stone_tablet, mo-mod:flowering_peach_tree, mo-mod:human_ancient_ore, mo-mod:human_built_bridges, minecraft:lake_lava_underground, minecraft:lake_water_surface, mo-mod:patch_flower_default, mo-mod:patch_grain_plain, mo-mod:peach_bamboo_single, mo-mod:peach_podzol_patch, mo-mod:peach_sand_patch, mo-mod:peach_tree_dense, mo-mod:peach_tree_scattered, minecraft:spring_lava, mo-mod:traditional_pavilion]
-        at net.minecraft.registry.SimpleRegistry.freeze(SimpleRegistry.java:360)
-        at net.minecraft.registry.RegistryLoader.method_45128(RegistryLoader.java:103)
-        at java.base/java.lang.Iterable.forEach(Iterable.java:75)
-        at net.minecraft.registry.RegistryLoader.load(RegistryLoader.java:100)
-        at net.minecraft.server.SaveLoading.loadDynamicRegistryManager(SaveLoading.java:67)
-        at net.minecraft.server.SaveLoading.withRegistriesLoaded(SaveLoading.java:71)
-        at net.minecraft.server.SaveLoading.load(SaveLoading.java:34)
-        at net.minecraft.client.gui.screen.world.CreateWorldScreen.create(CreateWorldScreen.java:333)
-        at net.minecraft.client.gui.screen.world.SelectWorldScreen.method_19944(SelectWorldScreen.java:60)
-        at net.minecraft.client.gui.widget.ButtonWidget.onPress(ButtonWidget.java:94)
-        at net.minecraft.client.gui.widget.PressableWidget.onClick(PressableWidget.java:56)
-        at net.minecraft.client.gui.widget.ClickableWidget.mouseClicked(ClickableWidget.java:189)
-        at net.minecraft.client.gui.ParentElement.mouseClicked(ParentElement.java:38)
-        at net.minecraft.client.Mouse.method_1611(Mouse.java:98)
-        at net.minecraft.client.gui.screen.Screen.wrapScreenError(Screen.java:409)
-        at net.minecraft.client.Mouse.onMouseButton(Mouse.java:98)
-        at net.minecraft.client.Mouse.method_22686(Mouse.java:169)
-        at net.minecraft.util.thread.ThreadExecutor.execute(ThreadExecutor.java:102)
-        at net.minecraft.client.Mouse.method_22684(Mouse.java:169)
-        at org.lwjgl.glfw.GLFWMouseButtonCallbackI.callback(GLFWMouseButtonCallbackI.java:43)
-        at org.lwjgl.system.JNI.invokeV(Native Method)
-        at org.lwjgl.glfw.GLFW.glfwWaitEventsTimeout(GLFW.java:3474)
-        at com.mojang.blaze3d.systems.RenderSystem.limitDisplayFPS(RenderSystem.java:237)
-        at net.minecraft.client.MinecraftClient.render(MinecraftClient.java:1244)
-        at net.minecraft.client.MinecraftClient.run(MinecraftClient.java:802)
-        at net.minecraft.client.main.Main.main(Main.java:250)
-        at net.fabricmc.loader.impl.game.minecraft.MinecraftGameProvider.launch(MinecraftGameProvider.java:470)
-        at net.fabricmc.loader.impl.launch.knot.Knot.launch(Knot.java:74)
-        at net.fabricmc.loader.impl.launch.knot.KnotClient.main(KnotClient.java:23)
-        at net.fabricmc.devlaunchinjector.Main.main(Main.java:86)
 > Errors in registry minecraft:worldgen/biome:
 >> Errors in element mo-mod:yaozhuohua:
 java.lang.IllegalStateException: Failed to parse mo-mod:worldgen/biome/yaozhuohua.json from pack fabric
@@ -139,7 +74,7 @@ java.lang.IllegalStateException: Failed to parse mo-mod:worldgen/biome/yaozhuohu
         at net.fabricmc.loader.impl.launch.knot.Knot.launch(Knot.java:74)
         at net.fabricmc.loader.impl.launch.knot.KnotClient.main(KnotClient.java:23)
         at net.fabricmc.devlaunchinjector.Main.main(Main.java:86)
-Caused by: java.lang.RuntimeException: Not a JSON object: [{"type":"minecraft:monster","weight":50,"minCount":1,"maxCount":2},{"type":"minecraft:creature","weight":10,"minCount":2,"maxCount":4},{"type":"minecraft:ambient_creature","weight":15,"minCount":2,"maxCount":3},{"type":"minecraft:water_creature","weight":100,"minCount":1,"maxCount":3},{"type":"minecraft:water_ambient","weight":20,"minCount":1,"maxCount":2},{"type":"minecraft:misc","weight":5,"minCount":1,"maxCount":1}]; Unknown element name:default missed input: {"default":"mo-mod:cave_carver"}; Not a number: "#E6B8CC"; Not a number: "#A5D6EA"; Not a number: "#B4D4FF"; Not a number: "#FFB6C1"
+Caused by: java.lang.RuntimeException: Unknown element name:ambient_creature missed input: {"ambient_creature":[{"type":"minecraft:bat","weight":15,"minCount":2,"maxCount":3}]}; Unknown element name:default missed input: {"default":"minecraft:cave"}; No key has_precipitation in MapLike[{"carvers":{"air":"minecraft:cave","default":"minecraft:cave"},"features":[[],[],[]],"spawners":{"monster":[{"type":"minecraft:spider","weight":50,"minCount":1,"maxCount":2},{"type":"minecraft:zombie","weight":50,"minCount":1,"maxCount":2}],"creature":[{"type":"minecraft:cow","weight":10,"minCount":2,"maxCount":4}],"ambient_creature":[{"type":"minecraft:bat","weight":15,"minCount":2,"maxCount":3}],"water_creature":[{"type":"minecraft:squid","weight":100,"minCount":1,"maxCount":3}],"water_ambient":[{"type":"minecraft:cod","weight":20,"minCount":1,"maxCount":2}],"misc":[{"type":"minecraft:bat","weight":5,"minCount":1,"maxCount":1}]},"spawn_costs":{},"creature_spawn_probability":0.1,"effects":{"fog_color":16755273,"sky_color":15132390,"water_color":11865371,"water_fog_color":10848070,"grass_color":16755273,"foliage_color":15132390},"precipitation":"rain","temperature":0.8,"downfall":0.9,"depth":0.1,"scale":0.4,"surface_builder":"minecraft:grass"}]
         at com.mojang.serialization.DataResult.lambda$getOrThrow$5(DataResult.java:101)
         at com.mojang.datafixers.util.Either$Right.map(Either.java:99)
         at com.mojang.serialization.DataResult.getOrThrow(DataResult.java:93)
@@ -538,4 +473,4 @@ Caused by: java.lang.RuntimeException: No key amplitudes in MapLike[{"type":"min
         at net.minecraft.registry.RegistryLoader.load(RegistryLoader.java:176)
         ... 30 more
 
-   [19:24:30] [Render thread/ERROR] (Minecraft) Reported exception thrown!
+   [19:28:26] [Render thread/ERROR] (Minecraft) Reported exception thrown!

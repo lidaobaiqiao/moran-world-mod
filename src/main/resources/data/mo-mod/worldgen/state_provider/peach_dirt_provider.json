@@ -1,9 +1,0 @@
-{
-  "type": "minecraft:simple_state_provider",
-  "state": {
-    "Name": "mo-mod:peach_blossom_dirt"
-  },
-  "properties": {
-    "mo-mod:peach_blossom_dirt": "normal"
-  }
-}
