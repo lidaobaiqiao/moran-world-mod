@@ -5,6 +5,7 @@ import com.lidao.moran.dimensions.peach_blossom.PeachBlossomDimension;
 import com.lidao.moran.systems.commands.TestTeleportCommand;
 import com.lidao.moran.systems.teleport.RaftTeleportHandler;
 import com.lidao.moran.systems.items.ItemSystem;
+import com.lidao.moran.systems.blocks.BlockSystem;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
@@ -33,6 +34,9 @@ public class MoranMod implements ModInitializer {
         // 初始化维度系统
         initializeDimensionSystem();
         
+        // 初始化方块系统
+        initializeBlockSystem();
+        
         // 初始化物品系统
         initializeItemSystem();
         
@@ -44,6 +48,7 @@ public class MoranMod implements ModInitializer {
         
         LOGGER.info("🎨 墨世界模组初始化完成！");
         LOGGER.info("🌸 桃花源维度已就绪");
+        LOGGER.info("⛏️ 墨彩方块系统已激活");
         LOGGER.info("💎 墨韵物品系统已激活");
         LOGGER.info("🎣 竹筏传送系统已激活");
         LOGGER.info("🎮 玩家可以开始探索墨世界了！");
@@ -56,6 +61,14 @@ public class MoranMod implements ModInitializer {
         LOGGER.info("🌀 初始化桃花源维度系统...");
         DimensionRegistry.initialize();
         PeachBlossomDimension.register();
+    }
+    
+    /**
+     * 初始化方块系统
+     */
+    private void initializeBlockSystem() {
+        LOGGER.info("⛏️ 初始化墨彩方块系统...");
+        BlockSystem.initialize();
     }
     
     /**
