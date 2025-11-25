@@ -1,33 +1,22 @@
 {
-  "type": "minecraft:overworld",
-  "generator": {
-    "type": "mo-mod:peach_blossom",
-    "seed": 0
-  },
-  "monster_spawn_block_light_limit": 0,
-  "monster_spawn_light_level": {
-    "type": "minecraft:uniform",
-    "value": {
-      "min_inclusive": 0,
-      "max_inclusive": 7
-    }
-  },
-  "infiniburn": "minecraft:infiniburn_overworld",
-  "respawn_anchor_works": false,
-  "has_skylight": true,
-  "bed_works": true,
-  "piglin_safe": false,
-  "has_raids": true,
-  "logical_height": 256,
-  "height": 256,
-  "min_y": -64,
-  "ambient_light": 0,
-  "fixed_time": null,
   "ultrawarm": false,
   "natural": true,
   "coordinate_scale": 1.0,
-  "bedrock_floor": false,
+  "piglin_safe": false,
+  "bed_works": true,
+  "respawn_anchor_works": false,
+  "has_raids": true,
+  "monster_spawn_light_level": 0,
+  "monster_spawn_block_light_limit": 0,
   "has_ceiling": false,
-  "ceiling_light_level": 0,
-  "createDragonFight": false
+  "has_skylight": true,
+  "ambient_light": 0,
+  "fixed_time": null,
+  "infiniburn": "minecraft:infiniburn_overworld",
+  "bedrock_floor": false,
+  "createDragonFight": false,
+  "logical_height": 256,
+  "height": 256,
+  "min_y": -64,
+  "ceiling_light_level": 0
 }
