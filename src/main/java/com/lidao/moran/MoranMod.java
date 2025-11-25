@@ -23,7 +23,7 @@ import org.slf4j.LoggerFactory;
  */
 public class MoranMod implements ModInitializer {
     
-    public static final String MOD_ID = "mo-mod";
+    public static final String MOD_ID = "moran-mod";  // 统一使用moran-mod，去除mo-mod
     public static final Logger LOGGER = LoggerFactory.getLogger(MOD_ID);
 
     @Override

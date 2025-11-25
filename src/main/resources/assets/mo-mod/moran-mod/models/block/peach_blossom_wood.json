@@ -1,7 +1,0 @@
-{
-  "parent": "block/cube_column",
-  "textures": {
-    "end": "moran-mod:block/peach_blossom_wood_top",
-    "side": "moran-mod:block/peach_blossom_wood"
-  }
-}

@@ -14,9 +14,10 @@ import net.minecraft.world.biome.source.BiomeSource;
 import net.minecraft.world.gen.chunk.ChunkGenerator;
 
 public class PeachBlossomDimension extends BaseDimension {
+    public static final String MOD_ID = "moran-mod";  // 统一使用moran-mod
     public static final String DIMENSION_ID = "peach_blossom";
     public static final RegistryKey<World> DIMENSION_KEY =
-            RegistryKey.of(RegistryKeys.WORLD, new Identifier("moran-mod", DIMENSION_ID));
+            RegistryKey.of(RegistryKeys.WORLD, new Identifier(MOD_ID, DIMENSION_ID));
 
     private TerrainGenerator terrainGenerator;
     private BiomeDistributionManager biomeManager;
