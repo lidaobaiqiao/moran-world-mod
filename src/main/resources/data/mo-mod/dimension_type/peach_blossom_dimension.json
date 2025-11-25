@@ -1,0 +1,7 @@
+{
+  "type": "minecraft:overworld",
+  "generator": {
+    "type": "mo-mod:peach_blossom",
+    "seed": 0
+  }
+}

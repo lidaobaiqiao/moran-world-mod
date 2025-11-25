@@ -1,0 +1,110 @@
+{
+  "type": "minecraft:noise",
+  "noise": {
+    "top_slicer": {
+      "type": "minecraft:clamped_gradient",
+      "from": -3,
+      "to": 2,
+      "slice": {
+        "type": "minecraft:clamped_gradient",
+        "from": -10000,
+        "to": 10000,
+        "slice": {
+          "type": "minecraft:end_islands",
+          "randomness": 0.7,
+          "sampling": {
+            "xz_scale": 2,
+            "y_scale": 1
+          }
+        }
+      }
+    },
+    "bottom_slicer": {
+      "type": "minecraft:clamped_gradient",
+      "from": -3,
+      "to": 2,
+      "slice": {
+        "type": "minecraft:clamped_gradient",
+        "from": -10000,
+        "to": 10000,
+        "slice": {
+          "type": "minecraft:end_islands",
+          "randomness": 0.7,
+          "sampling": {
+            "xz_scale": 2,
+            "y_scale": 1
+          }
+        }
+      }
+    },
+    "temperature": {
+      "type": "minecraft:clamped_gradient",
+      "from": 0.15,
+      "to": 0.75,
+      "slice": {
+        "type": "minecraft:noise",
+        "noise": "minecraft:temperature",
+        "xz_scale": 1,
+        "y_scale": 1
+      }
+    },
+    "humidity": {
+      "type": "minecraft:clamped_gradient",
+      "from": -0.3,
+      "to": 0.6,
+      "slice": {
+        "type": "minecraft:noise",
+        "noise": "minecraft:vegetation",
+        "xz_scale": 1,
+        "y_scale": 1
+      }
+    },
+    "continentalness": {
+      "type": "minecraft:noise",
+      "noise": "minecraft:continentalness",
+      "xz_scale": 1,
+        "y_scale": 1,
+        "amplitude": 0.8
+    },
+    "erosion": {
+      "type": "minecraft:noise",
+      "noise": "minecraft:erosion",
+      "xz_scale": 1,
+      "y_scale": 0.4
+    },
+    "depth": {
+      "type": "minecraft:clamp",
+      "input": 1,
+      "min": 0,
+      "max": 0.3
+    },
+    "weirdness": {
+      "type": "minecraft:clamp",
+      "input": {
+        "type": "minecraft:add",
+        "argument1": {
+          "type": "minecraft:mul",
+          "argument1": {
+            "type": "minecraft:terrain_offset",
+            "noise": "minecraft:overworld"
+          },
+          "argument2": -0.15
+        },
+        "argument2": {
+          "type": "minecraft:mul",
+          "argument1": {
+            "type": "minecraft:range_choice",
+            "input": "minecraft:y",
+            "min_inclusive": -64,
+            "max_inclusive": 320
+          },
+          "argument2": 0.04
+        }
+      },
+      "min": 0,
+      "max": 0.08
+    }
+  },
+  "sea_level": 0,
+  "disable_mob_generation": false
+}
