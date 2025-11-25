@@ -7,7 +7,9 @@
     "MoranModMixin"
   ],
   "injectors": [],
-  "client": [
-    "MoranModClientMixin"
-  ]
+  "client": {
+    "mixins": [
+      "MoranModClientMixin"
+    ]
+  }
 }
