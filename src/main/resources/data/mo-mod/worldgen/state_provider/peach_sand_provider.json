@@ -1,0 +1,9 @@
+{
+  "type": "minecraft:simple_state_provider",
+  "state": {
+    "Name": "mo-mod:peach_blossom_sand"
+  },
+  "properties": {
+    "mo-mod:peach_blossom_sand": "normal"
+  }
+}

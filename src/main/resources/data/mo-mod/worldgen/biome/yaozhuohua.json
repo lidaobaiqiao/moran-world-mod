@@ -18,6 +18,14 @@
         "value": 24
       },
       {
+        "feature": "mo-mod:peach_sand_patch",
+        "value": 6
+      },
+      {
+        "feature": "mo-mod:peach_podzol_patch",
+        "value": 8
+      },
+      {
         "feature": "mo-mod:peach_tree_dense",
         "value": 1
       },
@@ -62,7 +70,7 @@
         "value": 2
       }
     ]
-  },
+  ],
   "spawners": [
     {
       "type": "minecraft:monster",
@@ -129,5 +137,6 @@
   "temperature_modifier": "biased_toward_warm",
   "downfall_modifier": "biased_toward_wet",
   "has_precipitation": true,
-  "scale": 0.4
+  "scale": 0.4,
+  "surface_builder": "mo-mod:peach_blossom_surface"
 }
