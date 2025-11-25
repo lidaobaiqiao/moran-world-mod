@@ -1,5 +1,5 @@
- [19:51:23] [Render thread/ERROR] (Minecraft) Features: Not a JSON object: null
-<==[19:51:24] [Render thread/ERROR] (Minecraft) Registry loading errors:
+  [20:11:51] [Render thread/ERROR] (Minecraft) Features: Not a JSON object: null
+<==[20:11:51] [Render thread/ERROR] (Minecraft) Registry loading errors:
 > Errors in registry minecraft:dimension_type:
 >> Errors in element mo-mod:peach_blossom_dimension:
 java.lang.IllegalStateException: Failed to parse mo-mod:dimension_type/peach_blossom_dimension.json from pack fabric
@@ -41,4 +41,4 @@ Caused by: java.lang.RuntimeException: Not a tag id
         at net.minecraft.registry.RegistryLoader.load(RegistryLoader.java:176)
         ... 30 more
 
-   [19:51:24] [Render thread/ERROR] (Minecraft) Reported exception thrown!
+   [20:11:52] [Render thread/ERROR] (Minecraft) Reported exception thrown!
