@@ -26,6 +26,18 @@
         "value": 8
       },
       {
+        "feature": "mo-mod:traditional_pavilion",
+        "value": 3
+      },
+      {
+        "feature": "mo-mod:cultural_stone_tablet",
+        "value": 5
+      },
+      {
+        "feature": "mo-mod:human_built_bridges",
+        "value": 4
+      },
+      {
         "feature": "mo-mod:peach_tree_dense",
         "value": 1
       },
@@ -50,7 +62,7 @@
         "value": 3
       },
       {
-        "feature": "mo-mod:immortal_ore_vein",
+        "feature": "mo-mod:human_ancient_ore",
         "value": 10
       }
     ],
