@@ -30,6 +30,45 @@
   "item.moran-mod.peach_blossom_sand": "桃源沙",
   "item.moran-mod.peach_blossom_dirt": "桃源土",
   "item.moran-mod.peach_blossom_grass_block": "桃源草方块",
-  "item.moran-mod.peach_blossom_podzol": "桃源覆土"
+  "item.moran-mod.peach_blossom_podzol": "桃源覆土",
+
+  "item.moran-mod.peach_sapling": "桃树树苗",
+  "item.moran-mod.peach_sapling.tooltip": "§7妖灼华原的桃树树苗\n§6在桃源土上生长",
+
+  "item.moran-mod.crystal_shard": "水晶碎片",
+  "item.moran-mod.crystal_shard.tooltip": "§7来自妖灼华原的水晶碎片\n§6蕴含着神秘的力量",
+
+  "item.moran-mod.immortal_ingot": "仙锭",
+  "item.moran-mod.immortal_ingot.tooltip": "§7由仙矿石熔炼而成\n§6具有神奇的特性",
+
+  "item.moran-mod.bamboo_shoot": "竹笋",
+  "item.moran-mod.bamboo_shoot.tooltip": "§7妖灼华原的竹笋\n§6可以食用或种植",
+
+  "block.moran-mod.peach_stone": "桃源石",
+  "block.moran-mod.peach_stone.tooltip": "§7妖灼华原的基础石材",
+
+  "block.moran-mod.ancient_stone": "古老桃源石",
+  "block.moran-mod.ancient_stone.tooltip": "§7古老的桃源石材，蕴含历史",
+
+  "block.moran-mod.mossy_ancient_stone": "苔藓古老桃源石",
+  "block.moran-mod.mossy_ancient_stone.tooltip": "§7覆盖苔藓的古老桃源石",
+
+  "block.moran-mod.peach_log": "桃树原木",
+  "block.moran-mod.peach_log.tooltip": "§7妖灼华原的桃树原木",
+
+  "block.moran-mod.peach_planks": "桃木木板",
+  "block.moran-mod.peach_planks.tooltip": "§7由桃树原木制成的木板",
+
+  "block.moran-mod.peach_bamboo": "桃源竹子",
+  "block.moran-mod.peach_bamboo.tooltip": "§7妖灼华原的特殊竹子",
+
+  "block.moran-mod.immortal_ore": "仙矿石",
+  "block.moran-mod.immortal_ore.tooltip": "§7蕴含仙气的矿石\n§6熔炼后可获得仙锭",
+
+  "block.moran-mod.petal_block": "花瓣方块",
+  "block.moran-mod.petal_block.tooltip": "§7由桃花花瓣组成的方块\n§6散发着淡淡的芬芳",
+
+  "biome.moran-mod.yaozhuohua": "妖灼华原",
+  "biome.moran-mod.yaozhuohua.tooltip": "§7桃之夭夭，灼灼其华\n§6妖灼华原的壮丽景观"
 }
 

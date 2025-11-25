@@ -18,6 +18,12 @@ public class ItemSystem {
     public static final Item MORAN = register("moran", new Item(new FabricItemSettings()));
     public static final Item QINGFENG_JINGHUA = register("qingfeng", new Item(new FabricItemSettings().maxCount(16)));
     public static final Item MORAN_SWORD = register("moran_sword", new MoranSwordItem());
+    
+    // 🍑 桃树相关物品
+    public static final Item PEACH_SAPLING = register("peach_sapling", new Item(new FabricItemSettings()));
+    public static final Item CRYSTAL_SHARD = register("crystal_shard", new Item(new FabricItemSettings()));
+    public static final Item IMMORTAL_INGOT = register("immortal_ingot", new Item(new FabricItemSettings()));
+    public static final Item BAMBOO_SHOOT = register("bamboo_shoot", new Item(new FabricItemSettings().maxCount(64)));
 
     public static void initialize() {
         System.out.println("✅ 物品系统初始化完成");

@@ -1,0 +1,10 @@
+
+{
+  "modId": "moran-mod",
+  "providers": [
+    {
+      "type": "terrablender:api",
+      "value": "com.lidao.moran.core.terrablender.TerrablenderIntegration"
+    }
+  ]
+}

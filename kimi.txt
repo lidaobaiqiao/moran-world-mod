@@ -1,0 +1,83 @@
+你问的是 **Terraform 模组库**（`com.terraformersmc.terraform`）的学习资源，但搜索结果全是 **HashiCorp Terraform**（基础设施即代码工具），两者完全不是一回事。
+
+我来帮你找正确的 Minecraft Terraform 文档：
+
+---
+
+### 1. **官方源码（最权威）**
+Terraform 模组库是开源的，直接看源码里的示例：
+- **GitHub**: https://github.com/TerraformersMC/Terraform
+- **重点关注**:
+  - `terraform-dimension-api-v1` 目录下的测试示例
+  - `terraform-wood-api-v1` 看方块/物品注册
+  - `README.md` 里有版本兼容表
+
+---
+
+### 2. **使用 Terraform 的开源模组（学实践）**
+这些模组都用了 Terraform，可以直接看它们怎么写：
+
+| 模组 | GitHub 地址 | 学习点 |
+|------|-------------|--------|
+| **Traverse** | https://github.com/TerraformersMC/Traverse | 维度、生物群系、噪声设置 |
+| **Cinderscapes** | https://github.com/TerraformersMC/Cinderscapes | 下界维度、自定义地形 |
+| **Terrestria** | https://github.com/TerraformersMC/Terrestria | 主世界生物群系扩展 |
+
+**搜索技巧**：在 GitHub 搜 `com.terraformersmc.terraform dimension 1.20.4`
+
+---
+
+### 3. **Fabric 官方 Discord 的 #terraform 频道**
+- **地址**: https://discord.gg/v6v4pMv
+- 直接问作者（Prospector, NeusFear），响应很快
+
+---
+
+### 4. **Misode 的噪声生成器（辅助工具）**
+虽然不是用来学 Terraform 的，但能帮你理解噪声参数：
+- **网址**: https://misode.github.io/worldgen/noise-settings/
+- **用法**: 在线调参数，生成 JSON 后对照 Terraform 的 Builder 方法
+
+---
+
+### 5. **Fabric Wiki（基础补充）**
+如果不懂 `RegistryKey`、`Registry` 这些概念，先看：
+- **维度注册**: https://fabricmc.net/wiki/tutorial:dimension
+- **生物群系**: https://fabricmc.net/wiki/tutorial:biomes
+
+---
+
+### **快速上手路径（推荐）**
+
+1. **花 10 分钟** 看 Terraform 的 `README.md` 和 `CHANGELOG.md`（知道支持哪些 Minecraft 版本）
+2. **花 30 分钟** 克隆 **Traverse** 模组，搜 `NoiseSettingsBuilder` 看实际用法
+3. **花 20 分钟** 在 Discord 翻历史消息，搜 `peach_noise_settings` 看别人踩过的坑
+4. **回来写代码**，遇到具体报错再搜源码里的测试用例
+
+---
+
+### **你现在最需要的代码片段**
+
+直接看 **Traverse** 的 [`NoisyChunkGenerator`](https://github.com/TerraformersMC/Traverse/blob/1.20.4/src/main/java/com/terraformersmc/traverse/world/gen/chunk/NoisyChunkGenerator.java#L37)：
+
+```java
+private static NoiseSettings createNoiseSettings() {
+    return NoiseSettingsBuilder.builder()
+        .seaLevel(63)
+        .defaultBlock(Blocks.GRASS_BLOCK.getDefaultState())
+        .defaultFluid(Blocks.WATER.getDefaultState())
+        .minimumY(-64)
+        .height(384)
+        .horizontalSize(1)
+        .verticalSize(2)
+        .densityFactor(1.0)
+        .densityOffset(-0.46875)
+        .simplexSurfaceNoise(true)
+        .randomDensityOffset(true)
+        .build();
+}
+```
+
+和你的需求几乎一样，把方块换成 `ModBlocks.PEACH_STONE` 就行。
+
+需要我帮你把**完整的 Traverse 实现**抽出来当模板吗？

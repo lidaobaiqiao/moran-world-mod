@@ -28,11 +28,11 @@ public class MoranModDataGenerator implements DataGeneratorEntrypoint {
 
         @Override
         public void generateItemModels(ItemModelGenerator itemModelGenerator) {
-            // 修复：使用物品系统注册模型
-            itemModelGenerator.register(
-                    com.lidao.moran.systems.items.ItemSystem.MORAN,
-                    Models.GENERATED
-            );
+            // 暂时注释掉，等物品系统完善后再添加
+            // itemModelGenerator.register(
+            //         com.lidao.moran.systems.items.ItemSystem.MORAN,
+            //         Models.GENERATED
+            // );
         }
     }
 

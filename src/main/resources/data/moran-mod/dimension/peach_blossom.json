@@ -1,20 +1,12 @@
 {
   "type": "moran-mod:peach_blossom",
   "generator": {
-    "type": "moran-mod:peach_blossom",
+    "type": "minecraft:noise",
+    "seed": 12345,
     "biome_source": {
-      "type": "moran-mod:peach_blossom",
-      "seed": 12345,
-      "biomes": [
-        "moran-mod:peach_valley",
-        "moran-mod:bamboo_grove_peach",
-        "moran-mod:farm_plains",
-        "moran-mod:green_hills",
-        "moran-mod:blossom_stream",
-        "moran-mod:mirror_lakes",
-        "moran-mod:hidden_depths"
-      ]
+      "type": "minecraft:fixed",
+      "biome": "moran-mod:yaozhuohua"
     },
-    "seed": 12345
+    "settings": "minecraft:overworld"
   }
 }

@@ -15,7 +15,7 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public class RaftTeleportHandler {
     private static final Map<UUID, RaftData> playerRaftData = new ConcurrentHashMap<>();
-    private static int REQUIRED_SECONDS = 30;
+    private static int REQUIRED_SECONDS = 5;  // 测试模式：5秒
     private static int REQUIRED_TICKS = REQUIRED_SECONDS * 20;
 
     public static void onPlayerTick(ServerPlayerEntity player) {
@@ -28,11 +28,11 @@ public class RaftTeleportHandler {
             return;
         }
 
-        // 检查玩家是否骑乘竹筏
+        // 测试模式：简化检查 - 只检查是否骑乘竹筏
         if (player.getVehicle() instanceof BoatEntity boat) {
-            if (boat.getVariant() == BoatEntity.Type.BAMBOO) {
-                handleRaftTeleport(player, boat);
-            }
+            // 测试模式：任何竹筏都可以触发传送
+            System.out.println("🎣 检测到玩家乘坐竹筏: " + player.getEntityName() + ", 类型: " + boat.getVariant());
+            handleRaftTeleport(player, boat);
         } else {
             playerRaftData.remove(player.getUuid());
         }
@@ -51,16 +51,16 @@ public class RaftTeleportHandler {
         if (currentPos.distanceTo(data.lastPosition) < 2.0) {
             data.stationaryTicks++;
 
-            // 每30秒提示一次
-            if (data.stationaryTicks % 60 == 0) {
+            // 每秒提示一次（测试模式）
+            if (data.stationaryTicks % 20 == 0) {
                 int secondsLeft = (REQUIRED_TICKS - data.stationaryTicks) / 20;
                 player.sendMessage(net.minecraft.text.Text.literal(
-                        "§e竹筏在神秘水域静止... §7(" + secondsLeft + "秒后进入桃花源)"), false);
+                        "§e测试模式：竹筏静止中... §7(" + secondsLeft + "秒后进入桃花源)"), false);
             }
 
             // 达到设定时间，触发传送
             if (data.stationaryTicks >= REQUIRED_TICKS) {
-                System.out.println("🎯 触发传送: " + player.getEntityName());
+                System.out.println("🎯 测试模式：触发传送! " + player.getEntityName() + " 静止了 " + REQUIRED_SECONDS + " 秒");
                 triggerDimensionTravel(player);
                 return;
             }
@@ -77,18 +77,24 @@ public class RaftTeleportHandler {
 
     private static void triggerDimensionTravel(ServerPlayerEntity player) {
         // 使用维度注册表获取桃花源维度
+        System.out.println("🔍 检查维度注册表: peach_blossom");
         if (DimensionRegistry.getDimension("peach_blossom") == null) {
+            System.out.println("❌ 桃花源维度未注册!");
             player.sendMessage(net.minecraft.text.Text.literal("§c桃花源维度尚未准备好..."), false);
             return;
         }
 
+        System.out.println("✅ 桃花源维度已注册，获取维度世界...");
         net.minecraft.server.world.ServerWorld targetWorld = player.getServer()
                 .getWorld(DimensionRegistry.getDimension("peach_blossom").getDimensionKey());
 
         if (targetWorld == null) {
+            System.out.println("❌ 桃花源维度世界未加载!");
             player.sendMessage(net.minecraft.text.Text.literal("§c桃花源维度尚未加载..."), false);
             return;
         }
+
+        System.out.println("✅ 桃花源维度世界已获取，准备传送...");
 
         try {
             // 传送前清除计时数据

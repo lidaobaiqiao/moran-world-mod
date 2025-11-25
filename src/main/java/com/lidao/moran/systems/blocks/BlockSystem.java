@@ -44,8 +44,89 @@ public class BlockSystem {
             new GrassBlock(FabricBlockSettings.copyOf(Blocks.GRASS_BLOCK)));
 
     // 灰化土（Podzol）：必须 SnowyBlock，否则顶部雪模型会出错
-//    public static final Block PEACH_BLOSSOM_PODZOL = registerBlock("peach_blossom_podzol",
-//            new SnowyBlock(FabricBlockSettings.copyOf(Blocks.PODZOL)));
+    public static final Block PEACH_BLOSSOM_PODZOL = registerBlock("peach_blossom_podzol",
+            new SnowyBlock(FabricBlockSettings.copyOf(Blocks.PODZOL)));
+
+    // -----------------------------------------------------
+    // 🍑 桃源石材系列
+    // -----------------------------------------------------
+    public static final Block PEACH_STONE = registerBlock("peach_stone",
+            new Block(FabricBlockSettings.copyOf(Blocks.STONE)));
+    
+    public static final Block ANCIENT_STONE = registerBlock("ancient_stone",
+            new Block(FabricBlockSettings.copyOf(Blocks.STONE).strength(2.0f, 6.0f).requiresTool()));
+    
+    public static final Block MOSSY_ANCIENT_STONE = registerBlock("mossy_ancient_stone",
+            new Block(FabricBlockSettings.copyOf(Blocks.STONE).strength(2.0f, 6.0f).requiresTool()));
+    
+    // -----------------------------------------------------
+    // 🍑 桃木建筑系列
+    // -----------------------------------------------------
+    public static final Block PEACH_LOG = registerBlock("peach_log",
+            new PillarBlock(FabricBlockSettings.copyOf(Blocks.OAK_LOG)));
+    
+    public static final Block PEACH_PLANKS = registerBlock("peach_planks",
+            new Block(FabricBlockSettings.copyOf(Blocks.OAK_PLANKS)));
+    
+    public static final Block PEACH_BRICK = registerBlock("peach_brick",
+            new Block(FabricBlockSettings.copyOf(Blocks.STONE_BRICKS)));
+    
+    public static final Block PEACH_TILE = registerBlock("peach_tile",
+            new Block(FabricBlockSettings.copyOf(Blocks.STONE_BRICKS)));
+    
+    public static final Block PEACH_ROOF_TILE = registerBlock("peach_roof_tile",
+            new Block(FabricBlockSettings.copyOf(Blocks.STONE_BRICKS)));
+    
+    // -----------------------------------------------------
+    // 🍑 装饰方块系列
+    // -----------------------------------------------------
+    public static final Block WHITE_PLASTER = registerBlock("white_plaster",
+            new Block(FabricBlockSettings.copyOf(Blocks.SMOOTH_STONE)));
+    
+    public static final Block CARVED_WOOD = registerBlock("carved_wood",
+            new Block(FabricBlockSettings.copyOf(Blocks.OAK_PLANKS)));
+    
+    public static final Block PETAL_BLOCK = registerBlock("petal_block",
+            new Block(FabricBlockSettings.copyOf(Blocks.POPPY).nonOpaque()));
+    
+    public static final Block STONE_LANTERN = registerBlock("stone_lantern",
+            new Block(FabricBlockSettings.copyOf(Blocks.LANTERN).luminance(15)));
+    
+    public static final Block STONE_BENCH = registerBlock("stone_bench",
+            new Block(FabricBlockSettings.copyOf(Blocks.STONE_SLAB)));
+    
+    public static final Block TEA_TABLE = registerBlock("tea_table",
+            new Block(FabricBlockSettings.copyOf(Blocks.OAK_PLANKS)));
+    
+    // -----------------------------------------------------
+    // 🎋 竹子系列
+    // -----------------------------------------------------
+    public static final Block PEACH_BAMBOO = registerBlock("peach_bamboo",
+            new PillarBlock(FabricBlockSettings.copyOf(Blocks.BAMBOO)));
+    
+    public static final Block BAMBOO_PLANKS = registerBlock("bamboo_planks",
+            new Block(FabricBlockSettings.copyOf(Blocks.BAMBOO_PLANKS)));
+    
+    public static final Block BAMBOO_MAT = registerBlock("bamboo_mat",
+            new Block(FabricBlockSettings.copyOf(Blocks.WHITE_CARPET)));
+    
+    // -----------------------------------------------------
+    // ✨ 仙境系列
+    // -----------------------------------------------------
+    public static final Block CLOUD_BLOCK = registerBlock("cloud_block",
+            new Block(FabricBlockSettings.copyOf(Blocks.WHITE_WOOL).nonOpaque()));
+    
+    public static final Block RAINBOW_BLOCK = registerBlock("rainbow_block",
+            new Block(FabricBlockSettings.copyOf(Blocks.GLASS).luminance(8)));
+    
+    public static final Block CRYSTAL_BLOCK = registerBlock("crystal_block",
+            new Block(FabricBlockSettings.copyOf(Blocks.GLASS).luminance(12)));
+    
+    public static final Block SKY_STONE = registerBlock("sky_stone",
+            new Block(FabricBlockSettings.copyOf(Blocks.STONE).strength(3.0f, 9.0f).requiresTool()));
+    
+    public static final Block IMMORTAL_ORE = registerBlock("immortal_ore",
+            new Block(FabricBlockSettings.copyOf(Blocks.IRON_ORE).requiresTool()));
 
 
     // -----------------------------------------------------

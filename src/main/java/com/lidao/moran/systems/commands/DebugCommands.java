@@ -6,6 +6,7 @@ import com.lidao.moran.dimensions.base.BiomeDistributionManager;
 import com.lidao.moran.dimensions.base.TerrainGenerator;
 import com.lidao.moran.dimensions.peach_blossom.PeachBlossomDimension;
 import com.lidao.moran.systems.teleport.DimensionTeleportManager;
+import com.lidao.moran.core.config.ConfigManager;
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.Text;
@@ -61,6 +62,15 @@ public class DebugCommands {
                                     })
                             )
                     )
+                    .then(literal("simple_teleport")
+                            .executes(context -> {
+                                ServerPlayerEntity player = context.getSource().getPlayer();
+                                if (player != null) {
+                                    simpleTeleportToPeachBlossom(player);
+                                }
+                                return 1;
+                            })
+                    )
             );
         });
 
@@ -91,7 +101,7 @@ public class DebugCommands {
         player.sendMessage(Text.literal("§6竹筏传送时间: " +
                 com.lidao.moran.core.config.ModConfig.Teleport.RAFT_STATIONARY_SECONDS + "秒"), false);
         player.sendMessage(Text.literal("§6启用桃花源: " +
-                com.lidao.moran.core.config.ModConfig.Dimensions.ENABLE_PEACH_BLOSSOM), false);
+                ConfigManager.isDimensionEnabled("peach_blossom")), false);
     }
 
     private static void testTerrainGeneration(ServerPlayerEntity player) {
@@ -148,6 +158,50 @@ public class DebugCommands {
         if (maxWeight == hills) return "叠翠微岚 (丘陵)";
 
         return "未知区域";
+    }
+
+    /**
+     * 简单的桃花源传送（测试用）
+     */
+    private static void simpleTeleportToPeachBlossom(ServerPlayerEntity player) {
+        try {
+            // 检查维度是否已注册
+            if (DimensionRegistry.getDimension("peach_blossom") == null) {
+                player.sendMessage(Text.literal("§c桃花源维度尚未注册"), false);
+                return;
+            }
+
+            net.minecraft.server.world.ServerWorld targetWorld = player.getServer()
+                    .getWorld(DimensionRegistry.getDimension("peach_blossom").getDimensionKey());
+
+            if (targetWorld == null) {
+                player.sendMessage(Text.literal("§c桃花源维度尚未加载"), false);
+                return;
+            }
+
+            // 执行传送
+            net.fabricmc.fabric.api.dimension.v1.FabricDimensions.teleport(
+                    player,
+                    targetWorld,
+                    new net.minecraft.world.TeleportTarget(
+                            new net.minecraft.util.math.Vec3d(
+                                    targetWorld.getSpawnPos().getX() + 0.5,
+                                    targetWorld.getSpawnPos().getY() + 1,
+                                    targetWorld.getSpawnPos().getZ() + 0.5
+                            ),
+                            net.minecraft.util.math.Vec3d.ZERO,
+                            player.getYaw(),
+                            player.getPitch()
+                    )
+            );
+
+            player.sendMessage(Text.literal("§a已传送到桃花源维度（测试模式）"), false);
+
+        } catch (Exception e) {
+            player.sendMessage(Text.literal("§c传送失败: " + e.getMessage()), false);
+            System.err.println("简单传送失败: " + e.getMessage());
+            e.printStackTrace();
+        }
     }
 }
 
