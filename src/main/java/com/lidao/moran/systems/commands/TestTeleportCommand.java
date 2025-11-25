@@ -1,6 +1,7 @@
 package com.lidao.moran.systems.commands;
 
 import com.lidao.moran.dimensions.DimensionRegistry;
+import com.lidao.moran.systems.teleport.DimensionTeleportManager;
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.context.CommandContext;
 import net.minecraft.server.command.ServerCommandSource;
@@ -32,39 +33,14 @@ public class TestTeleportCommand {
             return 0;
         }
         
-        try {
-            net.minecraft.server.world.ServerWorld targetWorld = player.getServer()
-                    .getWorld(DimensionRegistry.getDimension("peach_blossom").getDimensionKey());
-            
-            if (targetWorld == null) {
-                player.sendMessage(Text.literal("§c桃花源维度尚未加载"), false);
-                return 0;
-            }
-            
-            // 执行传送
-            net.fabricmc.fabric.api.dimension.v1.FabricDimensions.teleport(
-                    player,
-                    targetWorld,
-                    new net.minecraft.world.TeleportTarget(
-                            new net.minecraft.util.math.Vec3d(
-                                    targetWorld.getSpawnPos().getX() + 0.5,
-                                    targetWorld.getSpawnPos().getY() + 1,
-                                    targetWorld.getSpawnPos().getZ() + 0.5
-                            ),
-                            net.minecraft.util.math.Vec3d.ZERO,
-                            player.getYaw(),
-                            player.getPitch()
-                    )
-            );
-            
-            player.sendMessage(Text.literal("§a已传送到桃花源维度（测试模式）"), false);
+        // 使用传送管理器进行传送
+        boolean success = DimensionTeleportManager.travelToDimension(player, "peach_blossom");
+        
+        if (success) {
             context.getSource().sendFeedback(() -> Text.literal("§a玩家 " + player.getName().getString() + " 已传送到桃花源"), true);
-            
             return 1;
-            
-        } catch (Exception e) {
-            player.sendMessage(Text.literal("§c传送失败: " + e.getMessage()), false);
-            context.getSource().sendFeedback(() -> Text.literal("§c传送失败: " + e.getMessage()), true);
+        } else {
+            context.getSource().sendFeedback(() -> Text.literal("§c传送失败"), true);
             return 0;
         }
     }

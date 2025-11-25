@@ -2,7 +2,9 @@ package com.lidao.moran;
 
 import com.lidao.moran.dimensions.DimensionRegistry;
 import com.lidao.moran.dimensions.peach_blossom.PeachBlossomDimension;
+import com.lidao.moran.systems.commands.TestTeleportCommand;
 import net.fabricmc.api.ModInitializer;
+import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -28,6 +30,9 @@ public class MoranMod implements ModInitializer {
         // 初始化维度系统
         initializeDimensionSystem();
         
+        // 初始化命令系统
+        initializeCommandSystem();
+        
         LOGGER.info("🎨 墨世界模组初始化完成！");
         LOGGER.info("🌸 桃花源维度已就绪");
         LOGGER.info("🎮 玩家可以开始探索墨世界了！");
@@ -40,5 +45,15 @@ public class MoranMod implements ModInitializer {
         LOGGER.info("🌀 初始化桃花源维度系统...");
         DimensionRegistry.initialize();
         PeachBlossomDimension.register();
+    }
+    
+    /**
+     * 初始化命令系统
+     */
+    private void initializeCommandSystem() {
+        LOGGER.info("⌨️ 初始化传送命令系统...");
+        CommandRegistrationCallback.EVENT.register((dispatcher, registryAccess, environment) -> {
+            TestTeleportCommand.register(dispatcher);
+        });
     }
 }
