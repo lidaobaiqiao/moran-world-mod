@@ -1,62 +1,54 @@
-树叶贴图错误的核心原因：方块模型用了错误的 **parent**，且方块状态配置过于复杂。
+// src/main/java/com/lidao/moran/worldgen/SurfaceRuleRegistry.java
+package com.lidao.moran.worldgen;
 
----
+import net.minecraft.block.Blocks;
+import net.minecraft.util.Identifier;
+import net.minecraft.util.registry.Registry;
+import net.minecraft.world.gen.surfacebuilder.MaterialRules;
+import terrablender.api.SurfaceRuleManager;
 
-## 问题诊断
-
-你的配置存在 **3 个关键错误**：
-
-1. **模型类型错误**：`"parent": "minecraft:block/cube"` → 立方体模型不支持透明
-2. **方块状态过度配置**：随机旋转权重对树叶是无意义的
-3. **物品模型缺失**：需要独立的物品模型文件
-
----
-
-## 极简修复方案（复制粘贴）
-
-### **1. 方块模型**  
-`E:\test_mod-template-1.20.4\src\main\resources\assets\moran-mod\models\block\peach_blossom_leaves.json`
-```json
-{
-  "parent": "minecraft:block/oak_leaves",
-  "textures": {
-    "all": "moran-mod:block/peach_blossom_leaves"
-  }
+public class SurfaceRuleRegistry {
+    public static void initialize() {
+        // 规则优先级：从上到下，先匹配先执行
+        SurfaceRuleManager.addSurfaceRule(
+            SurfaceRuleManager.RuleCategory.OVERWORLD, // 或自定义维度类型
+            "mo-mod",  // 模组命名空间
+            MaterialRules.sequence(
+                // 规则 1：桃花群系的水下底部 → 桃花沙
+                MaterialRules.condition(
+                    MaterialRules.and(
+                        MaterialRules.biome(RegistryKey.of(RegistryKeys.BIOME, new Identifier("mo-mod", "peach_blossom_biome"))),
+                        MaterialRules.waterBlockCheck(-1, 0),  // 水下 1 格
+                        MaterialRules.stoneDepthCheck(0, false, 0, MaterialRules.StoneDepthType.FLOOR)
+                    ),
+                    MaterialRules.state(Registry.BLOCK.get(new Identifier("mo-mod", "peach_sand")).getDefaultState())
+                ),
+                
+                // 规则 2：桃花群系的地表 → 桃花土
+                MaterialRules.condition(
+                    MaterialRules.biome(RegistryKey.of(RegistryKeys.BIOME, new Identifier("mo-mod", "peach_blossom_biome"))),
+                    MaterialRules.sequence(
+                        // 地表第 1 层（草）
+                        MaterialRules.condition(
+                            MaterialRules.stoneDepthCheck(1, false, 0, MaterialRules.StoneDepthType.FLOOR),
+                            MaterialRules.state(Registry.BLOCK.get(new Identifier("mo-mod", "peach_grass")).getDefaultState())
+                        ),
+                        // 地表下方（泥土）
+                        MaterialRules.condition(
+                            MaterialRules.stoneDepthCheck(3, false, 0, MaterialRules.StoneDepthType.FLOOR),
+                            MaterialRules.state(Registry.BLOCK.get(new Identifier("mo-mod", "peach_dirt")).getDefaultState())
+                        ),
+                        // 更深处（石头）
+                        MaterialRules.state(Registry.BLOCK.get(new Identifier("mo-mod", "peach_stone")).getDefaultState())
+                    )
+                ),
+                
+                // 规则 3：其他群系 → 原版（fallback）
+                MaterialRules.condition(
+                    MaterialRules.not(MaterialRules.biome(RegistryKey.of(RegistryKeys.BIOME, new Identifier("mo-mod", "peach_blossom_biome")))),
+                    MaterialRules.state(Blocks.STONE.getDefaultState())
+                )
+            )
+        );
+    }
 }
-```
-
-### **2. 方块状态**  
-`E:\test_mod-template-1.20.4\src\main\resources\assets\moran-mod\blockstates\peach_blossom_leaves.json`
-```json
-{
-  "variants": {
-    "": { "model": "moran-mod:block/peach_blossom_leaves" }
-  }
-}
-```
-
-### **3. 物品模型**（**新建文件**）  
-`E:\test_mod-template-1.20.4\src\main\resources\assets\moran-mod\models\item\peach_blossom_leaves.json`
-```json
-{
-  "parent": "moran-mod:block/peach_blossom_leaves"
-}
-```
-
----
-
-## 验证清单
-
-✅ **纹理文件**：`peach_blossom_leaves.png` 必须是 **32x32 像素**，**透明背景**（RGBA 格式）  
-✅ **清除缓存**：删除 `run` 文件夹，强制重新生成资源  
-✅ **重启游戏**：`/give @s moran-mod:peach_blossom_leaves` 检查物品栏图标  
-
----
-
-## 原理说明
-
--  **`parent: "minecraft:block/oak_leaves"`**  ：继承树叶专用模型，自动支持透明和腐烂动画
--  **`LeavesBlock` 类**  ：Java 代码已处理 `distance` 状态，JSON 只需空变体
-- **物品模型**：直接引用方块模型，无需重复定义
-
-**修改后重新运行 `./gradlew runClient`**，树叶应正常显示透明效果。

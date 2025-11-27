@@ -1,77 +1,64 @@
-// src/main/java/com/lidao/moran/dimensions/DimensionRegistry.java
 package com.lidao.moran.dimensions;
 
-import com.lidao.moran.dimensions.base.BaseDimension;
-import com.lidao.moran.dimensions.peach_blossom.PeachBlossomDimension;
+import com.lidao.moran.worldgen.PeachRegion;
+import com.lidao.moran.worldgen.PeachSurfaceRules;
 import net.minecraft.registry.RegistryKey;
 import net.minecraft.registry.RegistryKeys;
+import net.minecraft.util.Identifier;
 import net.minecraft.world.World;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import terrablender.api.Regions;
+import com.lidao.moran.MoranMod;
 
-import java.util.Collection;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
-import java.util.Set;
 
 /**
- * 维度注册表 - 管理所有8个维度
- * 注意：此类的“注册”是指内部管理，而非向Minecraft注册表注册。
- * 真正的维度注册由数据文件 完成。
+ * 维度注册表（TerraBlender 兼容版）
+ * 分离维度键注册和 TerraBlender 组件注册
  */
 public class DimensionRegistry {
-    private static final Map<String, BaseDimension> DIMENSIONS = new HashMap<>();
+    private static final Logger LOGGER = LoggerFactory.getLogger(MoranMod.MOD_ID);
+    private static final Map<String, RegistryKey<World>> DIMENSION_KEYS = new HashMap<>();
 
-    /**
-     * 初始化并实例化所有维度
-     * 这个方法应该在模组的 onInitialize 阶段被调用
-     */
     public static void initialize() {
-        // 实例化并注册桃花源维度
-        PeachBlossomDimension peachBlossomDimension = new PeachBlossomDimension();
-        registerDimension(peachBlossomDimension);
+        LOGGER.info("📦 注册维度管理器...");
 
-        // 在这里实例化并注册其他未来的维度
-        // registerDimension(new WindRealmDimension());
+        // 注册维度 RegistryKey（可安全地在 onInitialize 中调用）
+        registerDimension("peach_blossom", new Identifier("moran_mod", "peach_blossom_dimension"));
 
-        System.out.println("✅ 墨世界维度管理器初始化完成，共管理 " + DIMENSIONS.size() + " 个维度。");
+        LOGGER.info("✅ 维度管理器就绪，共 {} 个维度", DIMENSION_KEYS.size());
     }
 
     /**
-     * 将维度实例添加到内部管理器中
-     * @param dimension 维度实例
+     * ✅ 新增：注册 TerraBlender 组件（必须在 onTerraBlenderInitialized 中调用）
      */
-    public static void registerDimension(BaseDimension dimension) {
-        String id = dimension.getDimensionId();
-        DIMENSIONS.put(id, dimension);
-        System.out.println("📌 已将维度 '" + id + "' 添加到内部管理器。");
+    public static void registerTerraBlenderComponents() {
+        LOGGER.info("🌍 注册 TerraBlender 组件...");
+        registerAllRegions();
+        registerAllSurfaceRules();
+        LOGGER.info("✅ TerraBlender 组件注册完成");
     }
 
-    /**
-     * 根据ID获取维度实例
-     */
-    public static BaseDimension getDimension(String id) {
-        return DIMENSIONS.get(id);
+    private static void registerDimension(String id, Identifier dimensionId) {
+        RegistryKey<World> key = RegistryKey.of(RegistryKeys.WORLD, dimensionId);
+        DIMENSION_KEYS.put(id, key);
+        LOGGER.info("📌 注册维度: {} -> {}", id, dimensionId);
     }
 
-    /**
-     * 根据ID获取维度的RegistryKey
-     */
     public static RegistryKey<World> getDimensionKey(String id) {
-        BaseDimension dimension = DIMENSIONS.get(id);
-        return dimension != null ? dimension.getDimensionKey() : null;
+        return DIMENSION_KEYS.get(id);
     }
 
-    /**
-     * 获取所有已管理的维度实例
-     */
-    public static Collection<BaseDimension> getAllDimensions() {
-        return DIMENSIONS.values();
+    private static void registerAllRegions() {
+        // ✅ 只传 1 个参数：Region 实例
+        Regions.register(new PeachRegion(new Identifier("moran_mod", "peach_region")));
+        LOGGER.info("🗺️ 注册 TerraBlender Region");
     }
 
-    /**
-     * 获取所有已管理的维度ID（用于调试）
-     */
-    public static Set<String> getRegisteredDimensionIds() {
-        return new HashSet<>(DIMENSIONS.keySet());
+    private static void registerAllSurfaceRules() {
+        PeachSurfaceRules.register();
+        LOGGER.info("🏔️ 注册 TerraBlender SurfaceRule");
     }
 }

@@ -1,0 +1,584 @@
+Carver definition
+
+This feature is exclusive to Java Edition.
+Configured carvers are used to add caves and canyons. They are referenced in biomes.
+
+
+Contents
+1	Definition
+2	JSON format
+3	Carver Type
+3.1	cave and nether_cave
+3.2	canyon
+4	History
+5	External links
+6	Navigation
+Definition
+Configured carvers can be defined in data packs, as part of the directory structure below.
+
+File archive.png: Sprite image for archive in Minecraft data pack name.zip or File directory.png: Sprite image for directory in Minecraft data pack name
+File file.png: Sprite image for file in Minecraft pack.mcmeta
+File directory.png: Sprite image for directory in Minecraft data
+File directory.png: Sprite image for directory in Minecraft namespace
+File directory.png: Sprite image for directory in Minecraft worldgen
+File directory.png: Sprite image for directory in Minecraft configured_carver
+File file.png: Sprite image for file in Minecraft <name>.json
+More directories…
+More directories…
+JSON format
+[NBT Compound / JSON Object]: The root object.
+[String] type: The ID of carver type; see below.
+[NBT Compound / JSON Object] config: Configuration values for the carver.
+[Float] probability: The probability that each chunk attempts to generate carvers. Value between 0 and 1 (both inclusive).
+[NBT Compound / JSON Object] y: The height at which this carver attempts to generate.
+Height provider[]
+Specifying a constant height:
+Choices for a vertical anchor (must choose only one of the three)[]
+[Int] absolute: An absolute height as seen on the F3 screen.
+[Int] above_bottom: A relative height starting at the bottom of the world.
+[Int] below_top: A relative height starting at the top of the world. Higher values move the height down.
+Either specifying a constant height directly as above, or specifying the types and additional fields as below:
+[String] type: The type of the height provider. One of (specify a constant height), (random value in a uniform distribution), (random value, biased towards the bottom), (random value [needs testing]), (random value, isosceles trapezoidal distribution), and (random value from a weighted list). constantuniformbiased_to_bottomvery_biased_to_bottomtrapezoidweighted_list
+If is , additional fields are as follows:typeconstant
+[NBT Compound / JSON Object] value: The vertical anchor to use as constant height.
+Choices for a vertical anchor (must choose only one of the three)[]
+[Int] absolute: An absolute height as seen on the F3 screen.
+[Int] above_bottom: A relative height starting at the bottom of the world.
+[Int] below_top: A relative height starting at the top of the world. Higher values move the height down.
+If is , additional fields are as follows:typeuniform
+[NBT Compound / JSON Object] min_inclusive: The vertical anchor to use as minimum height.
+Choices for a vertical anchor (must choose only one of the three)[]
+[Int] absolute: An absolute height as seen on the F3 screen.
+[Int] above_bottom: A relative height starting at the bottom of the world.
+[Int] below_top: A relative height starting at the top of the world. Higher values move the height down.
+[NBT Compound / JSON Object] max_inclusive: The vertical anchor to use as maximum height.
+Choices for a vertical anchor (must choose only one of the three)[]
+[Int] absolute: An absolute height as seen on the F3 screen.
+[Int] above_bottom: A relative height starting at the bottom of the world.
+[Int] below_top: A relative height starting at the top of the world. Higher values move the height down.
+If is or , additional fields are as follows:typebiased_to_bottomvery_biased_to_bottom
+[NBT Compound / JSON Object] min_inclusive: The vertical anchor to use as minimum height.
+Choices for a vertical anchor (must choose only one of the three)[]
+[Int] absolute: An absolute height as seen on the F3 screen.
+[Int] above_bottom: A relative height starting at the bottom of the world.
+[Int] below_top: A relative height starting at the top of the world. Higher values move the height down.
+[NBT Compound / JSON Object] max_inclusive: The vertical anchor to use as maximum height.
+Choices for a vertical anchor (must choose only one of the three)[]
+[Int] absolute: An absolute height as seen on the F3 screen.
+[Int] above_bottom: A relative height starting at the bottom of the world.
+[Int] below_top: A relative height starting at the top of the world. Higher values move the height down.
+[Int] inner: (optional, defaults to 1) The inner value. Must be at least 1.
+If is , additional fields are as follows:typetrapezoid
+[NBT Compound / JSON Object] min_inclusive: The vertical anchor to use as minimum height.
+Choices for a vertical anchor (must choose only one of the three)[]
+[Int] absolute: An absolute height as seen on the F3 screen.
+[Int] above_bottom: A relative height starting at the bottom of the world.
+[Int] below_top: A relative height starting at the top of the world. Higher values move the height down.
+[NBT Compound / JSON Object] max_inclusive: The vertical anchor to use as maximum height.
+Choices for a vertical anchor (must choose only one of the three)[]
+[Int] absolute: An absolute height as seen on the F3 screen.
+[Int] above_bottom: A relative height starting at the bottom of the world.
+[Int] below_top: A relative height starting at the top of the world. Higher values move the height down.
+[Int] plateau: (optional, defaults to 0) The length of the range in the middle of the trapezoid distribution that has a uniform distribution.
+If is , additional fields are as follows:typeweighted_list
+[NBT List / JSON Array] distribution: (Cannot be empty) A random weighted pool of height providers.
+[NBT Compound / JSON Object] One entry in the random pool.
+[Int] data: A height provider.
+Height provider[]
+Specifying a constant height:
+Choices for a vertical anchor (must choose only one of the three)[]
+[Int] absolute: An absolute height as seen on the F3 screen.
+[Int] above_bottom: A relative height starting at the bottom of the world.
+[Int] below_top: A relative height starting at the top of the world. Higher values move the height down.
+Either specifying a constant height directly as above, or specifying the types and additional fields as below:
+[String] type: The type of the height provider. One of (specify a constant height), (random value in a uniform distribution), (random value, biased towards the bottom), (random value [needs testing]), (random value, isosceles trapezoidal distribution), and (random value from a weighted list). constantuniformbiased_to_bottomvery_biased_to_bottomtrapezoidweighted_list
+If is , additional fields are as follows:typeconstant
+[NBT Compound / JSON Object] value: The vertical anchor to use as constant height.
+Choices for a vertical anchor (must choose only one of the three)[]
+[Int] absolute: An absolute height as seen on the F3 screen.
+[Int] above_bottom: A relative height starting at the bottom of the world.
+[Int] below_top: A relative height starting at the top of the world. Higher values move the height down.
+If is , additional fields are as follows:typeuniform
+[NBT Compound / JSON Object] min_inclusive: The vertical anchor to use as minimum height.
+Choices for a vertical anchor (must choose only one of the three)[]
+[Int] absolute: An absolute height as seen on the F3 screen.
+[Int] above_bottom: A relative height starting at the bottom of the world.
+[Int] below_top: A relative height starting at the top of the world. Higher values move the height down.
+[NBT Compound / JSON Object] max_inclusive: The vertical anchor to use as maximum height.
+Choices for a vertical anchor (must choose only one of the three)[]
+[Int] absolute: An absolute height as seen on the F3 screen.
+[Int] above_bottom: A relative height starting at the bottom of the world.
+[Int] below_top: A relative height starting at the top of the world. Higher values move the height down.
+If is or , additional fields are as follows:typebiased_to_bottomvery_biased_to_bottom
+[NBT Compound / JSON Object] min_inclusive: The vertical anchor to use as minimum height.
+Choices for a vertical anchor (must choose only one of the three)[]
+[Int] absolute: An absolute height as seen on the F3 screen.
+[Int] above_bottom: A relative height starting at the bottom of the world.
+[Int] below_top: A relative height starting at the top of the world. Higher values move the height down.
+[NBT Compound / JSON Object] max_inclusive: The vertical anchor to use as maximum height.
+Choices for a vertical anchor (must choose only one of the three)[]
+[Int] absolute: An absolute height as seen on the F3 screen.
+[Int] above_bottom: A relative height starting at the bottom of the world.
+[Int] below_top: A relative height starting at the top of the world. Higher values move the height down.
+[Int] inner: (optional, defaults to 1) The inner value. Must be at least 1.
+If is , additional fields are as follows:typetrapezoid
+[NBT Compound / JSON Object] min_inclusive: The vertical anchor to use as minimum height.
+Choices for a vertical anchor (must choose only one of the three)[]
+[Int] absolute: An absolute height as seen on the F3 screen.
+[Int] above_bottom: A relative height starting at the bottom of the world.
+[Int] below_top: A relative height starting at the top of the world. Higher values move the height down.
+[NBT Compound / JSON Object] max_inclusive: The vertical anchor to use as maximum height.
+Choices for a vertical anchor (must choose only one of the three)[]
+[Int] absolute: An absolute height as seen on the F3 screen.
+[Int] above_bottom: A relative height starting at the bottom of the world.
+[Int] below_top: A relative height starting at the top of the world. Higher values move the height down.
+[Int] plateau: (optional, defaults to 0) The length of the range in the middle of the trapezoid distribution that has a uniform distribution.
+If is , additional fields are as follows:typeweighted_list
+[NBT List / JSON Array] distribution: (Cannot be empty) A random weighted pool of height providers.
+[NBT Compound / JSON Object] One entry in the random pool.
+[Int] data: A height provider.
+Height provider[]
+Specifying a constant height:
+Choices for a vertical anchor (must choose only one of the three)[]
+[Int] absolute: An absolute height as seen on the F3 screen.
+[Int] above_bottom: A relative height starting at the bottom of the world.
+[Int] below_top: A relative height starting at the top of the world. Higher values move the height down.
+Either specifying a constant height directly as above, or specifying the types and additional fields as below:
+[String] type: The type of the height provider. One of (specify a constant height), (random value in a uniform distribution), (random value, biased towards the bottom), (random value [needs testing]), (random value, isosceles trapezoidal distribution), and (random value from a weighted list). constantuniformbiased_to_bottomvery_biased_to_bottomtrapezoidweighted_list
+If is , additional fields are as follows:typeconstant
+[NBT Compound / JSON Object] value: The vertical anchor to use as constant height.
+Choices for a vertical anchor (must choose only one of the three)[]
+[Int] absolute: An absolute height as seen on the F3 screen.
+[Int] above_bottom: A relative height starting at the bottom of the world.
+[Int] below_top: A relative height starting at the top of the world. Higher values move the height down.
+If is , additional fields are as follows:typeuniform
+[NBT Compound / JSON Object] min_inclusive: The vertical anchor to use as minimum height.
+Choices for a vertical anchor (must choose only one of the three)[]
+[Int] absolute: An absolute height as seen on the F3 screen.
+[Int] above_bottom: A relative height starting at the bottom of the world.
+[Int] below_top: A relative height starting at the top of the world. Higher values move the height down.
+[NBT Compound / JSON Object] max_inclusive: The vertical anchor to use as maximum height.
+Choices for a vertical anchor (must choose only one of the three)[]
+[Int] absolute: An absolute height as seen on the F3 screen.
+[Int] above_bottom: A relative height starting at the bottom of the world.
+[Int] below_top: A relative height starting at the top of the world. Higher values move the height down.
+If is or , additional fields are as follows:typebiased_to_bottomvery_biased_to_bottom
+[NBT Compound / JSON Object] min_inclusive: The vertical anchor to use as minimum height.
+Choices for a vertical anchor (must choose only one of the three)[]
+[Int] absolute: An absolute height as seen on the F3 screen.
+[Int] above_bottom: A relative height starting at the bottom of the world.
+[Int] below_top: A relative height starting at the top of the world. Higher values move the height down.
+[NBT Compound / JSON Object] max_inclusive: The vertical anchor to use as maximum height.
+Choices for a vertical anchor (must choose only one of the three)[]
+[Int] absolute: An absolute height as seen on the F3 screen.
+[Int] above_bottom: A relative height starting at the bottom of the world.
+[Int] below_top: A relative height starting at the top of the world. Higher values move the height down.
+[Int] inner: (optional, defaults to 1) The inner value. Must be at least 1.
+If is , additional fields are as follows:typetrapezoid
+[NBT Compound / JSON Object] min_inclusive: The vertical anchor to use as minimum height.
+Choices for a vertical anchor (must choose only one of the three)[]
+[Int] absolute: An absolute height as seen on the F3 screen.
+[Int] above_bottom: A relative height starting at the bottom of the world.
+[Int] below_top: A relative height starting at the top of the world. Higher values move the height down.
+[NBT Compound / JSON Object] max_inclusive: The vertical anchor to use as maximum height.
+Choices for a vertical anchor (must choose only one of the three)[]
+[Int] absolute: An absolute height as seen on the F3 screen.
+[Int] above_bottom: A relative height starting at the bottom of the world.
+[Int] below_top: A relative height starting at the top of the world. Higher values move the height down.
+[Int] plateau: (optional, defaults to 0) The length of the range in the middle of the trapezoid distribution that has a uniform distribution.
+If is , additional fields are as follows:typeweighted_list
+[NBT List / JSON Array] distribution: (Cannot be empty) A random weighted pool of height providers.
+[NBT Compound / JSON Object] One entry in the random pool.
+[Int] data: A height provider.
+Height provider[]
+Specifying a constant height:
+Choices for a vertical anchor (must choose only one of the three)[]
+[Int] absolute: An absolute height as seen on the F3 screen.
+[Int] above_bottom: A relative height starting at the bottom of the world.
+[Int] below_top: A relative height starting at the top of the world. Higher values move the height down.
+Either specifying a constant height directly as above, or specifying the types and additional fields as below:
+[String] type: The type of the height provider. One of (specify a constant height), (random value in a uniform distribution), (random value, biased towards the bottom), (random value [needs testing]), (random value, isosceles trapezoidal distribution), and (random value from a weighted list). constantuniformbiased_to_bottomvery_biased_to_bottomtrapezoidweighted_list
+If is , additional fields are as follows:typeconstant
+[NBT Compound / JSON Object] value: The vertical anchor to use as constant height.
+Choices for a vertical anchor (must choose only one of the three)[]
+[Int] absolute: An absolute height as seen on the F3 screen.
+[Int] above_bottom: A relative height starting at the bottom of the world.
+[Int] below_top: A relative height starting at the top of the world. Higher values move the height down.
+If is , additional fields are as follows:typeuniform
+[NBT Compound / JSON Object] min_inclusive: The vertical anchor to use as minimum height.
+Choices for a vertical anchor (must choose only one of the three)[]
+[Int] absolute: An absolute height as seen on the F3 screen.
+[Int] above_bottom: A relative height starting at the bottom of the world.
+[Int] below_top: A relative height starting at the top of the world. Higher values move the height down.
+[NBT Compound / JSON Object] max_inclusive: The vertical anchor to use as maximum height.
+Choices for a vertical anchor (must choose only one of the three)[]
+[Int] absolute: An absolute height as seen on the F3 screen.
+[Int] above_bottom: A relative height starting at the bottom of the world.
+[Int] below_top: A relative height starting at the top of the world. Higher values move the height down.
+If is or , additional fields are as follows:typebiased_to_bottomvery_biased_to_bottom
+[NBT Compound / JSON Object] min_inclusive: The vertical anchor to use as minimum height.
+Choices for a vertical anchor (must choose only one of the three)[]
+[Int] absolute: An absolute height as seen on the F3 screen.
+[Int] above_bottom: A relative height starting at the bottom of the world.
+[Int] below_top: A relative height starting at the top of the world. Higher values move the height down.
+[NBT Compound / JSON Object] max_inclusive: The vertical anchor to use as maximum height.
+Choices for a vertical anchor (must choose only one of the three)[]
+[Int] absolute: An absolute height as seen on the F3 screen.
+[Int] above_bottom: A relative height starting at the bottom of the world.
+[Int] below_top: A relative height starting at the top of the world. Higher values move the height down.
+[Int] inner: (optional, defaults to 1) The inner value. Must be at least 1.
+If is , additional fields are as follows:typetrapezoid
+[NBT Compound / JSON Object] min_inclusive: The vertical anchor to use as minimum height.
+Choices for a vertical anchor (must choose only one of the three)[]
+[Int] absolute: An absolute height as seen on the F3 screen.
+[Int] above_bottom: A relative height starting at the bottom of the world.
+[Int] below_top: A relative height starting at the top of the world. Higher values move the height down.
+[NBT Compound / JSON Object] max_inclusive: The vertical anchor to use as maximum height.
+Choices for a vertical anchor (must choose only one of the three)[]
+[Int] absolute: An absolute height as seen on the F3 screen.
+[Int] above_bottom: A relative height starting at the bottom of the world.
+[Int] below_top: A relative height starting at the top of the world. Higher values move the height down.
+[Int] plateau: (optional, defaults to 0) The length of the range in the middle of the trapezoid distribution that has a uniform distribution.
+If is , additional fields are as follows:typeweighted_list
+[NBT List / JSON Array] distribution: (Cannot be empty) A random weighted pool of height providers.
+[NBT Compound / JSON Object] One entry in the random pool.
+[Int] data: A height provider.
+Height provider[]
+Specifying a constant height:
+Choices for a vertical anchor (must choose only one of the three)[]
+Either specifying a constant height directly as above, or specifying the types and additional fields as below:
+[String] type: The type of the height provider. One of (specify a constant height), (random value in a uniform distribution), (random value, biased towards the bottom), (random value [needs testing]), (random value, isosceles trapezoidal distribution), and (random value from a weighted list). constantuniformbiased_to_bottomvery_biased_to_bottomtrapezoidweighted_list
+If is , additional fields are as follows:typeconstant
+[NBT Compound / JSON Object] value: The vertical anchor to use as constant height.
+Choices for a vertical anchor (must choose only one of the three)[]
+[Int] absolute: An absolute height as seen on the F3 screen.
+[Int] above_bottom: A relative height starting at the bottom of the world.
+[Int] below_top: A relative height starting at the top of the world. Higher values move the height down.
+If is , additional fields are as follows:typeuniform
+[NBT Compound / JSON Object] min_inclusive: The vertical anchor to use as minimum height.
+Choices for a vertical anchor (must choose only one of the three)[]
+[Int] absolute: An absolute height as seen on the F3 screen.
+[Int] above_bottom: A relative height starting at the bottom of the world.
+[Int] below_top: A relative height starting at the top of the world. Higher values move the height down.
+[NBT Compound / JSON Object] max_inclusive: The vertical anchor to use as maximum height.
+Choices for a vertical anchor (must choose only one of the three)[]
+[Int] absolute: An absolute height as seen on the F3 screen.
+[Int] above_bottom: A relative height starting at the bottom of the world.
+[Int] below_top: A relative height starting at the top of the world. Higher values move the height down.
+If is or , additional fields are as follows:typebiased_to_bottomvery_biased_to_bottom
+[NBT Compound / JSON Object] min_inclusive: The vertical anchor to use as minimum height.
+Choices for a vertical anchor (must choose only one of the three)[]
+[Int] absolute: An absolute height as seen on the F3 screen.
+[Int] above_bottom: A relative height starting at the bottom of the world.
+[Int] below_top: A relative height starting at the top of the world. Higher values move the height down.
+[NBT Compound / JSON Object] max_inclusive: The vertical anchor to use as maximum height.
+Choices for a vertical anchor (must choose only one of the three)[]
+[Int] absolute: An absolute height as seen on the F3 screen.
+[Int] above_bottom: A relative height starting at the bottom of the world.
+[Int] below_top: A relative height starting at the top of the world. Higher values move the height down.
+[Int] inner: (optional, defaults to 1) The inner value. Must be at least 1.
+If is , additional fields are as follows:typetrapezoid
+[NBT Compound / JSON Object] min_inclusive: The vertical anchor to use as minimum height.
+Choices for a vertical anchor (must choose only one of the three)[]
+[Int] absolute: An absolute height as seen on the F3 screen.
+[Int] above_bottom: A relative height starting at the bottom of the world.
+[Int] below_top: A relative height starting at the top of the world. Higher values move the height down.
+[NBT Compound / JSON Object] max_inclusive: The vertical anchor to use as maximum height.
+Choices for a vertical anchor (must choose only one of the three)[]
+[Int] absolute: An absolute height as seen on the F3 screen.
+[Int] above_bottom: A relative height starting at the bottom of the world.
+[Int] below_top: A relative height starting at the top of the world. Higher values move the height down.
+[Int] plateau: (optional, defaults to 0) The length of the range in the middle of the trapezoid distribution that has a uniform distribution.
+If is , additional fields are as follows:typeweighted_list
+[NBT List / JSON Array] distribution: (Cannot be empty) A random weighted pool of height providers.
+[NBT Compound / JSON Object] One entry in the random pool.
+[Int] data: A height provider.
+Height provider[]
+Specifying a constant height:
+Choices for a vertical anchor (must choose only one of the three)[]
+[Int] absolute: An absolute height as seen on the F3 screen.
+[Int] above_bottom: A relative height starting at the bottom of the world.
+[Int] below_top: A relative height starting at the top of the world. Higher values move the height down.
+Either specifying a constant height directly as above, or specifying the types and additional fields as below:
+[String] type: The type of the height provider. One of (specify a constant height), (random value in a uniform distribution), (random value, biased towards the bottom), (random value [needs testing]), (random value, isosceles trapezoidal distribution), and (random value from a weighted list). constantuniformbiased_to_bottomvery_biased_to_bottomtrapezoidweighted_list
+If is , additional fields are as follows:typeconstant
+[NBT Compound / JSON Object] value: The vertical anchor to use as constant height.
+Choices for a vertical anchor (must choose only one of the three)[]
+[Int] absolute: An absolute height as seen on the F3 screen.
+[Int] above_bottom: A relative height starting at the bottom of the world.
+[Int] below_top: A relative height starting at the top of the world. Higher values move the height down.
+If is , additional fields are as follows:typeuniform
+[NBT Compound / JSON Object] min_inclusive: The vertical anchor to use as minimum height.
+Choices for a vertical anchor (must choose only one of the three)[]
+[NBT Compound / JSON Object] max_inclusive: The vertical anchor to use as maximum height.
+Choices for a vertical anchor (must choose only one of the three)[]
+If is or , additional fields are as follows:typebiased_to_bottomvery_biased_to_bottom
+[NBT Compound / JSON Object] min_inclusive: The vertical anchor to use as minimum height.
+Choices for a vertical anchor (must choose only one of the three)[]
+[NBT Compound / JSON Object] max_inclusive: The vertical anchor to use as maximum height.
+Choices for a vertical anchor (must choose only one of the three)[]
+[Int] inner: (optional, defaults to 1) The inner value. Must be at least 1.
+If is , additional fields are as follows:typetrapezoid
+[NBT Compound / JSON Object] min_inclusive: The vertical anchor to use as minimum height.
+Choices for a vertical anchor (must choose only one of the three)[]
+[NBT Compound / JSON Object] max_inclusive: The vertical anchor to use as maximum height.
+Choices for a vertical anchor (must choose only one of the three)[]
+[Int] plateau: (optional, defaults to 0) The length of the range in the middle of the trapezoid distribution that has a uniform distribution.
+If is , additional fields are as follows:typeweighted_list
+[NBT List / JSON Array] distribution: (Cannot be empty) A random weighted pool of height providers.
+[NBT Compound / JSON Object] One entry in the random pool.
+[Int] data: A height provider.
+Height provider[]
+Specifying a constant height:
+Choices for a vertical anchor (must choose only one of the three)[]
+Either specifying a constant height directly as above, or specifying the types and additional fields as below:
+[String] type: The type of the height provider. One of (specify a constant height), (random value in a uniform distribution), (random value, biased towards the bottom), (random value [needs testing]), (random value, isosceles trapezoidal distribution), and (random value from a weighted list). constantuniformbiased_to_bottomvery_biased_to_bottomtrapezoidweighted_list
+If is , additional fields are as follows:typeconstant
+[NBT Compound / JSON Object] value: The vertical anchor to use as constant height.
+Choices for a vertical anchor (must choose only one of the three)[]
+If is , additional fields are as follows:typeuniform
+[NBT Compound / JSON Object] min_inclusive: The vertical anchor to use as minimum height.
+Choices for a vertical anchor (must choose only one of the three)[]
+[NBT Compound / JSON Object] max_inclusive: The vertical anchor to use as maximum height.
+Choices for a vertical anchor (must choose only one of the three)[]
+If is or , additional fields are as follows:typebiased_to_bottomvery_biased_to_bottom
+[NBT Compound / JSON Object] min_inclusive: The vertical anchor to use as minimum height.
+Choices for a vertical anchor (must choose only one of the three)[]
+[NBT Compound / JSON Object] max_inclusive: The vertical anchor to use as maximum height.
+Choices for a vertical anchor (must choose only one of the three)[]
+[Int] inner: (optional, defaults to 1) The inner value. Must be at least 1.
+If is , additional fields are as follows:typetrapezoid
+[NBT Compound / JSON Object] min_inclusive: The vertical anchor to use as minimum height.
+Choices for a vertical anchor (must choose only one of the three)[]
+[NBT Compound / JSON Object] max_inclusive: The vertical anchor to use as maximum height.
+Choices for a vertical anchor (must choose only one of the three)[]
+[Int] plateau: (optional, defaults to 0) The length of the range in the middle of the trapezoid distribution that has a uniform distribution.
+If is , additional fields are as follows:typeweighted_list
+[NBT List / JSON Array] distribution: (Cannot be empty) A random weighted pool of height providers.
+[NBT Compound / JSON Object] One entry in the random pool.
+[Int] data: A height provider.
+Height provider[]
+[Int] weight: The weight of this entry.
+[Int] weight: The weight of this entry.
+[Int] weight: The weight of this entry.
+[Int] weight: The weight of this entry.
+[Int] weight: The weight of this entry.
+[Int] weight: The weight of this entry.
+[Int] weight: The weight of this entry.
+[NBT Compound / JSON Object] lava_level: The Y-level below or equal to which the carved areas are filled with lava. Doesn't affect (where lava level is always ). Note that the carver is also filled with the fluid from aquifers, which always include lava below . nether_cavebottom_y + 31-54
+Choices for a vertical anchor (must choose only one of the three)[]
+[Int] absolute: An absolute height as seen on the F3 screen.
+[Int] above_bottom: A relative height starting at the bottom of the world.
+[Int] below_top: A relative height starting at the top of the world. Higher values move the height down.
+[String][NBT List / JSON Array] replaceable: Blocks that can be carved. Can be a block ID, a block tag, or a list of block IDs.
+[NBT Compound / JSON Object] debug_settings: (optional) Replaces blocks in the carved areas for debugging.
+[Boolean] debug_mode: (optional, defauts to false) Enable debug mode for this carver.
+[NBT Compound / JSON Object] air_state: (optional, defaults to acacia button's default state) Replaces air blocks.
+Block state[]
+[String] Name: The identifier of the block to use.
+[NBT Compound / JSON Object] Properties: (Optional, can be empty) Block properties. Unspecified properties of the specified block will be set to their default values.
+[String] <property>: (Optional) Block state property key-value pair. The property must be possessed by the specified block.
+[NBT Compound / JSON Object] water_state: (optional, defaults to acacia button's default state) Replaces water blocks and then waterlogs these blocks.
+Block state[]
+[String] Name: The identifier of the block to use.
+[NBT Compound / JSON Object] Properties: (Optional, can be empty) Block properties. Unspecified properties of the specified block will be set to their default values.
+[String] <property>: (Optional) Block state property key-value pair. The property must be possessed by the specified block.
+[NBT Compound / JSON Object] lava_state: (optional, defaults to acacia button's default state) Replaces lava blocks.
+Block state[]
+[String] Name: The identifier of the block to use.
+[NBT Compound / JSON Object] Properties: (Optional, can be empty) Block properties. Unspecified properties of the specified block will be set to their default values.
+[String] <property>: (Optional) Block state property key-value pair. The property must be possessed by the specified block.
+[NBT Compound / JSON Object] barrier_state: (optional, defaults to acacia button's default state) Replaces barriers of aquifers.
+Block state[]
+[String] Name: The identifier of the block to use.
+[NBT Compound / JSON Object] Properties: (Optional, can be empty) Block properties. Unspecified properties of the specified block will be set to their default values.
+[String] <property>: (Optional) Block state property key-value pair. The property must be possessed by the specified block.
+Additional fields based on [String] type; see below.
+Carver Type
+The carver type determines the shape of the carving.
+
+cave and nether_cave
+Carves a cave. A cave is a long tunnel that sometimes branches. Sometimes one or more tunnels start from a circular void.
+
+Nether caves are similar to caves, but with a less frequency and wider tunnels [verify]. Also, aquifer doesn't work: The carved blocks below are filled with lava. bottom_y + 32.0
+
+Additional fields:
+
+[Float][NBT Compound / JSON Object] yScale: Vertically scales circular voids.
+Float provider[]
+[String] type: The type of the float provider. One of , , , or . constantuniformclamped_normaltrapezoid
+If is , additional fields are as follows:typeconstant
+[Float] value: The constant value to use.
+If is , additional fields are as follows:typeuniform
+[Float] min_inclusive: The minimum possible value (inclusive).
+[Float] max_exclusive: The maximum possible value (exclusive). Must be larger than [Float] min_inclusive.
+If is , additional fields are as follows:typeclamped_normal
+[Float] mean: The mean.
+[Float] deviation: The deviation.
+[Float] min: The minimum value to clamp to.
+[Float] max: The maximum value to clamp to. Must be larger than [Float] min.
+If is , additional fields are as follows:typetrapezoid
+[Float] min: The minimum value.
+[Float] max: The maximum value. Must be larger than [Float] min.
+[Float] plateau: The range in the middle of the trapezoid distribution that has a uniform distribution. Must be less than or equal to max - min
+[Float][NBT Compound / JSON Object] horizontal_radius_multiplier: Horizonally scales cave tunnels. Doesn't affect the length of tunnels.
+Float provider[]
+[String] type: The type of the float provider. One of , , , or . constantuniformclamped_normaltrapezoid
+If is , additional fields are as follows:typeconstant
+[Float] value: The constant value to use.
+If is , additional fields are as follows:typeuniform
+[Float] min_inclusive: The minimum possible value (inclusive).
+[Float] max_exclusive: The maximum possible value (exclusive). Must be larger than [Float] min_inclusive.
+If is , additional fields are as follows:typeclamped_normal
+[Float] mean: The mean.
+[Float] deviation: The deviation.
+[Float] min: The minimum value to clamp to.
+[Float] max: The maximum value to clamp to. Must be larger than [Float] min.
+If is , additional fields are as follows:typetrapezoid
+[Float] min: The minimum value.
+[Float] max: The maximum value. Must be larger than [Float] min.
+[Float] plateau: The range in the middle of the trapezoid distribution that has a uniform distribution. Must be less than or equal to max - min
+[Float][NBT Compound / JSON Object] vertical_radius_multiplier: Vertically scales cave tunnels. Doesn't affect the length of tunnels.
+Float provider[]
+[String] type: The type of the float provider. One of , , , or . constantuniformclamped_normaltrapezoid
+If is , additional fields are as follows:typeconstant
+[Float] value: The constant value to use.
+If is , additional fields are as follows:typeuniform
+[Float] min_inclusive: The minimum possible value (inclusive).
+[Float] max_exclusive: The maximum possible value (exclusive). Must be larger than [Float] min_inclusive.
+If is , additional fields are as follows:typeclamped_normal
+[Float] mean: The mean.
+[Float] deviation: The deviation.
+[Float] min: The minimum value to clamp to.
+[Float] max: The maximum value to clamp to. Must be larger than [Float] min.
+If is , additional fields are as follows:typetrapezoid
+[Float] min: The minimum value.
+[Float] max: The maximum value. Must be larger than [Float] min.
+[Float] plateau: The range in the middle of the trapezoid distribution that has a uniform distribution. Must be less than or equal to max - min
+[Float][NBT Compound / JSON Object] floor_level: Value between -1.0 and 1.0 (both inclusive). Change the shape of the cave's horizontal floor. If 0.0, carves the terrain with ellipsoids. If 1.0, carves with upper semi-ellipsoids, resulting in a level floor.
+Float provider[]
+[String] type: The type of the float provider. One of , , , or . constantuniformclamped_normaltrapezoid
+If is , additional fields are as follows:typeconstant
+[Float] value: The constant value to use.
+If is , additional fields are as follows:typeuniform
+[Float] min_inclusive: The minimum possible value (inclusive).
+[Float] max_exclusive: The maximum possible value (exclusive). Must be larger than [Float] min_inclusive.
+If is , additional fields are as follows:typeclamped_normal
+[Float] mean: The mean.
+[Float] deviation: The deviation.
+[Float] min: The minimum value to clamp to.
+[Float] max: The maximum value to clamp to. Must be larger than [Float] min.
+If is , additional fields are as follows:typetrapezoid
+[Float] min: The minimum value.
+[Float] max: The maximum value. Must be larger than [Float] min.
+[Float] plateau: The range in the middle of the trapezoid distribution that has a uniform distribution. Must be less than or equal to max - min
+canyon
+Carves a canyon.
+
+Additional fields:
+
+[Float][NBT Compound / JSON Object] yScale: Vertically scales canyons.
+Float provider[]
+[String] type: The type of the float provider. One of , , , or . constantuniformclamped_normaltrapezoid
+If is , additional fields are as follows:typeconstant
+[Float] value: The constant value to use.
+If is , additional fields are as follows:typeuniform
+[Float] min_inclusive: The minimum possible value (inclusive).
+[Float] max_exclusive: The maximum possible value (exclusive). Must be larger than [Float] min_inclusive.
+If is , additional fields are as follows:typeclamped_normal
+[Float] mean: The mean.
+[Float] deviation: The deviation.
+[Float] min: The minimum value to clamp to.
+[Float] max: The maximum value to clamp to. Must be larger than [Float] min.
+If is , additional fields are as follows:typetrapezoid
+[Float] min: The minimum value.
+[Float] max: The maximum value. Must be larger than [Float] min.
+[Float] plateau: The range in the middle of the trapezoid distribution that has a uniform distribution. Must be less than or equal to max - min
+[Float][NBT Compound / JSON Object] vertical_rotation: Vertical rotation as a canyon extends.
+Float provider[]
+[String] type: The type of the float provider. One of , , , or . constantuniformclamped_normaltrapezoid
+If is , additional fields are as follows:typeconstant
+[Float] value: The constant value to use.
+If is , additional fields are as follows:typeuniform
+[Float] min_inclusive: The minimum possible value (inclusive).
+[Float] max_exclusive: The maximum possible value (exclusive). Must be larger than [Float] min_inclusive.
+If is , additional fields are as follows:typeclamped_normal
+[Float] mean: The mean.
+[Float] deviation: The deviation.
+[Float] min: The minimum value to clamp to.
+[Float] max: The maximum value to clamp to. Must be larger than [Float] min.
+If is , additional fields are as follows:typetrapezoid
+[Float] min: The minimum value.
+[Float] max: The maximum value. Must be larger than [Float] min.
+[Float] plateau: The range in the middle of the trapezoid distribution that has a uniform distribution. Must be less than or equal to max - min
+[NBT Compound / JSON Object] shape: The shape to use for the ravine.
+[Float][NBT Compound / JSON Object] distance_factor: Scales the length of canyons. Higher values make canyons longer.
+Float provider[]
+[String] type: The type of the float provider. One of , , , or . constantuniformclamped_normaltrapezoid
+If is , additional fields are as follows:typeconstant
+[Float] value: The constant value to use.
+If is , additional fields are as follows:typeuniform
+[Float] min_inclusive: The minimum possible value (inclusive).
+[Float] max_exclusive: The maximum possible value (exclusive). Must be larger than [Float] min_inclusive.
+If is , additional fields are as follows:typeclamped_normal
+[Float] mean: The mean.
+[Float] deviation: The deviation.
+[Float] min: The minimum value to clamp to.
+[Float] max: The maximum value to clamp to. Must be larger than [Float] min.
+If is , additional fields are as follows:typetrapezoid
+[Float] min: The minimum value.
+[Float] max: The maximum value. Must be larger than [Float] min.
+[Float] plateau: The range in the middle of the trapezoid distribution that has a uniform distribution. Must be less than or equal to max - min
+[Float][NBT Compound / JSON Object] thickness: Scales the breadth and height of canyons.
+Float provider[]
+[String] type: The type of the float provider. One of , , , or . constantuniformclamped_normaltrapezoid
+If is , additional fields are as follows:typeconstant
+[Float] value: The constant value to use.
+If is , additional fields are as follows:typeuniform
+[Float] min_inclusive: The minimum possible value (inclusive).
+[Float] max_exclusive: The maximum possible value (exclusive). Must be larger than [Float] min_inclusive.
+If is , additional fields are as follows:typeclamped_normal
+[Float] mean: The mean.
+[Float] deviation: The deviation.
+[Float] min: The minimum value to clamp to.
+[Float] max: The maximum value to clamp to. Must be larger than [Float] min.
+If is , additional fields are as follows:typetrapezoid
+[Float] min: The minimum value.
+[Float] max: The maximum value. Must be larger than [Float] min.
+[Float] plateau: The range in the middle of the trapezoid distribution that has a uniform distribution. Must be less than or equal to max - min
+[Float][NBT Compound / JSON Object] horizontal_radius_factor: Scales the breadth of canyons. Higher values make canyons wider.
+Float provider[]
+[String] type: The type of the float provider. One of , , , or . constantuniformclamped_normaltrapezoid
+If is , additional fields are as follows:typeconstant
+[Float] value: The constant value to use.
+If is , additional fields are as follows:typeuniform
+[Float] min_inclusive: The minimum possible value (inclusive).
+[Float] max_exclusive: The maximum possible value (exclusive). Must be larger than [Float] min_inclusive.
+If is , additional fields are as follows:typeclamped_normal
+[Float] mean: The mean.
+[Float] deviation: The deviation.
+[Float] min: The minimum value to clamp to.
+[Float] max: The maximum value to clamp to. Must be larger than [Float] min.
+If is , additional fields are as follows:typetrapezoid
+[Float] min: The minimum value.
+[Float] max: The maximum value. Must be larger than [Float] min.
+[Float] plateau: The range in the middle of the trapezoid distribution that has a uniform distribution. Must be less than or equal to max - min
+[Float] vertical_radius_default_factor: Vertically scales canyons. Higher values make canyons deeper.
+[Float] vertical_radius_center_factor: Scales the height based on the horizontal distance from the canyon's center, resulting in deeper center.
+[Int] width_smoothness: Higher values smooth canyon walls on the vertical axis. Must be greater than 0.
+History
+[]Java Edition
+1.16.2	20w28a	Added experimental support for configured carvers in data packs.
+1.17	21w06a	Removed carvers and .underwater_canyonunderwater_cave
+21w08a	Added configuration for the canyon carver.
+Added optional carver field . When enabled with , can place blocks from .debug_settingsdebug_modeair_state
+21w11a	Renamed canyon carver field to .distanceFactordistance_factor
+21w13a	Added configuration for the cave carver.
+Replaced carver field and with field , which is a height provider. Added field . bottom_inclusivetop_inclusiveyyScale
+Moved canyon carver shape fields into sub-object .shape
+21w16a	Added field . aquifers_enabled
+Added fields , , and in the object.water_statelava_statebarrier_statedebug_settings
+1.18	21w38a	Removed field .aquifers_enabled
+1.19	22w15a	Added field to carver configuration.replaceable
+External links
+Configured carver Generator on misode.github.io

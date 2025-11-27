@@ -1,0 +1,47 @@
+噪声设置
+
+此功能仅限于Java版。
+噪声设置用于生成地形和噪声洞穴的形状，地形的阻挡材料以 JSON 文件形式存储在路径中的数据包中，并与生成器在维度中一起使用。原版设置包括普通主世界生成、放大主世界生成、普通下界生成、洞穴（类似下界但带有主世界地形特征）生成、普通终局生成，以及漂浮岛屿（类似末地外岛）生成。data/<namespace>/worldgen/noise_settingsminecraft:noiseminecraft:overworldminecraft:amplifiedminecraft:netherminecraft:cavesminecraft:endminecraft:floating_islands
+
+
+内容
+1	JSON 格式
+2	噪声布线器
+3	地面规则
+4	历史
+5	外部链接
+6	导航
+JSON 格式
+[NBT Compound / JSON Object]：根对象。
+[Int] sea_level：这个维度的海平面。注意，这个数值只影响世界生成。怪物生成的海平面是固定值63。
+[Boolean] disable_mob_generation：在区块生成时禁用生物生成。
+[Boolean] ore_veins_enabled：矿脉是否会生成。
+[Boolean] aquifers_enabled：含水层是否会产生。如果设置为虚假，几乎所有海平面以下的洞穴都充满了水。
+[Boolean] legacy_random_source：是否使用1.18之前的旧随机数生成器来生成世界。
+[NBT Compound / JSON Object] default_block：地形默认方块。
+块状状态[]
+[String] 名称：要使用的块的标识符。
+[NBT Compound / JSON Object] 属性：（可选，可以为空）块属性。指定块的未指定属性将被设置为默认值。
+[String] <property>：（可选）块状态属性键值对。该房产必须由指定的区块拥有。
+[NBT Compound / JSON Object] default_fluid：用于海洋和湖泊的默认方块。
+块状状态[]
+[String] 名称：要使用的块的标识符。
+[NBT Compound / JSON Object] 属性：（可选，可以为空）块属性。指定块的未指定属性将被设置为默认值。
+[String] <property>：（可选）块状态属性键值对。该房产必须由指定的区块拥有。
+[NBT List / JSON Array] spawn_target：（必填，但可为空）一组气候参数列表，用于指定玩家尝试生成的点周围。游戏会选择一些距离原点不超过2560格的水平位置（0,0），然后采样噪声值（“深度”噪声和“偏移”始终为0），并计算。玩家会在该数值最小的位置附近生成。((x^2+z^2)^2) / 390625 + (the square of the mininum distance to the ranges in the list)
+[NBT Compound / JSON Object]：范围。
+生物群系的噪音参数（参见世界生成 § 生物群系，了解原版游戏中每个参数的使用情况）[]
+[NBT Compound / JSON Object] 噪音：世界生成场。
+[Int] min_y：地形生成开始的最小Y坐标。价值介于-2032年至2031年之间（两者均含）。必须被16整除。
+[Int] 高度：地形生成的总高度。值介于0到4064之间（两者均含）。必须被16整除。而且不能超过2032年。min_y + height
+[Int] size_horizontal：值介于0到4之间（两者皆含）。注意噪声每个区块在值3时分为12×12块。
+[Int] size_vertical：值介于0到4之间（两者皆含）
+[NBT Compound / JSON Object] noise_router：噪声路由器将密度函数路由到用于世界生成的噪声参数。
+[NBT Compound / JSON Object] surface_rule：在地形中放置方块的主要表面规则。
+噪声布线
+主条目：噪声布线器
+噪声路由器是密度函数的集合。密度函数计算每个块位置的值。它们用于地形生成、生物群系布局、含水层、矿脉等。
+
+地面规则
+主条目：表面规则
+地表规则用于确定地形每个实心位置的方块。噪声设置包含一个根音[NBT Compound / JSON Object] surface_rule字段，包含放置不同表面块的所有逻辑。

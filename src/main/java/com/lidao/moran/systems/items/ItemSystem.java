@@ -35,7 +35,7 @@ public class ItemSystem {
 
     private static Item register(String id, Item item) {
         ITEMS.put(id, item);
-        return Registry.register(Registries.ITEM, new Identifier("moran-mod", id), item);
+        return Registry.register(Registries.ITEM, new Identifier("moran_mod", id), item);
     }
 
     public static Item getItem(String id) {

@@ -1,6 +1,0 @@
-{
-  "parent": "minecraft:block/oak_leaves",
-  "textures": {
-    "all": "moran-mod:block/peach_blossom_leaves"
-  }
-}

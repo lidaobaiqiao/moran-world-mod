@@ -47,7 +47,7 @@ public class MoranModDataGenerator implements DataGeneratorEntrypoint {
             builder.add(com.lidao.moran.systems.items.ItemSystem.MORAN, "墨石");
             builder.add(com.lidao.moran.systems.items.ItemSystem.QINGFENG_JINGHUA, "清风精华");
             builder.add(com.lidao.moran.systems.items.ItemSystem.MORAN_SWORD, "墨剑");
-            builder.add(com.lidao.moran.systems.blocks.BlockSystem.MORAN_BLOCK, "墨石块");
+
         }
     }
 }

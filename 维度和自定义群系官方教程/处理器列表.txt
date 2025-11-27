@@ -1,0 +1,216 @@
+Processor list
+A processor list is used to transform blocks of a structure template during generation. They contain a list of processors. Processor lists are configured using JSON files stored within a data pack in the folder or a addon at . data/<namespace>/worldgen/processor_list<root BP>/worldgen/processor_lists
+
+
+Contents
+1	JSON format
+2	Processors
+2.1	rule
+2.2	block_rot
+2.3	block_age
+2.4	block_ignore
+2.5	gravity
+2.6	protected_blocks
+2.7	blackstone_replace
+2.8	jigsaw_replacement
+2.9	lava_submerged_block
+2.10	capped
+2.11	nop
+3	Rule test
+3.1	always_true
+3.2	block_match
+3.3	blockstate_match
+3.4	random_block_match
+3.5	random_blockstate_match
+3.6	tag_match
+4	Position rule test
+4.1	always_true
+4.2	linear_pos
+4.3	axis_aligned_linear_pos
+5	External links
+6	Navigation
+JSON format
+A processor list can be a list, or an object that contains a list. Java Edition: A list:
+
+[NBT List / JSON Array]: A list of processors.
+[NBT Compound / JSON Object]: A processor object (see below)
+Or an object:
+
+[NBT Compound / JSON Object]: An object of processor list.
+[NBT List / JSON Array] processors: A list of processors.
+[NBT Compound / JSON Object]: A processor object (see below)
+Bedrock Edition:
+
+[NBT Compound / JSON Object] The root tag.
+[String] format_version: The game version to run the file as. Versions above 1.21.20 can be used.
+[NBT Compound / JSON Object] minecraft:processor_list
+[NBT Compound / JSON Object] description
+[String] identifier: The identifier used for referencing this processor.
+[NBT List / JSON Array] processors: A list of processors.
+[NBT Compound / JSON Object] processor_type: A processor. The type of processor determines the format of the rest of the processor.
+Processors
+rule
+Replaces blocks with custom rules
+
+[NBT Compound / JSON Object]: A processor object
+[String] processor_type: minecraft:rule
+[NBT List / JSON Array] rules: (Required, but can be empty) A list of rules. Only the first rule that all conditions are met takes effect. This is decided anew for each block.
+[NBT Compound / JSON Object]: A rule.
+[NBT Compound / JSON Object] position_predicate: (Optional, defaults to an "always_true" test) A § Position rule test to apply to the distance from the structure start to this block.
+[NBT Compound / JSON Object] input_predicate: A § Rule test to apply to the block placed by the structure.
+[NBT Compound / JSON Object] location_predicate: A § Rule test to apply to the block in the world that is replaced by the structure.
+[NBT Compound / JSON Object] output_state: The block that is placed when all conditions are met. Omitting block states use default values (e.g. the replacement of stairs with stairs without changing states need 40 rules to check for all facing combinations).
+Block state[]
+[NBT Compound / JSON Object] block_entity_modifier: (optional) Modifies nbt data of the block entity if all conditions are met.
+[String] type: Can be (Appends field and field to the block entity. The uses a random number seeded by the block position.), ‌[JE only](Merges specified data into the block entity.), ‌[JE only](Resets any existing fields on the block entity.) or (Do nothing). minecraft:append_lootLootTableLootTableSeedLootTableSeedminecraft:append_staticminecraft:clearminecraft:passthrough
+If is , additional field is as follows:typeminecraft:append_loot
+[String] loot_table: The resource location of a loot table.
+If is , additional field is as follows:typeminecraft:append_static
+[NBT Compound / JSON Object] data: The nbt data to be merged into the block entity. Needs to be in JSON form, see NBT format#JSON and NBT.
+block_rot
+
+This feature is exclusive to Java Edition.
+Randomly removes blocks. The removed blocks are not replaced by air, but keep the old blocks before the structure being generated
+
+[NBT Compound / JSON Object]: A processor object
+[String] processor_type: minecraft:block_rot
+[Float] integrity: The probability of randomly removing blocks in the structure. Value between 0 and 1.
+[String][NBT List / JSON Array] rottable_blocks: (optional) Blocks that can be removed. A block ID or a block tag, or a list of block IDs.
+block_age
+
+This feature is exclusive to Java Edition.
+Makes blocks aged. A stone, stone bricks, or cracked stone bricks block has a chance of 0.5 to be replaced with one of cracked stone bricks, stone brick stairs, mossy stone bricks, and mossy stone brick stairs. All variants of stairs have a 0.5 chance to become one of stone slab, stone brick slab, mossy stone brick stairs, and mossy stone brick slab. All variants of slabs and walls may remain unchanged or become mossy stone brick variants. Obsidian also has a 0.15 chance to be replaced with crying obsidian.
+
+[NBT Compound / JSON Object]: A processor object
+[String] processor_type: minecraft:block_age
+[Float] mossiness: Values below 0.0 is treated as 0.0; values above 1.0 is treated as 1.0. The probability of using mossy variants when making a block aged.
+block_ignore
+Removes specified blocks. The removed blocks are not replaced by air, but keep the old blocks before the structure being generated.
+
+[NBT Compound / JSON Object]: A processor object
+[String] processor_type: minecraft:block_ignore
+[NBT List / JSON Array] blocks: (Required, but can be empty) IDs of blocks to ignore. Specifying block states has no effect.
+[NBT Compound / JSON Object]: A block.
+Block state[]
+gravity
+
+This feature is exclusive to Java Edition.
+Change the Y-level of blocks' positions to fit the terrain like a village road. Note that this is not used to make floating gravity blocks fall down. This processor is hardcoded to be used on a structure template if its "projection" field in its template pool is "terrain_matching"
+
+[NBT Compound / JSON Object]: A processor object
+[String] processor_type: minecraft:gravity
+[String] heightmap: (optional, defaults to WORLD_SURFACE_WG) Must be one of (if not during world generation, fallbacks to ), , (if not during world generation, fallbacks to ), , , or ."WORLD_SURFACE_WG"WORLD_SURFACE"WORLD_SURFACE""OCEAN_FLOOR_WG"OCEAN_FLOOR"OCEAN_FLOOR""MOTION_BLOCKING""MOTION_BLOCKING_NO_LEAVES"
+[Int] offset: (optional, defaults to 0) The offset relative to the terrain. For example: 0 is to place the structure on the ground, -1 is to sink one block into the ground. When this processor is used on a structure template by hardcoding (when the template's "projection" field in its template pool is "terrain_matching"), [Int] offset is -1.
+protected_blocks
+Specifies which blocks in the world cannot be overridden by this structure
+
+[NBT Compound / JSON Object]: A processor object
+[String] processor_type: minecraft:protected_blocks
+[String] value: A block tag with .#
+blackstone_replace
+
+This feature is exclusive to Java Edition.
+Replaces all stone-variant blocks with blackstone variants and all iron bars with chains.
+
+[NBT Compound / JSON Object]: A processor object
+[String] processor_type: minecraft:blackstone_replace
+jigsaw_replacement
+
+This feature is exclusive to Java Edition.
+Replaces jigsaw blocks with the specified final state. This processor is hardcoded to be used unless generated in the jigsaw block GUI.
+
+[NBT Compound / JSON Object]: A processor object
+[String] processor_type: minecraft:jigsaw_replacement
+lava_submerged_block
+
+This feature is exclusive to Java Edition.
+Blocks with incomplete outline shapes cannot override the lava in the world
+
+[NBT Compound / JSON Object]: A processor object
+[String] processor_type: minecraft:lava_submerged_block
+capped
+Applies a processor to some random blocks instead of applying it to all blocks.
+
+[NBT Compound / JSON Object]: A processor object
+[String] processor_type: minecraft:capped
+[Int][NBT Compound / JSON Object] value: The number of blocks on which the processor is applied. Must be greater than 0. If it is greater than or equal to the total number of blocks in the structure template, all blocks are processed as if the processer is not capped.
+Int provider[]
+[NBT Compound / JSON Object] delegate: Another processor object
+nop
+
+This feature is exclusive to Java Edition.
+Does nothing
+
+[NBT Compound / JSON Object]: A processor object
+[String] processor_type: minecraft:nop
+Rule test
+Rule tests are used to test if a block matches specific conditions.
+
+always_true
+Matches any block
+
+[NBT Compound / JSON Object]: a rule test
+[String] predicate_type: always_true
+block_match
+Tests is the block is the specified block.
+
+[NBT Compound / JSON Object]: a rule test
+[String] predicate_type: block_match
+[String] block: A block ID.
+blockstate_match
+Tests is the block for the specified block state.
+
+[NBT Compound / JSON Object]: a rule test
+[String] predicate_type: blockstate_match
+[NBT Compound / JSON Object] block_state: A block state.
+Block state[]
+random_block_match
+Tests is the block is the specified block. Then only matches with a given probability.
+
+[NBT Compound / JSON Object]: a rule test
+[String] predicate_type: random_block_match
+[String] block: A block ID.
+[Float] probability: The probability of the predicate to pass if the block is found. Values below 0.0 is treated as 0.0; values above 1.0 is treated as 1.0.
+random_blockstate_match
+Tests is the block for the specified block state. Then only matches with a given probability.
+
+[NBT Compound / JSON Object]: a rule test
+[String] predicate_type: random_blockstate_match
+[NBT Compound / JSON Object] block_state: A block state.
+Block state[]
+[Float] probability: The probability of the predicate to pass if the block state is found. Values below 0.0 is treated as 0.0; values above 1.0 is treated as 1.0.
+tag_match
+Tests if the block is in the specified block tag.
+
+[NBT Compound / JSON Object]: a rule test
+[String] predicate_type: tag_match
+[String] tag: A block tag without .#
+Position rule test
+Position rule tests are used to test if a position matches specific conditions.
+
+always_true
+Matches any position.
+
+[NBT Compound / JSON Object]: a position rule test
+[String] predicate_type: always_true
+linear_pos
+Passes with a random probability, the probability is based on the 3D Manhattan distance to the structure start.
+
+[NBT Compound / JSON Object]: a position rule test
+[String] predicate_type: linear_pos
+[Float] min_chance: (optional, default is 0.0) The probability (probability less than 0 is treated as 0, greater than 1 is treated as 1) for the predicate to pass when the distance of a block to the structure start is equal to or less than .min_dist
+[Float] max_chance: (optional, default is 0.0) The probability (probability less than 0 is treated as 0, greater than 1 is treated as 1) for the predicate to pass when the distance of a block to the structure start is equal to or greater than . If a block's distance is between and , probability is obtained by linear interpolation between the values of and , that is, the probability is , and probability less than 0 is treated as 0, greater than 1 is treated as 1.max_distmin_distmax_distmin_distmax_dist(distance - min_dist ) / ( max_dist - min_dist ) * ( max_chance - min_chance ) + min_chance
+[Int] min_dist: (optional, defaults to 0) the distance when the minimum probability is used. Must be less than [Int] max_dist.
+[Int] max_dist: (optional, defaults to 0) the distance when the maximum probability is used. Must be greater than [Int] min_dist.
+axis_aligned_linear_pos
+Passes with a random probability, the probability is based on the distance to the structure start along the specified axis.
+
+[NBT Compound / JSON Object]: a position rule test
+[String] predicate_type: axis_aligned_linear_pos
+[String] axis: (optional, defaults to ) can be , or .yxyz
+[Float] min_chance: (optional, default is 0.0) The probability (probability less than 0 is treated as 0, greater than 1 is treated as 1) for the predicate to pass when the distance of a block to the structure start is equal to or less than .min_dist
+[Float] max_chance: (optional, default is 0.0) The probability (probability less than 0 is treated as 0, greater than 1 is treated as 1) for the predicate to pass when the distance of a block to the structure start is equal to or greater than . If a block's distance is between and , probability is obtained by linear interpolation between the values of and , that is, the probability is , and probability less than 0 is treated as 0, greater than 1 is treated as 1.max_distmin_distmax_distmin_distmax_dist(distance - min_dist ) / ( max_dist - min_dist ) * ( max_chance - min_chance ) + min_chance
+[Int] min_dist: (optional, defaults to 0) the distance when the minimum probability is used. Must be less than [Int] max_dist.
+[Int] max_dist: (optional, defaults to 0) the distance when the maximum probability is used. Must be greater than [Int] min_dist.
+External links
+Processor list Generator on misode.github.io

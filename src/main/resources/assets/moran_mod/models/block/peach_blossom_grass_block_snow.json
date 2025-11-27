@@ -1,0 +1,9 @@
+{
+  "parent": "minecraft:block/grass_block_snow",
+  "textures": {
+    "particle": "moran_mod:block/peach_blossom_dirt",
+    "bottom": "moran_mod:block/peach_blossom_dirt",
+    "side": "moran_mod:block/peach_blossom_grass_block_side",
+    "dirt": "moran_mod:block/peach_blossom_dirt"
+  }
+}

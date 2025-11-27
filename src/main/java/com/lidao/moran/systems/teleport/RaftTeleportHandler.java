@@ -22,8 +22,8 @@ public class RaftTeleportHandler {
         if (player == null) return;
 
         // 检查玩家是否已在桃花源维度
-        if (DimensionRegistry.getDimension("peach_blossom") != null &&
-                player.getWorld().getRegistryKey().equals(DimensionRegistry.getDimension("peach_blossom").getDimensionKey())) {
+        if (DimensionRegistry.getDimensionKey("peach_blossom") != null &&
+                player.getWorld().getRegistryKey().equals(DimensionRegistry.getDimensionKey("peach_blossom"))) {
             playerRaftData.remove(player.getUuid());
             return;
         }
@@ -78,7 +78,7 @@ public class RaftTeleportHandler {
     private static void triggerDimensionTravel(ServerPlayerEntity player) {
         // 使用维度注册表获取桃花源维度
         System.out.println("🔍 检查维度注册表: peach_blossom");
-        if (DimensionRegistry.getDimension("peach_blossom") == null) {
+        if (DimensionRegistry.getDimensionKey("peach_blossom") == null) {
             System.out.println("❌ 桃花源维度未注册!");
             player.sendMessage(net.minecraft.text.Text.literal("§c桃花源维度尚未准备好..."), false);
             return;
@@ -86,7 +86,7 @@ public class RaftTeleportHandler {
 
         System.out.println("✅ 桃花源维度已注册，获取维度世界...");
         net.minecraft.server.world.ServerWorld targetWorld = player.getServer()
-                .getWorld(DimensionRegistry.getDimension("peach_blossom").getDimensionKey());
+                .getWorld(DimensionRegistry.getDimensionKey("peach_blossom"));
 
         if (targetWorld == null) {
             System.out.println("❌ 桃花源维度世界未加载!");

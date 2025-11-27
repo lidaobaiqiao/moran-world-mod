@@ -10,7 +10,7 @@ import me.shedaniel.autoconfig.annotation.ConfigEntry;
  * 墨世界模组配置类
  * 使用 Cloth Config 提供配置界面
  */
-@Config(name = "moran-mod")
+@Config(name = "moran_mod")
 public class ModConfig implements ConfigData {
     
     @ConfigEntry.Gui.Excluded

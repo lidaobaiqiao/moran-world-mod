@@ -25,10 +25,21 @@ public class BlockSystem {
     public static final Block PEACH_BLOSSOM_LEAVES = registerBlock("peach_blossom_leaves",
             new LeavesBlock(FabricBlockSettings.copyOf(Blocks.OAK_LEAVES)));
 
-    // 为了兼容性，添加基础方块别名
-    public static final Block PEACH_BLOSSOM_DIRT = Blocks.DIRT;
-    public static final Block PEACH_BLOSSOM_GRASS_BLOCK = Blocks.GRASS_BLOCK;
-    public static final Block MORAN_BLOCK = Blocks.STONE;
+    // 🌱 妖灼华原基础方块（替换原版方块）
+    public static final Block PEACH_BLOSSOM_DIRT = registerBlock("peach_blossom_dirt",
+            new Block(FabricBlockSettings.copyOf(Blocks.DIRT)));
+    
+    public static final Block PEACH_BLOSSOM_GRASS_BLOCK = registerBlock("peach_blossom_grass_block",
+            new GrassBlock(FabricBlockSettings.copyOf(Blocks.GRASS_BLOCK)));
+    
+    public static final Block PEACH_BLOSSOM_STONE = registerBlock("peach_blossom_stone",
+            new Block(FabricBlockSettings.copyOf(Blocks.STONE)));
+    
+    public static final Block PEACH_BLOSSOM_SAND = registerBlock("peach_blossom_sand",
+            new SandBlock(0xF4D1AE, FabricBlockSettings.copyOf(Blocks.SAND)));
+    
+    public static final Block ANCIENT_PEACH_REALM_STONE = registerBlock("ancient_peach_realm_stone",
+            new Block(FabricBlockSettings.copyOf(Blocks.STONE)));
 
     // 初始化
     public static void initialize() {
@@ -47,7 +58,7 @@ public class BlockSystem {
     private static Block registerBlock(String id, Block block) {
         System.out.println("🌸 注册桃花方块: " + id);
         BLOCKS.put(id, block);
-        return Registry.register(Registries.BLOCK, new Identifier("moran-mod", id), block);
+        return Registry.register(Registries.BLOCK, new Identifier("moran_mod", id), block);
     }
 
     private static void registerBlockItems() {
@@ -56,7 +67,7 @@ public class BlockSystem {
             String id = entry.getKey();
             Block block = entry.getValue();
             Item item = new BlockItem(block, new Item.Settings());
-            Registry.register(Registries.ITEM, new Identifier("moran-mod", id), item);
+            Registry.register(Registries.ITEM, new Identifier("moran_mod", id), item);
             System.out.println("   - 注册物品: " + id);
         }
     }

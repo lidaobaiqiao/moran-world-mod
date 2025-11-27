@@ -1,0 +1,361 @@
+
+本教程仅限Java版。 
+
+一个自定义维度的示例，颜色经过修改并加入了一些功能。
+这个教程解释了如何利用数据包为世界添加新的自定义维度。它假设你已经知道如何创建数据包。
+
+pack.mcmeta
+
+{
+  "pack": {
+    "description": "Adding a custom dimension",
+    "pack_format": 61,
+    "supported_formats": {
+      "min_inclusive": 57,
+      "max_inclusive": 61
+    }
+  }
+}
+复制
+运行[1]时，世界生成文件的更改不会被应用。一定要离开，重新开放世界，以应用新的变化！/reload
+
+内容
+1	尺寸
+2	维度类型
+3	噪声发生器
+4	噪声设置
+5	噪声布线器
+6	地面规则
+7	生物群系
+8	参见
+9	引用
+10	导航
+维度
+
+新创造的维度。
+
+使用实验设置打开世界时出现的警告界面。
+添加新维度只需在数据包中创建一个文件即可。这个第一维度通过块生成器添加了一个新的超平坦世界。flat
+
+data/tutorial/dimension/example_world.json
+
+{
+  "type": "minecraft:overworld",
+  "generator": {
+    "type": "minecraft:flat",
+    "settings": {
+      "biome": "minecraft:plains",
+      "layers": [
+        {
+          "block": "minecraft:stone",
+          "height": 64
+        }
+      ],
+      "structure_overrides": []
+    }
+  }
+}
+复制
+在添加现有世界时，一定要离开并重新打开世界！警告界面会让你用实验性世界设置确认。这意味着新版本可能会毫无预警地破坏现有的世界生成数据包。你可以点击“我知道自己在做什么！”。
+
+现在你可以用它传送到这个新维度。/execute in tutorial:example_world run tp @s ~ ~ ~
+
+设置还可以进一步自定义：
+
+[NBT Compound / JSON Object] 场景：
+平坦生成设置[]
+维度类型
+上述示例使用了 。这是对该维度的维度类型所指的。尺寸由两部分组成："type": "minecraft:overworld"
+
+尺寸类型控制环境属性。维度类型的更改也会影响现有区块。
+区块生成器控制放置在世界中的物理方块和实体。对区块生成器的更改只会影响新生成的区块。
+如果你想修改维度属性，可以在文件夹里创建一个新文件。在这个例子中dimension_type[Int] min_y 和[Int]高度属性与主世界维度类型相比进行了修改。这些控制着维度的建造限制。
+
+data/tutorial/dimension_type/example_world.json
+
+{
+  "ultrawarm": false,
+  "natural": true,
+  "piglin_safe": false,
+  "respawn_anchor_works": false,
+  "bed_works": true,
+  "has_raids": true,
+  "has_skylight": true,
+  "has_ceiling": false,
+  "coordinate_scale": 1,
+  "ambient_light": 0,
+  "logical_height": 256,
+  "effects": "minecraft:overworld",
+  "infiniburn": "#minecraft:infiniburn_overworld",
+  "min_y": 0,
+  "height": 256,
+  "monster_spawn_light_level": {
+    "type": "minecraft:uniform",
+    "min_inclusive": 0,
+    "max_inclusive": 7
+  },
+  "monster_spawn_block_light_limit": 0
+}
+复制
+要让某个维度使用你新创建的维度类型，需要更新维度文件以引用这个新的维度类型：
+
+data/tutorial/dimension/example_world.json
+
+{
+  "type": "tutorial:example_world",
+  "generator": {
+    // ...
+  }
+}
+复制
+维度类型的完整 JSON 格式
+噪声发生器
+
+一个用噪声块生成器实现的自定义维度，完全是平原。
+为了在自定义维度中拥有类似世界地图的地形，可以使用生成器类型。noise
+
+data/tutorial/dimension/example_world.json
+
+{
+  "type": "tutorial:example_world",
+  "generator": {
+    "type": "minecraft:noise",
+    "settings": "minecraft:overworld",
+    "biome_source": {
+      "type": "minecraft:fixed",
+      "biome": "minecraft:plains"
+    }
+  }
+}
+复制
+噪声设置
+
+自定义噪音设置，以方解石为默认方解石块。
+上述示例重复使用了噪声设置，假设世界范围从 Y=-64 到 Y=320。它还包含了原版生物群系中不必要的逻辑。为了自定义噪声设置，可以在 中创建文件。这个例子把底层改成方解石，禁用矿脉，并在表面上加了一层草块。minecraft:overworldworldgen/noise_settings
+
+由于这个文件默认非常大，最好从原版文件开始。你有几个选择：
+
+从版本jar中提取文件
+直接从公共仓库下载文件：overworld.json
+data/tutorial/worldgen/noise_settings/example_world.json
+
+{
+  "sea_level": 63,
+  "disable_mob_generation": false,
+  "aquifers_enabled": true,
+  "ore_veins_enabled": false,
+  "legacy_random_source": false,
+  "default_block": {
+    "Name": "minecraft:calcite"
+  },
+  "default_fluid": {
+    "Name": "minecraft:water",
+    "Properties": {
+      "level": "0"
+    }
+  },
+  "noise": {
+    "min_y": 0,
+    "height": 256,
+    "size_horizontal": 1,
+    "size_vertical": 2
+  },
+  "noise_router": {
+    // ... (keep the same as the vanilla overworld)
+  },
+  "spawn_target": [],
+  "surface_rule": {
+    "type": "minecraft:condition",
+    "if_true": {
+      "type": "minecraft:stone_depth",
+      "offset": 0,
+      "surface_type": "floor",
+      "add_surface_depth": false,
+      "secondary_depth_range": 0
+    },
+    "then_run": {
+      "type": "minecraft:block",
+      "result_state": {
+        "Name": "minecraft:grass_block",
+        "Properties": {
+          "snowy": "false"
+        }
+      }
+    }
+  }
+}
+复制
+data/tutorial/dimension/example_world.json
+
+{
+  "type": "tutorial:example_world",
+  "generator": {
+    "type": "minecraft:noise",
+    "settings": "tutorial:example_world",
+    "biome_source": {
+      "type": "minecraft:fixed",
+      "biome": "minecraft:plains"
+    }
+  }
+}
+复制
+完整的噪声设置 JSON 格式
+噪声布线
+最后一步，噪音路由器从原版主世界保持原版状态。但这在世界底部造成了问题，因为这个自定义维度从Y=0开始，而噪声路由器仍然假设它从Y=-64开始。这导致世界底部出现洞穴，虚空暴露出来。
+
+修复方法在噪声路由器里。需要解决两个问题。在噪声设置文件里找到以下代码，替换成已修复的版本。第一个问题也可以在第74行的噪声路由器部分修复，但这点没那么关键。第二个修复是禁用面条洞。final_densityinitial_density_without_jaggedness
+
+以前	后
+"argument1": {
+  "type": "minecraft:y_clamped_gradient",
+  "from_y": -64,
+  "to_y": -40,
+  "from_value": 0,
+  "to_value": 1
+},
+"argument1": {
+  "type": "minecraft:y_clamped_gradient",
+  "from_y": 0,
+  "to_y": 24,
+  "from_value": 0,
+  "to_value": 1
+},
+"argument2": "minecraft:overworld/caves/noodle"
+"argument2": 1
+之前：世界底部的大洞。
+之前：世界底部的大洞。
+ 
+之后：所有洞穴都用实心方块封闭。
+之后：所有洞穴都用实心方块封闭。
+表面规则
+
+世界底部的基岩垂直梯度。
+
+草块下方有一层泥土。
+目前唯一的地表方块是方解石和草地方块。你可以在草块下方加一层泥土，在世界底部加一层基岩渐变，配合更复杂的表面规则。
+
+data/tutorial/worldgen/noise_settings/example_world.json
+
+{
+  // ...
+  "surface_rule": {
+    "type": "minecraft:sequence",
+    "sequence": [
+      {
+        "type": "minecraft:condition",
+        "if_true": {
+          "type": "minecraft:vertical_gradient",
+          "random_name": "minecraft:bedrock_floor",
+          "true_at_and_below": {
+            "above_bottom": 0
+          },
+          "false_at_and_above": {
+            "above_bottom": 5
+          }
+        },
+        "then_run": {
+          "type": "minecraft:block",
+          "result_state": {
+            "Name": "minecraft:bedrock"
+          }
+        }
+      },
+      {
+        "type": "minecraft:condition",
+        "if_true": {
+          "type": "minecraft:stone_depth",
+          "offset": 0,
+          "surface_type": "floor",
+          "add_surface_depth": false,
+          "secondary_depth_range": 0
+        },
+        "then_run": {
+          "type": "minecraft:block",
+          "result_state": {
+            "Name": "minecraft:grass_block",
+            "Properties": {
+              "snowy": "false"
+            }
+          }
+        }
+      },
+      {
+        "type": "minecraft:condition",
+        "if_true": {
+          "type": "minecraft:stone_depth",
+          "offset": 0,
+          "surface_type": "floor",
+          "add_surface_depth": true,
+          "secondary_depth_range": 0
+        },
+        "then_run": {
+          "type": "minecraft:block",
+          "result_state": {
+            "Name": "minecraft:dirt"
+          }
+        }
+      }
+    ]
+  }
+}
+复制
+生物群系
+
+一个自定义生物群系，颜色经过修改并带有一些功能。
+示例维度仍然使用了生物群系。要更改草地颜色、建筑、特征、生成规则等，你需要自定义生物群系。这个例子增加了生物群系，它会修改草地和植被的颜色。minecraft:plainstutorial:plains
+
+第十个装饰步骤中加入了一些特征，即 。如果你想添加矿石，会在第7步：。vegetal_decorationunderground_ores
+
+data/tutorial/worldgen/biome/plains.json
+
+{
+  "temperature": 0.8,
+  "downfall": 0.4,
+  "has_precipitation": true,
+  "effects": {
+    "sky_color": 7907327,
+    "fog_color": 12638463,
+    "water_color": 4159204,
+    "water_fog_color": 329011,
+    "grass_color": 10073398,
+    "foliage_color": 13127730
+  },
+  "spawners": {},
+  "spawn_costs": {},
+  "carvers": [],
+  "features": [
+    [],
+    [],
+    [],
+    [],
+    [],
+    [],
+    [],
+    [],
+    [],
+    [
+      "minecraft:glow_lichen",
+      "minecraft:trees_plains",
+      "minecraft:patch_grass_plain",
+      "minecraft:patch_sugar_cane"
+    ],
+    []
+  ]
+}
+复制
+data/tutorial/dimension/example_world.json
+
+{
+  "type": "tutorial:example_world",
+  "generator": {
+    "type": "minecraft:noise",
+    "settings": "tutorial:example_world",
+    "biome_source": {
+      "type": "minecraft:fixed",
+      "biome": "tutorial:plains"
+    }
+  }
+}
+复制
+
+参见

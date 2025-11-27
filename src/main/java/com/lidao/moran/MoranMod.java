@@ -1,122 +1,95 @@
 package com.lidao.moran;
 
 import com.lidao.moran.dimensions.DimensionRegistry;
-import com.lidao.moran.dimensions.peach_blossom.PeachBlossomDimension;
-import com.lidao.moran.systems.commands.TestTeleportCommand;
+import com.lidao.moran.systems.commands.TeleportCommand;
 import com.lidao.moran.systems.teleport.RaftTeleportHandler;
 import com.lidao.moran.systems.items.ItemSystem;
 import com.lidao.moran.systems.blocks.BlockSystem;
 import com.lidao.moran.core.terrablender.BiomeDataCreator;
-import com.lidao.moran.core.terrablender.TerrablenderIntegration;
+import com.lidao.moran.worldgen.PeachSurfaceRules;
 import net.fabricmc.api.ModInitializer;
-import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import terrablender.api.TerraBlenderApi; // ✅ 添加导入
 
 /**
  * 墨世界模组 - 主类
- * 
- * 一个具有桃花源自定义维度和神秘生物群系的Minecraft模组
- * 让玩家在充满诗意的水墨世界中探索
- * 
- * @author Lidao & AI Assistant
- * @version 1.0.0
+ * 初始化顺序：
+ * 1. 方块（SurfaceRule 需要引用它们）
+ * 2. 生物群系数据（JSON）
+ * 3. TerraBlender 组件（必须在 onTerraBlenderInitialized 中）
+ * 4. 其他系统
  */
-public class MoranMod implements ModInitializer {
-    
-    public static final String MOD_ID = "moran-mod";  // 统一使用moran-mod，去除mo-mod
+public class MoranMod implements ModInitializer, TerraBlenderApi { // ✅ 实现接口
+
+    public static final String MOD_ID = "moran_mod";
     public static final Logger LOGGER = LoggerFactory.getLogger(MOD_ID);
 
     @Override
     public void onInitialize() {
-        LOGGER.info("🎭 墨世界模组启动 - 水墨丹青，诗意桃花");
-        LOGGER.info("🌸 载入桃花源维度系统...");
-        
-        // 初始化维度系统
-        initializeDimensionSystem();
-        
-        // 初始化方块系统
+        LOGGER.info("🎭 墨世界模组启动");
+
+        // 1️⃣ 方块系统（最先）
         initializeBlockSystem();
-        
-        // 初始化物品系统
-        initializeItemSystem();
-        
-        // 初始化命令系统
-        initializeCommandSystem();
-        
-        // 初始化生物群系系统
+
+        // 2️⃣ 生物群系数据（仅创建数据，不注册 TerraBlender）
         initializeBiomeSystem();
-        
-        // 初始化竹筏传送系统
+
+        // 3️⃣ 维度系统（只注册维度键，不注册 TerraBlender）
+        initializeDimensionSystem();
+
+        // 4️⃣ 其他系统
+        initializeItemSystem();
+        initializeCommandSystem();
         initializeRaftTeleportSystem();
-        
-        LOGGER.info("🎨 墨世界模组初始化完成！");
-        LOGGER.info("🌸 桃花源维度已就绪");
-        LOGGER.info("⛏️ 墨彩方块系统已激活");
-        LOGGER.info("💎 墨韵物品系统已激活");
-        LOGGER.info("🌍 生物群系系统已激活");
-        LOGGER.info("🎣 竹筏传送系统已激活");
-        LOGGER.info("🎮 玩家可以开始探索墨世界了！");
     }
-    
-    /**
-     * 初始化维度系统
-     */
-    private void initializeDimensionSystem() {
-        LOGGER.info("🌀 初始化桃花源维度系统...");
-        DimensionRegistry.initialize();
-        PeachBlossomDimension.register();
+
+    // ✅ 新增：TerraBlender 初始化回调
+    @Override
+    public void onTerraBlenderInitialized() {
+        LOGGER.info("🌍 TerraBlender 初始化中...");
+        DimensionRegistry.registerTerraBlenderComponents();
+
+        // ✅ 添加这一行
+        PeachSurfaceRules.register(); // 立即注册地表规则
+
+        LOGGER.info("✅ TerraBlender 组件注册完成");
     }
-    
-    /**
-     * 初始化方块系统
-     */
+
     private void initializeBlockSystem() {
         LOGGER.info("⛏️ 初始化墨彩方块系统...");
         BlockSystem.initialize();
+        LOGGER.info("✅ 方块系统就绪");
     }
-    
-    /**
-     * 初始化物品系统
-     */
+
+    private void initializeBiomeSystem() {
+        LOGGER.info("🌍 初始化生物群系数据...");
+        BiomeDataCreator.initialize();
+        LOGGER.info("✅ 生物群系数据就绪");
+    }
+
+    private void initializeDimensionSystem() {
+        LOGGER.info("🌀 初始化维度管理系统...");
+        DimensionRegistry.initialize(); // ✅ 现在只注册维度键
+        LOGGER.info("✅ 维度系统就绪");
+    }
+
     private void initializeItemSystem() {
         LOGGER.info("💎 初始化墨韵物品系统...");
         ItemSystem.initialize();
     }
-    
-    /**
-     * 初始化命令系统
-     */
+
     private void initializeCommandSystem() {
         LOGGER.info("⌨️ 初始化传送命令系统...");
-        CommandRegistrationCallback.EVENT.register((dispatcher, registryAccess, environment) -> {
-            TestTeleportCommand.register(dispatcher);
-        });
+        TeleportCommand.initialize();
+        LOGGER.info("✅ 命令系统就绪");
     }
-    
-    /**
-     * 初始化生物群系系统
-     */
-    private void initializeBiomeSystem() {
-        LOGGER.info("🌍 初始化生物群系系统...");
-        BiomeDataCreator.initialize();
-        // TerraBlender将通过服务自动加载
-    }
-    
-    /**
-     * 初始化竹筏传送系统
-     */
+
     private void initializeRaftTeleportSystem() {
         LOGGER.info("🎣 初始化竹筏传送系统...");
-        
-        // 注册服务器tick事件，用于检测竹筏静止
         ServerTickEvents.END_SERVER_TICK.register(server -> {
-            server.getPlayerManager().getPlayerList().forEach(player -> {
-                RaftTeleportHandler.onPlayerTick(player);
-            });
+            server.getPlayerManager().getPlayerList().forEach(RaftTeleportHandler::onPlayerTick);
         });
-        
-        LOGGER.info("✅ 竹筏传送系统已激活 - 乘坐竹筏静止5秒即可传送到桃花源");
     }
 }

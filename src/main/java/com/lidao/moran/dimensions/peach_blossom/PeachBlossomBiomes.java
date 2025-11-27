@@ -13,11 +13,11 @@ import java.util.List;
  */
 public class PeachBlossomBiomes {
     
-    public static final String MOD_ID = "moran-mod";
+    public static final String MOD_ID = "moran_mod";
     
     // 妖灼华原生物群系（核心群系）
     public static final RegistryKey<Biome> YAOZHUOHUA =
-            RegistryKey.of(RegistryKeys.BIOME, new Identifier(MOD_ID, "yaozhuohua"));
+            RegistryKey.of(RegistryKeys.BIOME, new Identifier(MOD_ID, "yaozhuohuayuan"));
 
     // 桃花源维度七大生物群系（备用）
     public static final RegistryKey<Biome> PEACH_VALLEY =
