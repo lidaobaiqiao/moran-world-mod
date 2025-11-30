@@ -5,7 +5,7 @@
     "dirt_provider": {
       "type": "minecraft:simple_state_provider",
       "state": {
-        "Name": "moran_mod:peach_blossom_dirt"
+        "Name": "moran_mod:peach_blossom_grass_block"
       }
     },
     "trunk_provider": {
@@ -26,22 +26,26 @@
       }
     },
     "minimum_size": {
-      "type": "minecraft:two_layers_feature_size",
+      "type": "minecraft:three_layers_feature_size",
       "limit": 1,
+      "upper_limit": 0,
+      "middle_size": 0,
       "lower_size": 0,
-      "upper_size": 0
+      "upper_size": 1
     },
     "trunk_placer": {
-      "type": "minecraft:straight_trunk_placer",
-      "base_height": 5,
-      "height_rand_a": 2,
-      "height_rand_b": 1
+      "type": "minecraft:fancy_trunk_placer",
+      "base_height": 4,
+      "height_rand_a": 5,
+      "height_rand_b": 2
     },
     "foliage_placer": {
-      "type": "minecraft:blob_foliage_placer",
+      "type": "minecraft:random_spread_foliage_placer",
       "radius": 2,
       "offset": 0,
-      "height": 3
+      "height": 3,
+      "foliage_height": 4,
+      "leaf_placement_attempts": 128
     },
     "ignore_vines": true,
     "force_dirt": false

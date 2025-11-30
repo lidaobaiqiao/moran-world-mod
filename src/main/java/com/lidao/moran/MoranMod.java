@@ -9,19 +9,15 @@ import com.lidao.moran.core.terrablender.BiomeDataCreator;
 import com.lidao.moran.worldgen.PeachSurfaceRules;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
+import net.minecraft.item.Item; // ✅ 新增导入
+import net.minecraft.registry.Registries; // ✅ 新增导入
+import net.minecraft.registry.Registry; // ✅ 新增导入
+import net.minecraft.util.Identifier; // ✅ 新增导入
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import terrablender.api.TerraBlenderApi; // ✅ 添加导入
+import terrablender.api.TerraBlenderApi;
 
-/**
- * 墨世界模组 - 主类
- * 初始化顺序：
- * 1. 方块（SurfaceRule 需要引用它们）
- * 2. 生物群系数据（JSON）
- * 3. TerraBlender 组件（必须在 onTerraBlenderInitialized 中）
- * 4. 其他系统
- */
-public class MoranMod implements ModInitializer, TerraBlenderApi { // ✅ 实现接口
+public class MoranMod implements ModInitializer, TerraBlenderApi {
 
     public static final String MOD_ID = "moran_mod";
     public static final Logger LOGGER = LoggerFactory.getLogger(MOD_ID);
@@ -30,33 +26,23 @@ public class MoranMod implements ModInitializer, TerraBlenderApi { // ✅ 实现
     public void onInitialize() {
         LOGGER.info("🎭 墨世界模组启动");
 
-        // 1️⃣ 方块系统（最先）
         initializeBlockSystem();
-
-        // 2️⃣ 生物群系数据（仅创建数据，不注册 TerraBlender）
         initializeBiomeSystem();
-
-        // 3️⃣ 维度系统（只注册维度键，不注册 TerraBlender）
         initializeDimensionSystem();
-
-        // 4️⃣ 其他系统
         initializeItemSystem();
         initializeCommandSystem();
         initializeRaftTeleportSystem();
     }
 
-    // ✅ 新增：TerraBlender 初始化回调
     @Override
     public void onTerraBlenderInitialized() {
         LOGGER.info("🌍 TerraBlender 初始化中...");
         DimensionRegistry.registerTerraBlenderComponents();
-
-        // ✅ 添加这一行
-        PeachSurfaceRules.register(); // 立即注册地表规则
-
+        PeachSurfaceRules.register();
         LOGGER.info("✅ TerraBlender 组件注册完成");
     }
 
+    // ... (后面的 initialize 方法保持不变) ...
     private void initializeBlockSystem() {
         LOGGER.info("⛏️ 初始化墨彩方块系统...");
         BlockSystem.initialize();
@@ -71,7 +57,7 @@ public class MoranMod implements ModInitializer, TerraBlenderApi { // ✅ 实现
 
     private void initializeDimensionSystem() {
         LOGGER.info("🌀 初始化维度管理系统...");
-        DimensionRegistry.initialize(); // ✅ 现在只注册维度键
+        DimensionRegistry.initialize();
         LOGGER.info("✅ 维度系统就绪");
     }
 

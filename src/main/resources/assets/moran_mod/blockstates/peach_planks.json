@@ -1,5 +1,5 @@
 {
   "variants": {
-    "": { "model": "moran-mod:block/peach_planks" }
+    "": { "model": "moran_mod:block/peach_planks" }
   }
 }

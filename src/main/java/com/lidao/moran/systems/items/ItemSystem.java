@@ -1,6 +1,7 @@
 package com.lidao.moran.systems.items;
 
 import com.lidao.moran.item.MoranSwordItem;
+import com.lidao.moran.systems.blocks.BlockSystem;
 import net.fabricmc.fabric.api.item.v1.FabricItemSettings;
 import net.minecraft.item.BlockItem;
 import net.minecraft.item.Item;
@@ -19,7 +20,8 @@ public class ItemSystem {
     public static final Item MORAN_SWORD = register("moran_sword", new MoranSwordItem());
     
     // 🍑 桃树相关物品
-    public static final Item PEACH_SAPLING = register("peach_sapling", new Item(new FabricItemSettings()));
+    public static final Item PEACH_SAPLING = register("peach_sapling", 
+        new BlockItem(BlockSystem.PEACH_SAPLING, new FabricItemSettings()));
     public static final Item CRYSTAL_SHARD = register("crystal_shard", new Item(new FabricItemSettings()));
     public static final Item IMMORTAL_INGOT = register("immortal_ingot", new Item(new FabricItemSettings()));
     public static final Item BAMBOO_SHOOT = register("bamboo_shoot", new Item(new FabricItemSettings().maxCount(64)));

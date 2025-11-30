@@ -3,12 +3,12 @@
   "downfall": 0.3,
   "has_precipitation": true,
   "effects": {
-    "sky_color": 8880464,
+    "sky_color": 3432127,
     "fog_color": 11591910,
     "water_color": 11591910,
     "water_fog_color": 10134989,
-    "grass_color": 10079487,
-    "foliage_color": 10079487
+    "grass_color": 9419919,
+    "foliage_color": 9420508
   },
   "spawners": {
     "creature": [

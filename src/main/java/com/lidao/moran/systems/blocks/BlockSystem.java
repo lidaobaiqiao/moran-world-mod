@@ -23,15 +23,22 @@ public class BlockSystem {
             new PillarBlock(FabricBlockSettings.copyOf(Blocks.OAK_LOG)));
     
     public static final Block PEACH_BLOSSOM_LEAVES = registerBlock("peach_blossom_leaves",
-            new LeavesBlock(FabricBlockSettings.copyOf(Blocks.OAK_LEAVES)));
+            new LeavesBlock(FabricBlockSettings.copyOf(Blocks.OAK_LEAVES)
+                .allowsSpawning((state, world, pos, type) -> false)));
+    
+    public static final Block PEACH_SAPLING = registerBlock("peach_sapling",
+            new PeachSaplingBlock(new PeachSaplingGenerator(), 
+                FabricBlockSettings.copyOf(Blocks.OAK_SAPLING)
+                    .noCollision()
+                    .breakInstantly()));
 
     // 🌱 妖灼华原基础方块（替换原版方块）
     public static final Block PEACH_BLOSSOM_DIRT = registerBlock("peach_blossom_dirt",
             new Block(FabricBlockSettings.copyOf(Blocks.DIRT)));
-    
+
     public static final Block PEACH_BLOSSOM_GRASS_BLOCK = registerBlock("peach_blossom_grass_block",
             new GrassBlock(FabricBlockSettings.copyOf(Blocks.GRASS_BLOCK)));
-    
+
     public static final Block PEACH_BLOSSOM_STONE = registerBlock("peach_blossom_stone",
             new Block(FabricBlockSettings.copyOf(Blocks.STONE)));
     
@@ -65,6 +72,10 @@ public class BlockSystem {
         System.out.println("🔧 注册桃花方块物品...");
         for (Map.Entry<String, Block> entry : BLOCKS.entrySet()) {
             String id = entry.getKey();
+            // 跳过PEACH_SAPLING，因为已经在ItemSystem中处理
+            if ("peach_sapling".equals(id)) {
+                continue;
+            }
             Block block = entry.getValue();
             Item item = new BlockItem(block, new Item.Settings());
             Registry.register(Registries.ITEM, new Identifier("moran_mod", id), item);

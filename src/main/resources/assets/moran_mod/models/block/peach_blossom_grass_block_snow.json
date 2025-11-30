@@ -3,7 +3,8 @@
   "textures": {
     "particle": "moran_mod:block/peach_blossom_dirt",
     "bottom": "moran_mod:block/peach_blossom_dirt",
-    "side": "moran_mod:block/peach_blossom_grass_block_side",
+    "top": "moran_mod:block/peach_blossom_grass_block_top",
+    "side": "moran_mod:block/peach_blossom_grass_block_side_snow",
     "dirt": "moran_mod:block/peach_blossom_dirt"
   }
 }
