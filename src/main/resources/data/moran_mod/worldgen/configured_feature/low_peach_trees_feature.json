@@ -1,0 +1,27 @@
+{
+  "type": "minecraft:simple_block",
+  "config": {
+    "to_place": {
+      "type": "minecraft:weighted_state_provider",
+      "entries": [
+        {
+          "data": {
+            "Name": "moran_mod:peach_blossom_leaves",
+            "Properties": {
+              "distance": "7",
+              "persistent": "false",
+              "waterlogged": "false"
+            }
+          },
+          "weight": 15
+        },
+        {
+          "data": {
+            "Name": "moran_mod:peach_fallen_leaves"
+          },
+          "weight": 5
+        }
+      ]
+    }
+  }
+}

@@ -1,0 +1,10 @@
+{
+  "replace": false,
+  "values": [
+    "minecraft:mineshaft",
+    "minecraft:mineshaft_mesa",
+    "minecraft:ruined_portal",
+    "minecraft:shipwreck",
+    "minecraft:pillager_outpost"
+  ]
+}

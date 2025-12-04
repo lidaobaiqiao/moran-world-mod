@@ -12,7 +12,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * 极简方块系统 - 只保证桃花原木和树叶正常显示
+ * 墨世界完整方块系统 - 包含所有桃花功能
  */
 public class BlockSystem {
 
@@ -23,21 +23,29 @@ public class BlockSystem {
             new PillarBlock(FabricBlockSettings.copyOf(Blocks.OAK_LOG)));
     
     public static final Block PEACH_BLOSSOM_LEAVES = registerBlock("peach_blossom_leaves",
-            new LeavesBlock(FabricBlockSettings.copyOf(Blocks.OAK_LEAVES)
-                .allowsSpawning((state, world, pos, type) -> false)));
+            new PeachBlossomLeavesBlock(FabricBlockSettings.copyOf(Blocks.OAK_LEAVES)
+                .allowsSpawning((state, world, pos, type) -> false)
+                .dropsNothing()));
     
+    // 🍃 落花堆（特殊透明方块）
+    public static final Block PEACH_FALLEN_LEAVES = registerBlock("peach_fallen_leaves",
+            new Block(FabricBlockSettings.copyOf(Blocks.SAND)
+                .strength(0.1f)
+                .nonOpaque()
+                .allowsSpawning((state, world, pos, type) -> false)));
+
     public static final Block PEACH_SAPLING = registerBlock("peach_sapling",
             new PeachSaplingBlock(new PeachSaplingGenerator(), 
                 FabricBlockSettings.copyOf(Blocks.OAK_SAPLING)
                     .noCollision()
                     .breakInstantly()));
 
-    // 🌱 妖灼华原基础方块（替换原版方块）
+    // 🌱 桃园基础方块（带自定义逻辑）
     public static final Block PEACH_BLOSSOM_DIRT = registerBlock("peach_blossom_dirt",
-            new Block(FabricBlockSettings.copyOf(Blocks.DIRT)));
+            new PeachBlossomDirtBlock(FabricBlockSettings.copyOf(Blocks.DIRT)));
 
     public static final Block PEACH_BLOSSOM_GRASS_BLOCK = registerBlock("peach_blossom_grass_block",
-            new GrassBlock(FabricBlockSettings.copyOf(Blocks.GRASS_BLOCK)));
+            new PeachBlossomGrassBlock(FabricBlockSettings.copyOf(Blocks.GRASS_BLOCK)));
 
     public static final Block PEACH_BLOSSOM_STONE = registerBlock("peach_blossom_stone",
             new Block(FabricBlockSettings.copyOf(Blocks.STONE)));
@@ -51,8 +59,8 @@ public class BlockSystem {
     // 初始化
     public static void initialize() {
         registerBlockItems();
-        System.out.println("✅ 极简方块系统初始化完成");
-        System.out.println("   已注册 " + BLOCKS.size() + " 个方块 (桃花核心)");
+        System.out.println("✅ 墨世界完整方块系统初始化完成");
+        System.out.println("   已注册 " + BLOCKS.size() + " 个方块 (包含所有桃花逻辑)");
         
         // 输出详细的调试信息
         System.out.println("🔍 桃花树方块注册信息：");

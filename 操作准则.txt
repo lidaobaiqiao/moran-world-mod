@@ -1,0 +1,78 @@
+🎭 墨世界模组开发 - 绝对操作准则
+
+## 🔒 核心原则
+
+### ⚡ 唯一真理
+
+• 代码位置:  src/main/java/com/lidao/moran/  - 唯一有效源码
+• 资源位置:  src/main/resources/assets/moran_mod/  和
+src/main/resources/data/moran_mod/
+• 配置文件:  fabric.mod.json  - 唯一入口配置
+
+### 🚫 绝对禁止
+
+1. 永不复制 任何文件到项目根目录
+2. 永不创建 重复的文件夹结构
+3. 永不修改  build/  目录内容
+4. 永不移动 已注册的Java类文件
+5. 永不更改 已确定的包名结构
+
+## 📂 项目结构 - 神圣不可侵犯
+
+test_mod-template-1.20.1/
+├── .git/                     # Git版本控制 ✅
+├── gradle/                   # Gradle配置 ✅
+├── src/                      # 源码根目录 ✅
+├── main/java/com/lidao/moran/     # Java源码 ⭐ 唯一合法位置
+└── main/resources/              # 资源文件 ⭐ 唯一合法位置
+├── assets/moran_mod/         # 纹理、模型、语言
+└── data/moran_mod/           # 维度、群系、战利品表
+├── build.gradle              # 构建配置 ✅
+├── gradlew/                  # Gradle包装器 ✅
+└── run/                      # 游戏运行数据 ✅
+
+## 🔧 开发操作 - 精确规范
+
+### 🔄 每次修改后
+
+[ ] 编译通过:  gradlew.bat compileJava
+[ ] 资源完整: 无缺失的模型/纹理文件
+[ ] 结构正确: 无重复文件或文件夹
+[ ] 功能测试: 游戏内验证修改效果
+
+### 📋 发布前
+
+[ ] 清理构建:  gradlew.bat clean
+[ ] 完整测试: 所有功能正常运行
+[ ] 资源检查: 无缺失或错误的资源文件
+[ ] 日志检查: 无错误或警告信息
+
+## 🏁 最终命令
+
+### 🎮 启动游戏
+
+cd E:\test_mod-template-1.20.1
+gradlew.bat runClient
+
+### 🔧 清理项目
+
+cd E:\test_mod-template-1.20.1
+gradlew.bat clean
+
+### 📝 检查编译
+
+cd E:\test_mod-template-1.20.1
+gradlew.bat compileJava
+
+--------
+
+## 🎊 终结宣言
+
+自此揭过，墨世界模组开发进入稳定期。 遵循本准则，确保项目健康。
+偏离本准则，后果自负。
+
+墨世界 - 永续开发，永不崩塌。
+
+--------
+
+制定时间: 2025-12-01 版本: v1.0 终极准则 状态: 🎯 生效执行

@@ -1,0 +1,7 @@
+{
+  "parent": "minecraft:block/cube_column",
+  "textures": {
+    "end": "moran_mod:block/peach_blossom_planks",
+    "side": "moran_mod:block/peach_blossom_planks"
+  }
+}
