@@ -1,5 +1,6 @@
 package com.lidao.moran.systems.blocks;
 
+import com.lidao.moran.MoranMod;
 import net.fabricmc.fabric.api.object.builder.v1.block.FabricBlockSettings;
 import net.minecraft.block.*;
 import net.minecraft.item.BlockItem;
@@ -7,95 +8,81 @@ import net.minecraft.item.Item;
 import net.minecraft.registry.Registries;
 import net.minecraft.registry.Registry;
 import net.minecraft.util.Identifier;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 
 /**
- * 墨世界完整方块系统 - 包含所有桃花功能
+ * 墨世界方块注册系统。
+ * 方块以类型化静态常量暴露；物品 ID 由注册表反查生成，杜绝字符串拼写错误。
+ * 新增方块：加一个常量字段即可，无需再改任何地方。
  */
 public class BlockSystem {
+    private static final Logger LOGGER = LoggerFactory.getLogger(MoranMod.MOD_ID);
 
-    private static final Map<String, Block> BLOCKS = new HashMap<>();
+    private static final List<Block> ALL_BLOCKS = new ArrayList<>();
 
-    // 🌸 最核心的桃花树方块
-    public static final Block PEACH_LOG = registerBlock("peach_log",
+    // 🌸 桃花树方块
+    public static final Block PEACH_LOG = register("peach_log",
             new PillarBlock(FabricBlockSettings.copyOf(Blocks.OAK_LOG)));
-    
-    public static final Block PEACH_BLOSSOM_LEAVES = registerBlock("peach_blossom_leaves",
+
+    public static final Block PEACH_BLOSSOM_LEAVES = register("peach_blossom_leaves",
             new PeachBlossomLeavesBlock(FabricBlockSettings.copyOf(Blocks.OAK_LEAVES)
-                .allowsSpawning((state, world, pos, type) -> false)
-                .dropsNothing()));
-    
-    // 🍃 落花堆（特殊透明方块）
-    public static final Block PEACH_FALLEN_LEAVES = registerBlock("peach_fallen_leaves",
+                    .allowsSpawning((state, world, pos, type) -> false)
+                    .dropsNothing()));
+
+    public static final Block PEACH_FALLEN_LEAVES = register("peach_fallen_leaves",
             new Block(FabricBlockSettings.copyOf(Blocks.SAND)
-                .strength(0.1f)
-                .nonOpaque()
-                .allowsSpawning((state, world, pos, type) -> false)));
+                    .strength(0.1f)
+                    .nonOpaque()
+                    .allowsSpawning((state, world, pos, type) -> false)));
 
-    public static final Block PEACH_SAPLING = registerBlock("peach_sapling",
-            new PeachSaplingBlock(new PeachSaplingGenerator(), 
-                FabricBlockSettings.copyOf(Blocks.OAK_SAPLING)
-                    .noCollision()
-                    .breakInstantly()));
+    public static final Block PEACH_SAPLING = register("peach_sapling",
+            new PeachSaplingBlock(new PeachSaplingGenerator(),
+                    FabricBlockSettings.copyOf(Blocks.OAK_SAPLING)
+                            .noCollision()
+                            .breakInstantly()));
 
-    // 🌱 桃园基础方块（带自定义逻辑）
-    public static final Block PEACH_BLOSSOM_DIRT = registerBlock("peach_blossom_dirt",
+    // 🌱 桃源基础方块（带自定义逻辑）
+    public static final Block PEACH_BLOSSOM_DIRT = register("peach_blossom_dirt",
             new PeachBlossomDirtBlock(FabricBlockSettings.copyOf(Blocks.DIRT)));
 
-    public static final Block PEACH_BLOSSOM_GRASS_BLOCK = registerBlock("peach_blossom_grass_block",
+    public static final Block PEACH_BLOSSOM_GRASS_BLOCK = register("peach_blossom_grass_block",
             new PeachBlossomGrassBlock(FabricBlockSettings.copyOf(Blocks.GRASS_BLOCK)));
 
-    public static final Block PEACH_BLOSSOM_STONE = registerBlock("peach_blossom_stone",
+    public static final Block PEACH_BLOSSOM_STONE = register("peach_blossom_stone",
             new Block(FabricBlockSettings.copyOf(Blocks.STONE)));
-    
-    public static final Block PEACH_BLOSSOM_SAND = registerBlock("peach_blossom_sand",
+
+    public static final Block PEACH_BLOSSOM_SAND = register("peach_blossom_sand",
             new SandBlock(0xF4D1AE, FabricBlockSettings.copyOf(Blocks.SAND)));
-    
-    public static final Block ANCIENT_PEACH_REALM_STONE = registerBlock("ancient_peach_realm_stone",
+
+    public static final Block ANCIENT_PEACH_REALM_STONE = register("ancient_peach_realm_stone",
             new Block(FabricBlockSettings.copyOf(Blocks.STONE)));
 
-    // 初始化
+    /**
+     * 为所有方块注册 BlockItem（树苗除外——其物品在 ItemSystem 注册）。
+     */
     public static void initialize() {
-        registerBlockItems();
-        System.out.println("✅ 墨世界完整方块系统初始化完成");
-        System.out.println("   已注册 " + BLOCKS.size() + " 个方块 (包含所有桃花逻辑)");
-        
-        // 输出详细的调试信息
-        System.out.println("🔍 桃花树方块注册信息：");
-        for (Map.Entry<String, Block> entry : BLOCKS.entrySet()) {
-            Identifier id = Registries.BLOCK.getId(entry.getValue());
-            System.out.println("   - " + entry.getKey() + " -> " + id);
-        }
-    }
-
-    private static Block registerBlock(String id, Block block) {
-        System.out.println("🌸 注册桃花方块: " + id);
-        BLOCKS.put(id, block);
-        return Registry.register(Registries.BLOCK, new Identifier("moran_mod", id), block);
-    }
-
-    private static void registerBlockItems() {
-        System.out.println("🔧 注册桃花方块物品...");
-        for (Map.Entry<String, Block> entry : BLOCKS.entrySet()) {
-            String id = entry.getKey();
-            // 跳过PEACH_SAPLING，因为已经在ItemSystem中处理
-            if ("peach_sapling".equals(id)) {
+        for (Block block : ALL_BLOCKS) {
+            if (block == PEACH_SAPLING) {
                 continue;
             }
-            Block block = entry.getValue();
-            Item item = new BlockItem(block, new Item.Settings());
-            Registry.register(Registries.ITEM, new Identifier("moran_mod", id), item);
-            System.out.println("   - 注册物品: " + id);
+            Identifier id = Registries.BLOCK.getId(block);
+            Registry.register(Registries.ITEM, id, new BlockItem(block, new Item.Settings()));
         }
+        LOGGER.info("✅ 方块系统就绪：{} 个方块及其物品已注册", ALL_BLOCKS.size());
     }
 
-    public static Block getBlock(String id) {
-        return BLOCKS.get(id);
+    private static Block register(String name, Block block) {
+        Block registered = Registry.register(Registries.BLOCK, new Identifier(MoranMod.MOD_ID, name), block);
+        ALL_BLOCKS.add(registered);
+        return registered;
     }
 
-    public static java.util.Collection<Block> getAllBlocks() {
-        return BLOCKS.values();
+    public static Collection<Block> getAllBlocks() {
+        return ALL_BLOCKS;
     }
 }

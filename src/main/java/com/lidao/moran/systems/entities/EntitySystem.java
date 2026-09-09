@@ -65,7 +65,6 @@ public class EntitySystem {
         BiomeModifications.addSpawn(
                 BiomeSelectors.includeByKey(
                         biomeKey("yaozhuohuayuan"),
-                        biomeKey("low_peach_biome"),
                         biomeKey("peach_valley"),
                         biomeKey("bamboo_grove"),
                         biomeKey("farm_plains"),
