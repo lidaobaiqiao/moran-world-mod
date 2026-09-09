@@ -420,7 +420,7 @@
               "type": "minecraft:condition",
               "if_true": {
                 "type": "minecraft:biome",
-                "biomes": [
+                "biome_is": [
                   "moran_mod:mirror_lakes"
                 ]
               },
@@ -478,7 +478,7 @@
               "type": "minecraft:condition",
               "if_true": {
                 "type": "minecraft:biome",
-                "biomes": [
+                "biome_is": [
                   "moran_mod:yaozhuohuayuan",
                   "moran_mod:peach_valley",
                   "moran_mod:bamboo_grove",
