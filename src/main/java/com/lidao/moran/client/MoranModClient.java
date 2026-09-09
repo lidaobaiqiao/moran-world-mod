@@ -1,9 +1,14 @@
 package com.lidao.moran.client;
 
 import com.lidao.moran.MoranMod;
+import com.lidao.moran.client.render.MolingModel;
+import com.lidao.moran.client.render.MolingRenderer;
+import com.lidao.moran.systems.entities.EntitySystem;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.rendering.v1.ColorProviderRegistry;
+import net.fabricmc.fabric.api.client.rendering.v1.EntityRendererRegistry;
+import net.fabricmc.fabric.api.client.rendering.v1.EntityModelLayerRegistry;
 import net.minecraft.block.Block;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.color.world.BiomeColors; // ✅ 导入存放静态方法的类
@@ -41,6 +46,11 @@ public class MoranModClient implements ClientModInitializer {
         // === 核心修改：注册动态颜色提供器 ===
         registerBlockColorProvider(myGrassBlockBlock);
         registerItemColorProvider(myGrassBlock);
+
+        // === 墨灵：实体渲染器 + 模型层 ===
+        EntityModelLayerRegistry.registerModelLayer(MolingRenderer.MOLING_LAYER, MolingModel::getTexturedModelData);
+        EntityRendererRegistry.register(EntitySystem.MOLING, MolingRenderer::new);
+        LOGGER.info("👻 墨灵渲染器已注册");
 
         // 初始化其他客户端功能（保持你原有的结构）
         initializeClientRendering();

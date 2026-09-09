@@ -8,6 +8,7 @@ import com.lidao.moran.systems.respawn.RespawnSystem;
 import com.lidao.moran.systems.teleport.RaftTeleportHandler;
 import com.lidao.moran.systems.items.ItemSystem;
 import com.lidao.moran.systems.blocks.BlockSystem;
+import com.lidao.moran.systems.entities.EntitySystem;
 import com.lidao.moran.core.terrablender.BiomeDataCreator;
 import com.lidao.moran.worldgen.PeachSurfaceRules;
 import net.fabricmc.api.ModInitializer;
@@ -34,6 +35,7 @@ public class MoranMod implements ModInitializer, TerraBlenderApi {
         initializeBiomeSystem();
         initializeDimensionSystem();
         initializeItemSystem();
+        initializeEntitySystem();
         initializeCommandSystem();
         initializeRaftTeleportSystem();
         initializeWorldEventListener();
@@ -76,6 +78,11 @@ public class MoranMod implements ModInitializer, TerraBlenderApi {
     private void initializeItemSystem() {
         LOGGER.info("💎 初始化墨韵物品系统...");
         ItemSystem.initialize();
+    }
+
+    private void initializeEntitySystem() {
+        LOGGER.info("👻 初始化墨灵生物系统...");
+        EntitySystem.initialize();
     }
 
     private void initializeCommandSystem() {
