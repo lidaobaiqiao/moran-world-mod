@@ -40,5 +40,6 @@
   "tooltip.moran_mod.ancient_peach_realm_stone": "Ancient Peach Realm Stone with mystical power",
   "biome.moran_mod.low_peach_biome": "Lowland Peach Grove",
   "entity.moran_mod.moling": "Moling",
-  "item.moran_mod.moling_spawn_egg": "Moling Spawn Egg"
+  "item.moran_mod.moling_spawn_egg": "Moling Spawn Egg",
+  "itemgroup.moran_mod.main": "Ink World"
 }
