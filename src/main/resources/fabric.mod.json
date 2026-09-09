@@ -23,6 +23,9 @@
     ],
     "terrablender": [
       "com.lidao.moran.core.terrablender.TerrablenderIntegration"
+    ],
+    "fabric-datagen": [
+      "com.lidao.moran.MoranModDataGenerator"
     ]
   },
   "mixins": [

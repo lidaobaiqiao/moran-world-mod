@@ -1,7 +1,10 @@
 package com.lidao.moran;
 
 import com.lidao.moran.dimensions.DimensionRegistry;
+import com.lidao.moran.core.config.ConfigManager;
+import com.lidao.moran.core.event.WorldEventListener;
 import com.lidao.moran.systems.commands.TeleportCommand;
+import com.lidao.moran.systems.respawn.RespawnSystem;
 import com.lidao.moran.systems.teleport.RaftTeleportHandler;
 import com.lidao.moran.systems.items.ItemSystem;
 import com.lidao.moran.systems.blocks.BlockSystem;
@@ -26,12 +29,15 @@ public class MoranMod implements ModInitializer, TerraBlenderApi {
     public void onInitialize() {
         LOGGER.info("🎭 墨世界模组启动");
 
+        initializeConfigSystem();
         initializeBlockSystem();
         initializeBiomeSystem();
         initializeDimensionSystem();
         initializeItemSystem();
         initializeCommandSystem();
         initializeRaftTeleportSystem();
+        initializeWorldEventListener();
+        initializeRespawnSystem();
     }
 
     @Override
@@ -43,6 +49,12 @@ public class MoranMod implements ModInitializer, TerraBlenderApi {
     }
 
     // ... (后面的 initialize 方法保持不变) ...
+    private void initializeConfigSystem() {
+        LOGGER.info("⚙️ 初始化墨世界配置系统...");
+        ConfigManager.initialize();
+        LOGGER.info("✅ 配置系统就绪");
+    }
+
     private void initializeBlockSystem() {
         LOGGER.info("⛏️ 初始化墨彩方块系统...");
         BlockSystem.initialize();
@@ -77,5 +89,17 @@ public class MoranMod implements ModInitializer, TerraBlenderApi {
         ServerTickEvents.END_SERVER_TICK.register(server -> {
             server.getPlayerManager().getPlayerList().forEach(RaftTeleportHandler::onPlayerTick);
         });
+    }
+
+    private void initializeWorldEventListener() {
+        LOGGER.info("🌐 初始化世界事件监听...");
+        WorldEventListener.initialize();
+        LOGGER.info("✅ 世界事件监听就绪");
+    }
+
+    private void initializeRespawnSystem() {
+        LOGGER.info("💀 初始化重生遣返系统...");
+        RespawnSystem.initialize();
+        LOGGER.info("✅ 重生系统就绪");
     }
 }

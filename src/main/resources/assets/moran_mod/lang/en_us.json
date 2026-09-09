@@ -9,6 +9,7 @@
   "block.moran_mod.peach_blossom_stone": "Peach Realm Stone",
   "block.moran_mod.peach_blossom_sand": "Peach Realm Sand",
   "block.moran_mod.ancient_peach_realm_stone": "Ancient Peach Realm Stone",
+  "block.moran_mod.peach_fallen_leaves": "Peach Fallen Leaves",
   
   "item.moran_mod.peach_log": "Peach Log",
   "item.moran_mod.peach_blossom_leaves": "Peach Blossom Leaves",
@@ -20,6 +21,10 @@
   "item.moran_mod.ancient_peach_realm_stone": "Ancient Peach Realm Stone",
   
   "item.moran_mod.crystal_shard": "Crystal Shard",
+  "item.moran_mod.peach_fallen_leaves": "Peach Fallen Leaves",
+  "item.moran_mod.moran": "Ink Stone",
+  "item.moran_mod.qingfeng": "Qingfeng Essence",
+  "item.moran_mod.moran_sword": "Ink Sword",
   "item.moran_mod.bamboo_raft": "Bamboo Raft",
   "item.moran_mod.immortal_ingot": "Immortal Ingot",
   "item.moran_mod.bamboo_shoot": "Bamboo Shoot",

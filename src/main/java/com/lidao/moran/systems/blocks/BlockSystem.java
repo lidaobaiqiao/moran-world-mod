@@ -94,4 +94,8 @@ public class BlockSystem {
     public static Block getBlock(String id) {
         return BLOCKS.get(id);
     }
+
+    public static java.util.Collection<Block> getAllBlocks() {
+        return BLOCKS.values();
+    }
 }

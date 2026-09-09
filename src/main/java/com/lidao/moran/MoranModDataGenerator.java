@@ -1,56 +1,35 @@
 package com.lidao.moran;
 
+import com.lidao.moran.systems.blocks.BlockSystem;
 import net.fabricmc.fabric.api.datagen.v1.DataGeneratorEntrypoint;
 import net.fabricmc.fabric.api.datagen.v1.FabricDataGenerator;
 import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput;
-import net.fabricmc.fabric.api.datagen.v1.provider.FabricModelProvider;
-import net.fabricmc.fabric.api.datagen.v1.provider.FabricLanguageProvider;
-import net.minecraft.data.client.BlockStateModelGenerator;
-import net.minecraft.data.client.ItemModelGenerator;
-import net.minecraft.data.client.Models;
+import net.fabricmc.fabric.api.datagen.v1.provider.FabricBlockLootTableProvider;
+import net.minecraft.block.Block;
 
 public class MoranModDataGenerator implements DataGeneratorEntrypoint {
     @Override
     public void onInitializeDataGenerator(FabricDataGenerator generator) {
-        generator.createPack().addProvider(MoranModelProvider::new);
-        generator.createPack().addProvider(MoranLanguageProvider::new);
+        generator.createPack().addProvider(MoranBlockLootTableProvider::new);
     }
 
-    private static class MoranModelProvider extends FabricModelProvider {
-        public MoranModelProvider(FabricDataOutput output) {
+    /**
+     * 为所有方块生成"掉落自身"的战利品表，输出到 src/main/generated。
+     * 桃花树叶已有手工维护的战利品表（掉树苗逻辑），跳过以免生成重复资源。
+     */
+    private static class MoranBlockLootTableProvider extends FabricBlockLootTableProvider {
+        private MoranBlockLootTableProvider(FabricDataOutput output) {
             super(output);
         }
 
         @Override
-        public void generateBlockStateModels(BlockStateModelGenerator blockStateModelGenerator) {
-            // 如果没有方块，可以留空
-        }
-
-        @Override
-        public void generateItemModels(ItemModelGenerator itemModelGenerator) {
-            // 暂时注释掉，等物品系统完善后再添加
-            // itemModelGenerator.register(
-            //         com.lidao.moran.systems.items.ItemSystem.MORAN,
-            //         Models.GENERATED
-            // );
-        }
-    }
-
-    private static class MoranLanguageProvider extends FabricLanguageProvider {
-        public MoranLanguageProvider(FabricDataOutput output) {
-            super(output, "zh_cn");
-        }
-
-        @Override
-        public void generateTranslations(TranslationBuilder builder) {
-            // 修复：直接使用字符串注册翻译
-            builder.add(com.lidao.moran.systems.items.ItemSystem.MORAN, "墨石");
-            builder.add(com.lidao.moran.systems.items.ItemSystem.QINGFENG_JINGHUA, "清风精华");
-            builder.add(com.lidao.moran.systems.items.ItemSystem.MORAN_SWORD, "墨剑");
-
+        public void generate() {
+            for (Block block : BlockSystem.getAllBlocks()) {
+                if (block == BlockSystem.PEACH_BLOSSOM_LEAVES) {
+                    continue;
+                }
+                addDrop(block);
+            }
         }
     }
 }
-
-
-

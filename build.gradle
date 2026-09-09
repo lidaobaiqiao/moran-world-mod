@@ -11,6 +11,12 @@ base {
 }
 
 repositories {
+    // 阿里云镜像（国内直连，优先）
+    maven {
+        name = 'AliyunPublic'
+        url = 'https://maven.aliyun.com/repository/public'
+    }
+
     maven {
         name = 'Fabric'
         url = 'https://maven.fabricmc.net/'
@@ -68,6 +74,23 @@ dependencies {
     include files("libs/nightconfig-core-3.6.7.jar")
     include files("libs/nightconfig-toml-3.6.7.jar")
 }
+// datagen 生成资源的输出目录（gradlew runDatagen）
+sourceSets.main.resources { srcDir 'src/main/generated' }
+
+loom {
+    runs {
+        datagen {
+            inherit server
+            name "Data Generation"
+            vmArg "-Dfabric-api.datagen"
+            vmArg "-Dfabric-api.datagen.output-dir=${file("src/main/generated")}"
+            vmArg "-Dfabric-api.datagen.modid=moran-mod"
+
+            runDir "build/datagen"
+        }
+    }
+}
+
 processResources {
     inputs.property "version", project.version
     filesMatching("fabric.mod.json") {
