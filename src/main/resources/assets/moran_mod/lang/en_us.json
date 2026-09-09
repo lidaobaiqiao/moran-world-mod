@@ -1,6 +1,5 @@
 {
   "itemGroup.moran_mod": "Peach Blossom Realm",
-  
   "block.moran_mod.peach_log": "Peach Log",
   "block.moran_mod.peach_blossom_leaves": "Peach Blossom Leaves",
   "block.moran_mod.peach_sapling": "Peach Sapling",
@@ -10,7 +9,6 @@
   "block.moran_mod.peach_blossom_sand": "Peach Realm Sand",
   "block.moran_mod.ancient_peach_realm_stone": "Ancient Peach Realm Stone",
   "block.moran_mod.peach_fallen_leaves": "Peach Fallen Leaves",
-  
   "item.moran_mod.peach_log": "Peach Log",
   "item.moran_mod.peach_blossom_leaves": "Peach Blossom Leaves",
   "item.moran_mod.peach_sapling": "Peach Sapling",
@@ -19,7 +17,6 @@
   "item.moran_mod.peach_blossom_stone": "Peach Realm Stone",
   "item.moran_mod.peach_blossom_sand": "Peach Realm Sand",
   "item.moran_mod.ancient_peach_realm_stone": "Ancient Peach Realm Stone",
-  
   "item.moran_mod.crystal_shard": "Crystal Shard",
   "item.moran_mod.peach_fallen_leaves": "Peach Fallen Leaves",
   "item.moran_mod.moran": "Ink Stone",
@@ -28,7 +25,6 @@
   "item.moran_mod.bamboo_raft": "Bamboo Raft",
   "item.moran_mod.immortal_ingot": "Immortal Ingot",
   "item.moran_mod.bamboo_shoot": "Bamboo Shoot",
-  
   "biome.moran_mod.yaozhuohuayuan": "Yaozhuo Garden",
   "biome.moran_mod.peach_valley": "Peach Valley",
   "biome.moran_mod.bamboo_grove": "Hidden Bamboo Grove",
@@ -37,12 +33,10 @@
   "biome.moran_mod.blossom_stream": "Falling Petal Stream",
   "biome.moran_mod.mirror_lakes": "Mirror Lakes",
   "biome.moran_mod.hidden_depths": "Hidden Depths",
-  
   "item.moran_mod.peach_blossom_dimension": "Peach Blossom Portal",
-  
   "death.attack.moran_mod.peach_blossom_dimension": "%1$s was mesmerized by the Peach Blossom Realm",
   "death.attack.moran_mod.peach_blossom_dimension.player": "%1$s was mesmerized by %2$s in the Peach Blossom Realm",
-  
   "tooltip.moran_mod.peach_blossom_dimension": "Portal to the Peach Blossom Realm",
-  "tooltip.moran_mod.ancient_peach_realm_stone": "Ancient Peach Realm Stone with mystical power"
+  "tooltip.moran_mod.ancient_peach_realm_stone": "Ancient Peach Realm Stone with mystical power",
+  "biome.moran_mod.low_peach_biome": "Lowland Peach Grove"
 }

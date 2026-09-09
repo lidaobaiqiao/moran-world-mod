@@ -1,0 +1,58 @@
+{
+  "temperature": 0.8,
+  "downfall": 0.7,
+  "has_precipitation": true,
+  "effects": {
+    "sky_color": 3432127,
+    "fog_color": 11591910,
+    "water_color": 9307090,
+    "water_fog_color": 10134989,
+    "grass_color": 8837513,
+    "foliage_color": 8837513
+  },
+  "spawners": {
+    "monster": [],
+    "ambient": [],
+    "axolotls": [],
+    "underground_water_creature": [],
+    "water_creature": [
+      {
+        "type": "minecraft:salmon",
+        "weight": 8,
+        "minCount": 1,
+        "maxCount": 4
+      }
+    ],
+    "creature": [
+      {
+        "type": "minecraft:chicken",
+        "weight": 6,
+        "minCount": 1,
+        "maxCount": 3
+      }
+    ]
+  },
+  "spawn_costs": {},
+  "carvers": {
+    "air": [
+      "minecraft:cave"
+    ]
+  },
+  "features": [
+    [],
+    [],
+    [],
+    [],
+    [],
+    [],
+    [
+      "minecraft:disk_sand"
+    ],
+    [],
+    [],
+    [
+      "moran_mod:low_peach_trees_placed"
+    ],
+    []
+  ]
+}

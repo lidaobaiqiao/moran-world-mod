@@ -9,12 +9,219 @@
         {
           "biome": "moran_mod:yaozhuohuayuan",
           "parameters": {
-            "temperature": [0.2, 0.4],
-            "humidity": [0.8, 1.0],
-            "continentalness": [-0.3, 0.3],
-            "erosion": [0.5, 1.0],
-            "weirdness": [0.0, 0.3],
+            "temperature": [
+              0.2,
+              0.4
+            ],
+            "humidity": [
+              0.8,
+              1.0
+            ],
+            "continentalness": [
+              -0.3,
+              0.3
+            ],
+            "erosion": [
+              0.5,
+              1.0
+            ],
+            "weirdness": [
+              -0.15,
+              0.15
+            ],
             "depth": 0.0,
+            "offset": 0.0
+          }
+        },
+        {
+          "biome": "moran_mod:peach_valley",
+          "parameters": {
+            "temperature": [
+              0.2,
+              0.4
+            ],
+            "humidity": [
+              0.8,
+              1.0
+            ],
+            "continentalness": [
+              -0.3,
+              0.3
+            ],
+            "erosion": [
+              0.5,
+              1.0
+            ],
+            "weirdness": [
+              0.15,
+              0.4
+            ],
+            "depth": 0.0,
+            "offset": 0.0
+          }
+        },
+        {
+          "biome": "moran_mod:bamboo_grove",
+          "parameters": {
+            "temperature": [
+              0.2,
+              0.4
+            ],
+            "humidity": [
+              0.8,
+              1.0
+            ],
+            "continentalness": [
+              -0.3,
+              0.3
+            ],
+            "erosion": [
+              0.5,
+              1.0
+            ],
+            "weirdness": [
+              0.4,
+              0.65
+            ],
+            "depth": 0.0,
+            "offset": 0.0
+          }
+        },
+        {
+          "biome": "moran_mod:green_hills",
+          "parameters": {
+            "temperature": [
+              0.2,
+              0.4
+            ],
+            "humidity": [
+              0.8,
+              1.0
+            ],
+            "continentalness": [
+              -0.3,
+              0.3
+            ],
+            "erosion": [
+              0.5,
+              1.0
+            ],
+            "weirdness": [
+              0.65,
+              1.0
+            ],
+            "depth": 0.0,
+            "offset": 0.0
+          }
+        },
+        {
+          "biome": "moran_mod:blossom_stream",
+          "parameters": {
+            "temperature": [
+              0.2,
+              0.4
+            ],
+            "humidity": [
+              0.8,
+              1.0
+            ],
+            "continentalness": [
+              -0.3,
+              0.3
+            ],
+            "erosion": [
+              0.5,
+              1.0
+            ],
+            "weirdness": [
+              -0.4,
+              -0.15
+            ],
+            "depth": 0.0,
+            "offset": 0.0
+          }
+        },
+        {
+          "biome": "moran_mod:farm_plains",
+          "parameters": {
+            "temperature": [
+              0.2,
+              0.4
+            ],
+            "humidity": [
+              0.8,
+              1.0
+            ],
+            "continentalness": [
+              -0.3,
+              0.3
+            ],
+            "erosion": [
+              0.5,
+              1.0
+            ],
+            "weirdness": [
+              -0.65,
+              -0.4
+            ],
+            "depth": 0.0,
+            "offset": 0.0
+          }
+        },
+        {
+          "biome": "moran_mod:mirror_lakes",
+          "parameters": {
+            "temperature": [
+              0.2,
+              0.4
+            ],
+            "humidity": [
+              0.8,
+              1.0
+            ],
+            "continentalness": [
+              -0.3,
+              0.3
+            ],
+            "erosion": [
+              0.5,
+              1.0
+            ],
+            "weirdness": [
+              -1.0,
+              -0.65
+            ],
+            "depth": 0.0,
+            "offset": 0.0
+          }
+        },
+        {
+          "biome": "moran_mod:hidden_depths",
+          "parameters": {
+            "temperature": [
+              0.2,
+              0.4
+            ],
+            "humidity": [
+              0.8,
+              1.0
+            ],
+            "continentalness": [
+              -0.3,
+              0.3
+            ],
+            "erosion": [
+              0.5,
+              1.0
+            ],
+            "weirdness": [
+              -1.0,
+              1.0
+            ],
+            "depth": [
+              -1.0,
+              -0.2
+            ],
             "offset": 0.0
           }
         }

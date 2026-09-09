@@ -1,6 +1,5 @@
 {
   "itemGroup.moran_mod": "桃花源记",
-  
   "block.moran_mod.peach_log": "桃木原木",
   "block.moran_mod.peach_blossom_leaves": "桃花树叶",
   "block.moran_mod.peach_sapling": "桃树树苗",
@@ -10,7 +9,6 @@
   "block.moran_mod.peach_blossom_sand": "桃源沙",
   "block.moran_mod.ancient_peach_realm_stone": "古桃源界石",
   "block.moran_mod.peach_fallen_leaves": "桃花落叶堆",
-  
   "item.moran_mod.peach_log": "桃木原木",
   "item.moran_mod.peach_blossom_leaves": "桃花树叶",
   "item.moran_mod.peach_sapling": "桃树树苗",
@@ -20,7 +18,6 @@
   "item.moran_mod.peach_blossom_sand": "桃源沙",
   "item.moran_mod.ancient_peach_realm_stone": "古桃源界石",
   "item.moran_mod.peach_fallen_leaves": "桃花落叶堆",
-  
   "item.moran_mod.crystal_shard": "水晶碎片",
   "item.moran_mod.moran": "墨石",
   "item.moran_mod.qingfeng": "清风精华",
@@ -28,7 +25,6 @@
   "item.moran_mod.bamboo_raft": "竹筏",
   "item.moran_mod.immortal_ingot": "仙缘锭",
   "item.moran_mod.bamboo_shoot": "竹笋",
-  
   "biome.moran_mod.yaozhuohuayuan": "妖灼华原",
   "biome.moran_mod.peach_valley": "桃花谷",
   "biome.moran_mod.bamboo_grove": "隐竹之界",
@@ -37,12 +33,10 @@
   "biome.moran_mod.blossom_stream": "落花寻溪原",
   "biome.moran_mod.mirror_lakes": "镜湖百池",
   "biome.moran_mod.hidden_depths": "晦暗幽深处",
-  
   "item.moran_mod.peach_blossom_dimension": "桃花源传送门",
-  
   "death.attack.moran_mod.peach_blossom_dimension": "%1$s被桃花源的魅力所迷惑",
   "death.attack.moran_mod.peach_blossom_dimension.player": "%1$s在桃花源中被%2$s迷惑",
-  
   "tooltip.moran_mod.peach_blossom_dimension": "通往桃花源的传送门",
-  "tooltip.moran_mod.ancient_peach_realm_stone": "古代桃花源界石，蕴含神秘力量"
+  "tooltip.moran_mod.ancient_peach_realm_stone": "古代桃花源界石，蕴含神秘力量",
+  "biome.moran_mod.low_peach_biome": "低地桃林"
 }
