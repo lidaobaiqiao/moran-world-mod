@@ -7,7 +7,8 @@
   - Maven 中央仓库：`https://maven.aliyun.com/repository/public`（阿里云，build.gradle repositories 里已排在最前）
   - Gradle 插件：`https://maven.aliyun.com/repository/gradle-plugin`（settings.gradle pluginManagement 已配置）
   - Fabric / TerraBlender 等专用仓库（maven.fabricmc.net 等）实测可直连，无需镜像，保留原地址
-- 本机 JDK：`C:\Users\15537\.jdks\temurin-17`（JAVA_HOME 已指向它）；PATH 里的 `java` 是 11，不能用于本项目
+- 本机 JDK：项目用 `C:\Users\15537\.jdks\temurin-17`，已通过 `gradle.properties` 的 `org.gradle.java.home` 钉死（终端 PATH 里的 java 可能是 11 或 25，都不影响构建）
+- `.vscode/settings.json` 已把 VS Code 的 Gradle 同步和 Java 语言服务器指到 temurin-17
 - Gradle 8.14 与 fabric-loom 1.6 不兼容，必须用 Gradle 8.6（wrapper 已锁 8.6）
 
 ## 项目概况
