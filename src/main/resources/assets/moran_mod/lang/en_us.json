@@ -40,5 +40,17 @@
   "tooltip.moran_mod.ancient_peach_realm_stone": "Ancient Peach Realm Stone with mystical power",
   "entity.moran_mod.moling": "Moling",
   "item.moran_mod.moling_spawn_egg": "Moling Spawn Egg",
-  "itemgroup.moran_mod.main": "Ink World"
+  "itemgroup.moran_mod.main": "Ink World",
+  "block.moran_mod.willow_log": "Willow Log",
+  "block.moran_mod.willow_leaves": "Willow Leaves",
+  "block.moran_mod.willow_sapling": "Willow Sapling",
+  "block.moran_mod.pine_log": "Pine Log",
+  "block.moran_mod.pine_leaves": "Pine Leaves",
+  "block.moran_mod.pine_sapling": "Pine Sapling",
+  "block.moran_mod.plum_log": "Plum Log",
+  "block.moran_mod.plum_leaves": "Plum Leaves",
+  "block.moran_mod.plum_sapling": "Plum Sapling",
+  "block.moran_mod.ginkgo_log": "Ginkgo Log",
+  "block.moran_mod.ginkgo_leaves": "Ginkgo Leaves",
+  "block.moran_mod.ginkgo_sapling": "Ginkgo Sapling"
 }

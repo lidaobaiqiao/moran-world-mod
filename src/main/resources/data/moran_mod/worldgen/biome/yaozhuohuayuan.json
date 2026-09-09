@@ -27,7 +27,9 @@
   },
   "spawn_costs": {},
   "carvers": {
-    "air": ["minecraft:cave"]
+    "air": [
+      "minecraft:cave"
+    ]
   },
   "features": [
     [],
@@ -37,7 +39,11 @@
     [],
     [],
     [
-      "moran_mod:peach_trees_placed"
+      "moran_mod:peach_trees_placed",
+      "moran_mod:willow_tree_placed",
+      "moran_mod:pine_tree_placed",
+      "moran_mod:plum_tree_placed",
+      "moran_mod:ginkgo_tree_placed"
     ],
     [],
     [],

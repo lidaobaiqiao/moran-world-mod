@@ -1,0 +1,6 @@
+{
+  "parent": "minecraft:block/leaves",
+  "textures": {
+    "all": "moran_mod:block/pine_leaves"
+  }
+}

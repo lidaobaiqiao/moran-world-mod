@@ -40,5 +40,17 @@
   "tooltip.moran_mod.ancient_peach_realm_stone": "古代桃花源界石，蕴含神秘力量",
   "entity.moran_mod.moling": "墨灵",
   "item.moran_mod.moling_spawn_egg": "墨灵生成蛋",
-  "itemgroup.moran_mod.main": "墨世界"
+  "itemgroup.moran_mod.main": "墨世界",
+  "block.moran_mod.willow_log": "垂柳原木",
+  "block.moran_mod.willow_leaves": "垂柳树叶",
+  "block.moran_mod.willow_sapling": "垂柳树苗",
+  "block.moran_mod.pine_log": "劲松原木",
+  "block.moran_mod.pine_leaves": "劲松树叶",
+  "block.moran_mod.pine_sapling": "劲松树苗",
+  "block.moran_mod.plum_log": "寒梅原木",
+  "block.moran_mod.plum_leaves": "寒梅树叶",
+  "block.moran_mod.plum_sapling": "寒梅树苗",
+  "block.moran_mod.ginkgo_log": "银杏原木",
+  "block.moran_mod.ginkgo_leaves": "银杏树叶",
+  "block.moran_mod.ginkgo_sapling": "银杏树苗"
 }

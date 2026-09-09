@@ -62,6 +62,39 @@ public class BlockSystem {
     public static final Block ANCIENT_PEACH_REALM_STONE = register("ancient_peach_realm_stone",
             new Block(FabricBlockSettings.copyOf(Blocks.STONE)));
 
+    // 🌿 五树体系：桃树之外的四棵树（垂柳 / 劲松 / 寒梅 / 银杏）
+    public static final Block WILLOW_LOG = register("willow_log",
+            new PillarBlock(FabricBlockSettings.copyOf(Blocks.OAK_LOG)));
+    public static final Block WILLOW_LEAVES = register("willow_leaves",
+            new LeavesBlock(FabricBlockSettings.copyOf(Blocks.OAK_LEAVES)));
+    public static final Block WILLOW_SAPLING = register("willow_sapling",
+            new SaplingBlock(new MoranSaplingGenerator("willow_tree"),
+                    FabricBlockSettings.copyOf(Blocks.OAK_SAPLING).noCollision().breakInstantly()));
+
+    public static final Block PINE_LOG = register("pine_log",
+            new PillarBlock(FabricBlockSettings.copyOf(Blocks.OAK_LOG)));
+    public static final Block PINE_LEAVES = register("pine_leaves",
+            new LeavesBlock(FabricBlockSettings.copyOf(Blocks.SPRUCE_LEAVES)));
+    public static final Block PINE_SAPLING = register("pine_sapling",
+            new SaplingBlock(new MoranSaplingGenerator("pine_tree"),
+                    FabricBlockSettings.copyOf(Blocks.OAK_SAPLING).noCollision().breakInstantly()));
+
+    public static final Block PLUM_LOG = register("plum_log",
+            new PillarBlock(FabricBlockSettings.copyOf(Blocks.OAK_LOG)));
+    public static final Block PLUM_LEAVES = register("plum_leaves",
+            new LeavesBlock(FabricBlockSettings.copyOf(Blocks.OAK_LEAVES)));
+    public static final Block PLUM_SAPLING = register("plum_sapling",
+            new SaplingBlock(new MoranSaplingGenerator("plum_tree"),
+                    FabricBlockSettings.copyOf(Blocks.OAK_SAPLING).noCollision().breakInstantly()));
+
+    public static final Block GINKGO_LOG = register("ginkgo_log",
+            new PillarBlock(FabricBlockSettings.copyOf(Blocks.OAK_LOG)));
+    public static final Block GINKGO_LEAVES = register("ginkgo_leaves",
+            new LeavesBlock(FabricBlockSettings.copyOf(Blocks.OAK_LEAVES)));
+    public static final Block GINKGO_SAPLING = register("ginkgo_sapling",
+            new SaplingBlock(new MoranSaplingGenerator("ginkgo_tree"),
+                    FabricBlockSettings.copyOf(Blocks.OAK_SAPLING).noCollision().breakInstantly()));
+
     /**
      * 为所有方块注册 BlockItem（树苗除外——其物品在 ItemSystem 注册）。
      */

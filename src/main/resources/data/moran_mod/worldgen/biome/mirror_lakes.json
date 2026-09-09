@@ -46,7 +46,11 @@
     [],
     [],
     [
-      "minecraft:disk_sand"
+      "minecraft:disk_sand",
+      "moran_mod:willow_tree_placed",
+      "moran_mod:pine_tree_placed",
+      "moran_mod:plum_tree_placed",
+      "moran_mod:ginkgo_tree_placed"
     ],
     [],
     [],

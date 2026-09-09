@@ -1,0 +1,16 @@
+{
+  "variants": {
+    "axis=y": {
+      "model": "moran_mod:block/pine_log"
+    },
+    "axis=z": {
+      "model": "moran_mod:block/pine_log_horizontal",
+      "x": 90
+    },
+    "axis=x": {
+      "model": "moran_mod:block/pine_log_horizontal",
+      "x": 90,
+      "y": 90
+    }
+  }
+}
