@@ -1,3 +1,6 @@
 {
-  "parent": "moran_mod:block/peach_fallen_leaves"
+  "parent": "minecraft:item/handheld",
+  "textures": {
+    "layer0": "moran_mod:item/moran_sword"
+  }
 }
