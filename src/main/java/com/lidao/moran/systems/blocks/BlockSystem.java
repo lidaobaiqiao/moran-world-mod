@@ -37,6 +37,7 @@ public class BlockSystem {
     public static final Block PEACH_FALLEN_LEAVES = register("peach_fallen_leaves",
             new Block(FabricBlockSettings.copyOf(Blocks.SAND)
                     .strength(0.1f)
+                    .noCollision()
                     .nonOpaque()
                     .allowsSpawning((state, world, pos, type) -> false)));
 

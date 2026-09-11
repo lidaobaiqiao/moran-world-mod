@@ -1,7 +1,21 @@
 {
   "variants": {
-    "": {
-      "model": "moran_mod:block/peach_fallen_leaves"
-    }
+    "": [
+      {
+        "model": "moran_mod:block/peach_fallen_leaves"
+      },
+      {
+        "model": "moran_mod:block/peach_fallen_leaves",
+        "y": 90
+      },
+      {
+        "model": "moran_mod:block/peach_fallen_leaves",
+        "y": 180
+      },
+      {
+        "model": "moran_mod:block/peach_fallen_leaves",
+        "y": 270
+      }
+    ]
   }
 }

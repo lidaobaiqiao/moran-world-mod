@@ -1,10 +1,8 @@
 {
-  "parent": "minecraft:block/grass_block",
+  "parent": "minecraft:block/cube_bottom_top",
   "textures": {
-    "particle": "moran_mod:block/peach_blossom_dirt",
-    "bottom": "moran_mod:block/peach_blossom_dirt",
     "top": "moran_mod:block/peach_blossom_grass_block_top",
     "side": "moran_mod:block/peach_blossom_grass_block_side",
-    "overlay": "moran_mod:block/peach_blossom_grass_block_overlay"
+    "bottom": "moran_mod:block/peach_blossom_dirt"
   }
 }
