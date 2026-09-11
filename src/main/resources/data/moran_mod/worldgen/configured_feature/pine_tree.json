@@ -43,7 +43,8 @@
           "min_inclusive": 3,
           "max_inclusive": 5
         }
-      }
+      },
+      "height": 2
     },
     "minimum_size": {
       "type": "minecraft:two_layers_feature_size",
