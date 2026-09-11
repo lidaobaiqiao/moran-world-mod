@@ -10,26 +10,13 @@ import net.minecraft.world.World;
 import net.minecraft.world.WorldView;
 
 public class PeachBlossomDirtBlock extends Block implements Fertilizable {
-    
+
     public PeachBlossomDirtBlock(Settings settings) {
         super(settings);
     }
     
-    @Override
-    public boolean hasRandomTicks(BlockState state) {
-        return true;
-    }
-    
-    @Override
-    public void randomTick(BlockState state, ServerWorld world, BlockPos pos, Random random) {
-        // 有概率转变为桃花草方块
-        if (world.getLightLevel(pos.up()) >= 4) {
-            if (random.nextInt(10) == 0) {
-                world.setBlockState(pos, BlockSystem.PEACH_BLOSSOM_GRASS_BLOCK.getDefaultState());
-            }
-        }
-    }
-    
+    // 裸土不自发变草：由旁边桃源草方块的 randomTick 蔓延驱动（同原版草方块机制）
+
     @Override
     public boolean isFertilizable(WorldView world, BlockPos pos, BlockState state, boolean isClient) {
         return world.getBlockState(pos.up()).isAir();

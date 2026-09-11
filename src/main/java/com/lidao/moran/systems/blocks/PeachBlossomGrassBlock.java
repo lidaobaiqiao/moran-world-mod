@@ -54,7 +54,6 @@ public class PeachBlossomGrassBlock extends GrassBlock implements Fertilizable {
         }
         
         if (world.getLightLevel(pos.up()) < 4 && world.getBlockState(pos.up()).getOpacity(world, pos.up()) > 2) {
-            LOGGER.info("🌿 桃花草方块在 {} 退化成桃花泥土", pos);
             world.setBlockState(pos, BlockSystem.PEACH_BLOSSOM_DIRT.getDefaultState());
         } else {
             // 否则尝试传播到周围的泥土方块
