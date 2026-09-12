@@ -1,6 +1,7 @@
 package com.lidao.moran.systems.blocks;
 
 import com.lidao.moran.MoranMod;
+import com.lidao.moran.systems.trees.Trees;
 import net.fabricmc.fabric.api.object.builder.v1.block.FabricBlockSettings;
 import net.minecraft.block.*;
 import net.minecraft.item.BlockItem;
@@ -49,7 +50,7 @@ public class BlockSystem {
 
     // 🌳 桃源树枝：八段生长的活树干（树苗长成，逐节变粗）
     public static final Block PEACH_BRANCH = register("peach_branch",
-            new PeachBranchBlock(FabricBlockSettings.copyOf(Blocks.OAK_LOG)
+            new MoranBranchBlock(Trees.PEACH, FabricBlockSettings.copyOf(Blocks.OAK_LOG)
                     .nonOpaque()
                     .strength(0.4f)));
 
@@ -58,7 +59,7 @@ public class BlockSystem {
 
     // 🌸 桃花花苞：生殖生长起点，三阶段成熟后化为桃花树叶
     public static final Block PEACH_FLOWER_BUD = register("peach_flower_bud",
-            new PeachFlowerBudBlock(FabricBlockSettings.copyOf(Blocks.OAK_SAPLING)));
+            new MoranFlowerBudBlock(Trees.PEACH, FabricBlockSettings.copyOf(Blocks.OAK_SAPLING)));
 
     // 🌱 桃源基础方块（带自定义逻辑）
     public static final Block PEACH_BLOSSOM_DIRT = register("peach_blossom_dirt",
@@ -120,6 +121,8 @@ public class BlockSystem {
             Identifier id = Registries.BLOCK.getId(block);
             Registry.register(Registries.ITEM, id, new BlockItem(block, new Item.Settings()));
         }
+        // 树种档案绑定方块实例（引擎 ↔ 档案 互相接通）
+        Trees.PEACH.bind(PEACH_BRANCH, PEACH_FLOWER_BUD, PEACH_BLOSSOM_LEAVES);
         LOGGER.info("✅ 方块系统就绪：{} 个方块及其物品已注册", ALL_BLOCKS.size());
     }
 
