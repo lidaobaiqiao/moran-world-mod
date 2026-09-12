@@ -3,8 +3,10 @@ package com.lidao.moran.client;
 import com.lidao.moran.MoranMod;
 import com.lidao.moran.client.render.MolingModel;
 import com.lidao.moran.client.render.MolingRenderer;
+import com.lidao.moran.systems.blocks.BlockSystem;
 import com.lidao.moran.systems.entities.EntitySystem;
 import net.fabricmc.api.ClientModInitializer;
+import net.fabricmc.fabric.api.blockrenderlayer.v1.BlockRenderLayerMap;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.rendering.v1.ColorProviderRegistry;
 import net.fabricmc.fabric.api.client.rendering.v1.EntityRendererRegistry;
@@ -13,6 +15,7 @@ import net.minecraft.block.Block;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.color.world.BiomeColors; // ✅ 导入存放静态方法的类
 import net.minecraft.client.color.world.GrassColors; // ✅ 导入用于获取默认颜色的类
+import net.minecraft.client.render.RenderLayer;
 import net.minecraft.item.Item;
 import net.minecraft.particle.ParticleTypes;
 import net.minecraft.registry.Registries;
@@ -52,6 +55,9 @@ public class MoranModClient implements ClientModInitializer {
         EntityRendererRegistry.register(EntitySystem.MOLING, MolingRenderer::new);
         LOGGER.info("👻 墨灵渲染器已注册");
 
+        // === 透明像素方块的渲染层（cutout）：不注册会落入不透明层，透明像素显示为黑色 ===
+        registerCutoutLayers();
+
         // 初始化其他客户端功能（保持你原有的结构）
         initializeClientRendering();
         initializeClientEvents();
@@ -61,6 +67,36 @@ public class MoranModClient implements ClientModInitializer {
         LOGGER.info("🎮 客户端事件系统已激活");
         LOGGER.info("🌸 桃花特效系统已加载");
         LOGGER.info("🎭 玩家将体验完整的墨世界视觉效果！");
+    }
+
+    /**
+     * 树苗/树叶/落叶堆等含透明像素的方块必须走 cutout 渲染层；
+     * 方块与对应物品（物品栏展示）都要注册。
+     */
+    private void registerCutoutLayers() {
+        Block[] cutoutBlocks = {
+                BlockSystem.PEACH_SAPLING,
+                BlockSystem.WILLOW_SAPLING,
+                BlockSystem.PINE_SAPLING,
+                BlockSystem.PLUM_SAPLING,
+                BlockSystem.GINKGO_SAPLING,
+                BlockSystem.PEACH_BLOSSOM_LEAVES,
+                BlockSystem.WILLOW_LEAVES,
+                BlockSystem.PINE_LEAVES,
+                BlockSystem.PLUM_LEAVES,
+                BlockSystem.GINKGO_LEAVES,
+                BlockSystem.PEACH_FALLEN_LEAVES
+        };
+        for (Block block : cutoutBlocks) {
+            BlockRenderLayerMap.INSTANCE.putBlock(block, RenderLayer.getCutout());
+            BlockRenderLayerMap.INSTANCE.putItem(block.asItem(), RenderLayer.getCutout());
+        }
+        LOGGER.info("✂️ 已注册 {} 个 cutout 渲染层（树苗/树叶/落叶堆）", cutoutBlocks.length);
+
+        // 草方块：模型侧面带透明像素的 overlay 草沿层，必须走原版同款 cutout_mipped
+        BlockRenderLayerMap.INSTANCE.putBlock(BlockSystem.PEACH_BLOSSOM_GRASS_BLOCK, RenderLayer.getCutoutMipped());
+        BlockRenderLayerMap.INSTANCE.putItem(BlockSystem.PEACH_BLOSSOM_GRASS_BLOCK.asItem(), RenderLayer.getCutoutMipped());
+        LOGGER.info("🌱 草方块已注册 cutout_mipped 渲染层（治侧面发黑）");
     }
 
     /**
