@@ -218,9 +218,9 @@ public class MoranBranchBlock extends Block implements Fertilizable {
             }
         }
 
-        // 抽高期：按树种偏好萌发休眠侧芽（数量上限内 + 概率递减 + 向光 + 空间竞争）
-        // 整树封顶后不再萌发新侧芽（treeTopped 判整树，而非本方块的 TOPPED）
-        if (!treeTopped(world, pos) && growth >= 2) {
+        // 侧芽萌发：芽区 = 主干上部（树种判定），数量上限内概率递减，向光 + 空间竞争。
+        // 抽高期萌发的为休眠态（到顶统一唤醒）；封顶后补芽直接苏醒态（密度受 maxBuds 硬上限约束）
+        if (growth >= 2) {
             int buds = countBudsAroundTrunk(world, pos);
             if (buds < species.maxBuds()
                     && species.isBudPosition(world, pos, height, height + trunkSegmentsAbove(world, pos))
@@ -228,8 +228,9 @@ public class MoranBranchBlock extends Block implements Fertilizable {
                 Direction d = phototropicDirection(world, pos, random);
                 BlockPos p = pos.offset(d);
                 if (world.getBlockState(p).isAir() && !isCrowded(world, p)) {
+                    boolean dormant = !treeTopped(world, pos);
                     world.setBlockState(p, getDefaultState()
-                            .with(FACING, d).with(DORMANT, true)
+                            .with(FACING, d).with(DORMANT, dormant)
                             .with(NATURAL, state.get(NATURAL)), Block.NOTIFY_ALL);
                 }
             }
