@@ -154,7 +154,12 @@ public class MoranBranchBlock extends Block implements Fertilizable {
                 world.setBlockState(pos, world.getBlockState(pos).with(FAILS, 0), Block.NOTIFY_ALL);
             }
         }
-        world.scheduleBlockTick(pos, this, interval);
+        // 野生树完成使命（长满且整树封顶 / 侧枝长满）后永久静默，防 tick 风暴；
+        // 种植树保持低频常驻（60s 一次，成本可忽略）
+        boolean done = natural && isFullyGrown(state, world, pos);
+        if (!done) {
+            world.scheduleBlockTick(pos, this, interval);
+        }
     }
 
     /** 执行一次生长：自身成熟度 +1，再按身份推进结构（抽高/侧芽/侧枝/开花） */
@@ -214,7 +219,8 @@ public class MoranBranchBlock extends Block implements Fertilizable {
         }
 
         // 抽高期：按树种偏好萌发休眠侧芽（数量上限内 + 概率递减 + 向光 + 空间竞争）
-        if (!state.get(TOPPED) && growth >= 2) {
+        // 整树封顶后不再萌发新侧芽（treeTopped 判整树，而非本方块的 TOPPED）
+        if (!treeTopped(world, pos) && growth >= 2) {
             int buds = countBudsAroundTrunk(world, pos);
             if (buds < species.maxBuds()
                     && species.isBudPosition(world, pos, height, height + trunkSegmentsAbove(world, pos))
@@ -279,6 +285,38 @@ public class MoranBranchBlock extends Block implements Fertilizable {
                 break;
             }
         }
+    }
+
+    /** 整树是否已封顶（沿主干向上读到顶端方块的 TOPPED，而非本方块的标记） */
+    private boolean treeTopped(ServerWorld world, BlockPos pos) {
+        BlockPos p = pos;
+        while (true) {
+            BlockState above = world.getBlockState(p.up());
+            if (above.getBlock() instanceof MoranBranchBlock && above.get(FACING) == Direction.UP) {
+                p = p.up();
+            } else {
+                break;
+            }
+        }
+        return world.getBlockState(p).contains(TOPPED) && world.getBlockState(p).get(TOPPED);
+    }
+
+    /** 野生树是否已完成全部生长使命（可永久静默） */
+    private boolean isFullyGrown(BlockState state, ServerWorld world, BlockPos pos) {
+        int growth = state.get(GROWTH);
+        if (state.get(FACING) == Direction.UP) {
+            if (growth < species.trunkMaxGrowth()) {
+                return false;
+            }
+            // 顶端且上方是空气：顶花苞还没放下，还需 tick
+            BlockPos above = pos.up();
+            boolean top = !(world.getBlockState(above).getBlock() instanceof MoranBranchBlock);
+            if (top && world.getBlockState(above).isAir()) {
+                return false;
+            }
+            return treeTopped(world, pos);
+        }
+        return growth >= species.branchMaxGrowth();
     }
 
     /** 根部位置：沿同柱向下找第一个非枝干方块（土壤在其下方） */

@@ -1,13 +1,9 @@
-修复：野生树自启动 + 树叶消失（双根因）
+审查修复：tick 风暴 + 无限生长（生长引擎两处 P1/P2）
 
-1) 野生树不生长：SimpleBlockFeature 的 schedule_tick 字段在 1.20.1 是
-   死字段（字节码确认从不调用 scheduleBlockTick），且 flags=2 放置不触发
-   onBlockAdded——生长请求从未登记。
-   新增自定义特征 MoranTreeSeedFeature（moran_mod:moran_tree_seed）：
-   放置 natural 种子并当场 scheduleBlockTick，链式请求接管。
-2) 其他树种树叶消失：树叶 distance 衰减按 minecraft:logs 标签识别原木，
-   自定义 5 种原木从未入标签 → 任意邻块更新后 distance 全部算到 7 →
-   随机刻衰减。补 data/minecraft/tags/blocks/logs.json（5 原木入标签，
-   同时修复桃花树冠的同类隐患）。
-3) 光照判定改时间无关：天空光存储值 + 方块光取大，夜间加载区块的
-   野生树不再被误判低光冻结。
+- P1 tick 风暴：scheduledTick 末尾无条件重新调度——完全成熟的野生树方块
+  仍每 0.1s 做根遍历+水度扫描，森林=永久性每秒数十万次方块读取。
+  野生树完成使命（长满+整树封顶+顶花苞就位/被挡）后永久静默
+- P2 无限生长：侧芽萌发门槛用本方块 TOPPED（内部方块永远 false），
+  树到顶后内部方块无限萌发新侧芽并被唤醒循环激活。
+  改为 treeTopped（沿主干向上读顶端方块的 TOPPED）判整树
+- 种植树保持 60s 低频常驻（环境变化可恢复响应，成本可忽略）
