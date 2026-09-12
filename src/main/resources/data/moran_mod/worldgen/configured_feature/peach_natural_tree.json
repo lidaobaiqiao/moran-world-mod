@@ -1,7 +1,7 @@
 {
   "type": "minecraft:simple_block",
   "config": {
-    "schedule_tick": false,
+    "schedule_tick": true,
     "to_place": {
       "type": "minecraft:simple_state_provider",
       "state": {
