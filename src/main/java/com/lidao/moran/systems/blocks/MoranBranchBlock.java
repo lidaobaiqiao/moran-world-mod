@@ -238,23 +238,47 @@ public class MoranBranchBlock extends Block implements Fertilizable {
         }
     }
 
-    /** 侧枝生长：门槛后每次生长有概率停止进入开花，上限强制停；开花前可延伸一个子侧枝 */
+    /** 侧枝链长上限（含贴干首节）：主干芽 -> 一级枝 -> 二级枝 */
+    private static final int MAX_BRANCH_CHAIN = 3;
+    /** 侧枝末端延伸概率（主干同款的「抽高」，横向版） */
+    private static final float BRANCH_EXTEND_CHANCE = 0.75F;
+
+    /**
+     * 侧枝生长（与主干同构）：末端延伸成链 -> 链上分叉 -> 停止开花。
+     * 此前版本缺失延伸逻辑且子侧枝距离判定写反（量父枝位置，贴干芽恒为1），
+     * 导致侧枝永远单节、直接开花，树形光秃。
+     */
     private void growBranch(BlockState state, ServerWorld world, BlockPos pos, Random random, int growth, Direction facing) {
-        // 停止机制：一旦开始生成花苞就不再生成侧枝（停止即终末）
-        if (growth >= species.branchStopGrowth()
-                && (growth >= species.branchMaxGrowth() || random.nextFloat() < species.branchStopChance())) {
-            species.onBranchStop(world, pos, facing, random, state.get(NATURAL));
+        int chainPos = chainPosition(world, pos, facing); // 1 = 贴干首节
+        BlockPos tip = pos.offset(facing);
+        boolean tipAir = world.getBlockState(tip).isAir();
+
+        // 末端延伸：链未到上限时向外长出新节（新节 maturity 1，同主干抽高）
+        if (growth >= 2 && chainPos < MAX_BRANCH_CHAIN && tipAir
+                && random.nextFloat() < BRANCH_EXTEND_CHANCE) {
+            world.setBlockState(tip, getDefaultState()
+                    .with(FACING, facing).with(NATURAL, state.get(NATURAL)), Block.NOTIFY_ALL);
             return;
         }
 
-        // 子侧枝：成熟 >5 且链上位置距主干 >1，末端为空（末端被占即已生过，自然限一个）
-        Direction childDir = species.branchChildDirection(world, pos, facing);
-        BlockPos tip = pos.offset(childDir);
-        if (growth > 5 && chainPosition(world, pos, facing) > 1
-                && random.nextFloat() < species.subBranchChance()
-                && world.getBlockState(tip).isAir()) {
-            world.setBlockState(tip, getDefaultState()
-                    .with(FACING, childDir).with(NATURAL, state.get(NATURAL)), Block.NOTIFY_ALL);
+        // 分叉：成熟 >5 且本节距主干 >1（链上第二节起），侧向一个子侧枝；
+        // 侧向被占即本节已分过叉（自然限一节一叉）
+        if (growth > 5 && chainPos > 1) {
+            for (Direction side : new Direction[]{facing.rotateYClockwise(), facing.rotateYCounterclockwise()}) {
+                BlockPos sp = pos.offset(side);
+                if (world.getBlockState(sp).isAir() && random.nextFloat() < species.subBranchChance()) {
+                    world.setBlockState(sp, getDefaultState()
+                            .with(FACING, side).with(NATURAL, state.get(NATURAL)), Block.NOTIFY_ALL);
+                    return;
+                }
+            }
+        }
+
+        // 停止进入开花：链到上限或末端被占后，成熟度过门槛概率停止，上限强制
+        // （一旦开始生成花苞就不再延伸/分叉——停止即终末）
+        if (growth >= species.branchStopGrowth()
+                && (growth >= species.branchMaxGrowth() || random.nextFloat() < species.branchStopChance())) {
+            species.onBranchStop(world, pos, facing, random, state.get(NATURAL));
         }
     }
 
