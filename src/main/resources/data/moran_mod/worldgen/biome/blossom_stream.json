@@ -45,16 +45,12 @@
     [],
     [],
     [
-      "moran_mod:willow_tree_placed",
-      "moran_mod:pine_tree_placed",
-      "moran_mod:plum_tree_placed",
-      "moran_mod:ginkgo_tree_placed"
+      "moran_mod:willow_tree_placed"
     ],
     [],
     [],
     [
       "moran_mod:peach_fallen_leaves_placed",
-      "moran_mod:low_peach_trees_placed",
       "minecraft:flower_default"
     ],
     []

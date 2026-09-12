@@ -39,7 +39,12 @@ public class MoranBranchBlock extends Block implements Fertilizable {
     public static final EnumProperty<Direction> FACING = EnumProperty.of("facing", Direction.class,
             List.of(Direction.UP, Direction.NORTH, Direction.SOUTH, Direction.WEST, Direction.EAST));
     public static final IntProperty FAILS = IntProperty.of("fails", 0, TreeSpecies.MAX_FAILS);
+    /** 休眠侧芽：出现在主干上半部分，主干到顶后苏醒 */
     public static final BooleanProperty DORMANT = BooleanProperty.of("dormant");
+    /** 野生模式（世界生成）生长请求周期：0.1 秒 */
+    public static final int NATURAL_INTERVAL = 2;
+    /** 野生模式（世界生成）：0.1s 一次请求、条件过即立即生长、条件失败直接冻结 */
+    public static final BooleanProperty NATURAL = BooleanProperty.of("natural");
     /** 主干封顶标记：到顶决策持久化，唤醒侧芽与顶花苞由此驱动 */
     public static final BooleanProperty TOPPED = BooleanProperty.of("topped");
 
@@ -80,7 +85,8 @@ public class MoranBranchBlock extends Block implements Fertilizable {
                 .with(FACING, Direction.UP)
                 .with(FAILS, 0)
                 .with(DORMANT, false)
-                .with(TOPPED, false));
+                .with(TOPPED, false)
+                .with(NATURAL, false));
     }
 
     public TreeSpecies species() {
@@ -89,14 +95,17 @@ public class MoranBranchBlock extends Block implements Fertilizable {
 
     @Override
     protected void appendProperties(StateManager.Builder<Block, BlockState> builder) {
-        builder.add(GROWTH, FACING, FAILS, DORMANT, TOPPED);
+        builder.add(GROWTH, FACING, FAILS, DORMANT, TOPPED, NATURAL);
     }
 
     @Override
     public void onBlockAdded(BlockState state, World world, BlockPos pos, BlockState oldState, boolean moved) {
         // 新枝条入世（玩家种植/母株长出），登记第一次生长请求
         if (!world.isClient && world.getBlockState(pos).getBlock() instanceof MoranBranchBlock) {
-            world.scheduleBlockTick(pos, this, TreeSpecies.REQUEST_INTERVAL);
+            BlockState self = world.getBlockState(pos);
+            world.scheduleBlockTick(pos, this,
+                    self.contains(NATURAL) && self.get(NATURAL)
+                            ? NATURAL_INTERVAL : TreeSpecies.REQUEST_INTERVAL);
         }
     }
 
@@ -107,11 +116,14 @@ public class MoranBranchBlock extends Block implements Fertilizable {
             return;
         }
 
+        boolean natural = state.get(NATURAL);
+        int interval = natural ? NATURAL_INTERVAL : TreeSpecies.REQUEST_INTERVAL;
+
         int fails = state.get(FAILS);
         if (fails >= TreeSpecies.MAX_FAILS) {
             // 休眠期满：醒来，重置计数，进入下一轮请求循环
             world.setBlockState(pos, state.with(FAILS, 0), Block.NOTIFY_ALL);
-            world.scheduleBlockTick(pos, this, TreeSpecies.REQUEST_INTERVAL);
+            world.scheduleBlockTick(pos, this, interval);
             return;
         }
 
@@ -121,6 +133,9 @@ public class MoranBranchBlock extends Block implements Fertilizable {
         int hydration = TreeSpecies.hydration(world, root);
 
         if (!species.checkEnvironment(world, pos, hydration)) {
+            if (natural) {
+                return; // 野生树：条件不满足直接冻结，不再请求
+            }
             int next = fails + 1;
             world.setBlockState(pos, state.with(FAILS, next), Block.NOTIFY_ALL);
             // 连续 3 次条件不满足：休眠 24 分钟
@@ -129,8 +144,8 @@ public class MoranBranchBlock extends Block implements Fertilizable {
             return;
         }
 
-        // 条件满足：有效概率 = 基础 × 水度因子 × 土壤因子；骰子失败不计入休眠次数
-        if (random.nextFloat() < species.effectiveGrowChance(world, pos, hydration, soil)) {
+        // 条件满足：野生树立即生长；种植树掷骰（有效概率 = 基础 × 水度 × 土壤）
+        if (natural || random.nextFloat() < species.effectiveGrowChance(world, pos, hydration, soil)) {
             growPart(state, world, pos, random);
             if (!(world.getBlockState(pos).getBlock() instanceof MoranBranchBlock)) {
                 return;
@@ -139,7 +154,7 @@ public class MoranBranchBlock extends Block implements Fertilizable {
                 world.setBlockState(pos, world.getBlockState(pos).with(FAILS, 0), Block.NOTIFY_ALL);
             }
         }
-        world.scheduleBlockTick(pos, this, TreeSpecies.REQUEST_INTERVAL);
+        world.scheduleBlockTick(pos, this, interval);
     }
 
     /** 执行一次生长：自身成熟度 +1，再按身份推进结构（抽高/侧芽/侧枝/开花） */
@@ -158,7 +173,7 @@ public class MoranBranchBlock extends Block implements Fertilizable {
         if (trunk) {
             growTrunk(state, world, pos, random, growth);
         } else {
-            growBranch(world, pos, random, growth, facing);
+            growBranch(state, world, pos, random, growth, facing);
         }
     }
 
@@ -187,12 +202,14 @@ public class MoranBranchBlock extends Block implements Fertilizable {
             if (top && growth >= species.topBudGrowth() && world.getBlockState(above).isAir()
                     && !(world.getBlockState(above).getBlock() instanceof MoranFlowerBudBlock)) {
                 // 顶端方块成熟度达标：长出顶花苞
-                world.setBlockState(above, species.budBlock().getDefaultState(), Block.NOTIFY_ALL);
+                world.setBlockState(above, species.budBlock().getDefaultState()
+                        .with(MoranFlowerBudBlock.NATURAL, state.get(NATURAL)), Block.NOTIFY_ALL);
             }
         } else if (top && world.getBlockState(above).isAir()) {
             // 抽高期：自身 >= 2 才能向上生新节（新节恒为 1，「新块最大为自身减一」）
             if (growth >= 2) {
-                world.setBlockState(above, getDefaultState(), Block.NOTIFY_ALL);
+                world.setBlockState(above, getDefaultState()
+                        .with(NATURAL, state.get(NATURAL)), Block.NOTIFY_ALL);
             }
         }
 
@@ -205,18 +222,20 @@ public class MoranBranchBlock extends Block implements Fertilizable {
                 Direction d = phototropicDirection(world, pos, random);
                 BlockPos p = pos.offset(d);
                 if (world.getBlockState(p).isAir() && !isCrowded(world, p)) {
-                    world.setBlockState(p, getDefaultState().with(FACING, d).with(DORMANT, true), Block.NOTIFY_ALL);
+                    world.setBlockState(p, getDefaultState()
+                            .with(FACING, d).with(DORMANT, true)
+                            .with(NATURAL, state.get(NATURAL)), Block.NOTIFY_ALL);
                 }
             }
         }
     }
 
     /** 侧枝生长：门槛后每次生长有概率停止进入开花，上限强制停；开花前可延伸一个子侧枝 */
-    private void growBranch(ServerWorld world, BlockPos pos, Random random, int growth, Direction facing) {
+    private void growBranch(BlockState state, ServerWorld world, BlockPos pos, Random random, int growth, Direction facing) {
         // 停止机制：一旦开始生成花苞就不再生成侧枝（停止即终末）
         if (growth >= species.branchStopGrowth()
                 && (growth >= species.branchMaxGrowth() || random.nextFloat() < species.branchStopChance())) {
-            species.onBranchStop(world, pos, facing, random);
+            species.onBranchStop(world, pos, facing, random, state.get(NATURAL));
             return;
         }
 
@@ -226,7 +245,8 @@ public class MoranBranchBlock extends Block implements Fertilizable {
         if (growth > 5 && chainPosition(world, pos, facing) > 1
                 && random.nextFloat() < species.subBranchChance()
                 && world.getBlockState(tip).isAir()) {
-            world.setBlockState(tip, getDefaultState().with(FACING, childDir), Block.NOTIFY_ALL);
+            world.setBlockState(tip, getDefaultState()
+                    .with(FACING, childDir).with(NATURAL, state.get(NATURAL)), Block.NOTIFY_ALL);
         }
     }
 
@@ -253,7 +273,9 @@ public class MoranBranchBlock extends Block implements Fertilizable {
                         .with(DORMANT, false)
                         .with(TOPPED, false)
                         .with(FAILS, 0), Block.NOTIFY_ALL);
-                world.scheduleBlockTick(pos, neighbor.getBlock(), TreeSpecies.REQUEST_INTERVAL);
+                world.scheduleBlockTick(pos, neighbor.getBlock(),
+                        neighbor.contains(NATURAL) && neighbor.get(NATURAL)
+                                ? NATURAL_INTERVAL : TreeSpecies.REQUEST_INTERVAL);
                 break;
             }
         }
@@ -383,7 +405,8 @@ public class MoranBranchBlock extends Block implements Fertilizable {
                 BlockState s = world.getBlockState(n);
                 if (s.getBlock() instanceof MoranBranchBlock && s.get(DORMANT)) {
                     world.setBlockState(n, s.with(DORMANT, false), Block.NOTIFY_ALL);
-                    world.scheduleBlockTick(n, s.getBlock(), TreeSpecies.REQUEST_INTERVAL);
+                    world.scheduleBlockTick(n, s.getBlock(),
+                            s.get(NATURAL) ? NATURAL_INTERVAL : TreeSpecies.REQUEST_INTERVAL);
                 }
             }
             BlockState above = world.getBlockState(cur.up());

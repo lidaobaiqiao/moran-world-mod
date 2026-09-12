@@ -282,13 +282,13 @@ public class TreeSpecies {
      * 侧枝停止生长时的开花方式。默认（桃树范式）：末端与四周（上方 + 两侧垂直向）生成花苞，
      * 此后不再生侧枝——现实桃树的花芽着生一年生枝顶端与侧腋。
      */
-    public void onBranchStop(ServerWorld world, BlockPos pos, Direction facing, Random random) {
-        placeBudIfAir(world, pos.offset(facing), facing);
+    public void onBranchStop(ServerWorld world, BlockPos pos, Direction facing, Random random, boolean natural) {
+        placeBudIfAir(world, pos.offset(facing), facing, natural);
         Direction left = facing.rotateYCounterclockwise();
         Direction right = facing.rotateYClockwise();
-        placeBudIfAir(world, pos.up(), Direction.UP);
-        placeBudIfAir(world, pos.offset(left), left);
-        placeBudIfAir(world, pos.offset(right), right);
+        placeBudIfAir(world, pos.up(), Direction.UP, natural);
+        placeBudIfAir(world, pos.offset(left), left, natural);
+        placeBudIfAir(world, pos.offset(right), right, natural);
     }
 
     /**
@@ -309,10 +309,11 @@ public class TreeSpecies {
         }
     }
 
-    void placeBudIfAir(ServerWorld world, BlockPos pos, Direction facing) {
+    void placeBudIfAir(ServerWorld world, BlockPos pos, Direction facing, boolean natural) {
         if (world.getBlockState(pos).isAir()) {
             world.setBlockState(pos, budBlock.getDefaultState()
-                    .with(com.lidao.moran.systems.blocks.MoranFlowerBudBlock.FACING, facing), Block.NOTIFY_ALL);
+                    .with(com.lidao.moran.systems.blocks.MoranFlowerBudBlock.FACING, facing)
+                    .with(com.lidao.moran.systems.blocks.MoranFlowerBudBlock.NATURAL, natural), Block.NOTIFY_ALL);
         }
     }
 

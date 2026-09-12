@@ -57,17 +57,13 @@
     [],
     [],
     [
-      "moran_mod:willow_tree_placed",
-      "moran_mod:pine_tree_placed",
-      "moran_mod:plum_tree_placed",
-      "moran_mod:ginkgo_tree_placed"
+      "moran_mod:peach_natural_tree_placed"
     ],
     [],
     [],
     [
       "minecraft:flower_plains",
-      "minecraft:patch_grass_plain",
-      "moran_mod:low_peach_trees_placed"
+      "minecraft:patch_grass_plain"
     ],
     []
   ]

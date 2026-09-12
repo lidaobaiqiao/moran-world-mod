@@ -9,6 +9,7 @@ import net.minecraft.block.Fertilizable;
 import net.minecraft.block.ShapeContext;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.state.StateManager;
+import net.minecraft.state.property.BooleanProperty;
 import net.minecraft.state.property.EnumProperty;
 import net.minecraft.state.property.IntProperty;
 import net.minecraft.util.math.BlockPos;
@@ -33,33 +34,42 @@ public class MoranFlowerBudBlock extends Block implements Fertilizable {
             List.of(Direction.UP, Direction.NORTH, Direction.SOUTH, Direction.WEST, Direction.EAST));
     public static final IntProperty STAGE = IntProperty.of("stage", 1, 3);
     public static final IntProperty FAILS = IntProperty.of("fails", 0, TreeSpecies.MAX_FAILS);
+    /** 野生模式（世界生成）：0.1s 请求、立即生长、失败冻结 */
+    public static final BooleanProperty NATURAL = BooleanProperty.of("natural");
 
     private final TreeSpecies species;
 
     public MoranFlowerBudBlock(TreeSpecies species, Settings settings) {
         super(settings);
         this.species = species;
-        setDefaultState(getDefaultState().with(FACING, Direction.UP).with(STAGE, 1).with(FAILS, 0));
+        setDefaultState(getDefaultState()
+                .with(FACING, Direction.UP).with(STAGE, 1).with(FAILS, 0).with(NATURAL, false));
     }
 
     @Override
     protected void appendProperties(StateManager.Builder<Block, BlockState> builder) {
-        builder.add(FACING, STAGE, FAILS);
+        builder.add(FACING, STAGE, FAILS, NATURAL);
     }
 
     @Override
     public void onBlockAdded(BlockState state, World world, BlockPos pos, BlockState oldState, boolean moved) {
         if (!world.isClient && world.getBlockState(pos).getBlock() instanceof MoranFlowerBudBlock) {
-            world.scheduleBlockTick(pos, this, TreeSpecies.REQUEST_INTERVAL);
+            BlockState self = world.getBlockState(pos);
+            world.scheduleBlockTick(pos, this,
+                    self.contains(NATURAL) && self.get(NATURAL)
+                            ? MoranBranchBlock.NATURAL_INTERVAL : TreeSpecies.REQUEST_INTERVAL);
         }
     }
 
     @Override
     public void scheduledTick(BlockState state, ServerWorld world, BlockPos pos, Random random) {
+        boolean natural = state.get(NATURAL);
+        int interval = natural ? MoranBranchBlock.NATURAL_INTERVAL : TreeSpecies.REQUEST_INTERVAL;
+
         int fails = state.get(FAILS);
         if (fails >= TreeSpecies.MAX_FAILS) {
             world.setBlockState(pos, state.with(FAILS, 0), Block.NOTIFY_ALL);
-            world.scheduleBlockTick(pos, this, TreeSpecies.REQUEST_INTERVAL);
+            world.scheduleBlockTick(pos, this, interval);
             return;
         }
 
@@ -69,6 +79,9 @@ public class MoranFlowerBudBlock extends Block implements Fertilizable {
         int hydration = TreeSpecies.hydration(world, root);
 
         if (!species.checkEnvironment(world, pos, hydration)) {
+            if (natural) {
+                return; // 野生花苞：条件不满足直接冻结
+            }
             int next = fails + 1;
             world.setBlockState(pos, state.with(FAILS, next), Block.NOTIFY_ALL);
             world.scheduleBlockTick(pos, this,
@@ -76,7 +89,7 @@ public class MoranFlowerBudBlock extends Block implements Fertilizable {
             return;
         }
 
-        if (random.nextFloat() < species.effectiveGrowChance(world, pos, hydration, soil)) {
+        if (natural || random.nextFloat() < species.effectiveGrowChance(world, pos, hydration, soil)) {
             int stage = state.get(STAGE);
             if (stage >= 3) {
                 species.onBudMature(world, pos, state.get(FACING), random);
@@ -84,7 +97,7 @@ public class MoranFlowerBudBlock extends Block implements Fertilizable {
             }
             world.setBlockState(pos, state.with(STAGE, stage + 1), Block.NOTIFY_ALL);
         }
-        world.scheduleBlockTick(pos, this, TreeSpecies.REQUEST_INTERVAL);
+        world.scheduleBlockTick(pos, this, interval);
     }
 
     @Override

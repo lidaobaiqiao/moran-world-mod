@@ -1,0 +1,20 @@
+{
+  "type": "minecraft:simple_block",
+  "config": {
+    "schedule_tick": false,
+    "to_place": {
+      "type": "minecraft:simple_state_provider",
+      "state": {
+        "Name": "moran_mod:peach_branch",
+        "Properties": {
+          "growth": "1",
+          "facing": "up",
+          "fails": "0",
+          "dormant": "false",
+          "topped": "false",
+          "natural": "true"
+        }
+      }
+    }
+  }
+}
