@@ -1,8 +1,19 @@
 {
   "variants": {
-    "snowy=false": {
-      "model": "moran_mod:block/peach_blossom_grass_block"
-    },
+    "snowy=false": [
+      {
+        "model": "moran_mod:block/peach_blossom_grass_block"
+      },
+      {
+        "model": "moran_mod:block/peach_blossom_grass_block_tr90"
+      },
+      {
+        "model": "moran_mod:block/peach_blossom_grass_block_tr180"
+      },
+      {
+        "model": "moran_mod:block/peach_blossom_grass_block_tr270"
+      }
+    ],
     "snowy=true": {
       "model": "moran_mod:block/peach_blossom_grass_block_snow"
     }
