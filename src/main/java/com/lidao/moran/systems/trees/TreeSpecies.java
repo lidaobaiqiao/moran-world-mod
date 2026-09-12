@@ -272,9 +272,9 @@ public class TreeSpecies {
         return biomeHumidity(world, pos) >= minHumidity;
     }
 
-    /** 该主干方块是否处于可萌发侧芽的位置。默认：绝对高度达到生物顶端下限（树干上部，避免早芽落低） */
+    /** 该主干方块是否处于可萌发侧芽的位置。默认：当前树高的上半部分（现实：主枝自上部萌发） */
     public boolean isBudPosition(ServerWorld world, BlockPos pos, int height, int totalHeight) {
-        return height >= biologicalTopMin;
+        return height > totalHeight / 2;
     }
 
     /** 侧枝延伸时子枝的方向。默认：直线延伸（垂柳覆写为渐下垂） */

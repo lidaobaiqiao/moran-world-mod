@@ -218,9 +218,10 @@ public class MoranBranchBlock extends Block implements Fertilizable {
             }
         }
 
-        // 侧芽萌发：芽区 = 主干上部（树种判定），数量上限内概率递减，向光 + 空间竞争。
+        // 侧芽萌发：相位门控 = 主干至少长到生物顶端下限（防止矮树期落芽、树长高后芽挂底部）；
+        // 位置 = 当前树高上半部分（树种判定），数量上限内概率递减，向光 + 空间竞争。
         // 抽高期萌发的为休眠态（到顶统一唤醒）；封顶后补芽直接苏醒态（密度受 maxBuds 硬上限约束）
-        if (growth >= 2) {
+        if (growth >= 2 && height >= species.biologicalTopMin()) {
             int buds = countBudsAroundTrunk(world, pos);
             if (buds < species.maxBuds()
                     && species.isBudPosition(world, pos, height, height + trunkSegmentsAbove(world, pos))
