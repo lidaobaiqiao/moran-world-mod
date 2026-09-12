@@ -50,7 +50,6 @@ public class BlockSystem {
     // 🌳 桃源树枝：八段生长的活树干（树苗长成，逐节变粗）
     public static final Block PEACH_BRANCH = register("peach_branch",
             new PeachBranchBlock(FabricBlockSettings.copyOf(Blocks.OAK_LOG)
-                    .ticksRandomly()
                     .nonOpaque()
                     .strength(0.4f)));
 
