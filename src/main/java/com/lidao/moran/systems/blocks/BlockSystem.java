@@ -47,6 +47,16 @@ public class BlockSystem {
                             .noCollision()
                             .breakInstantly()));
 
+    // 🌳 桃源树枝：八段生长的活树干（树苗长成，逐节变粗）
+    public static final Block PEACH_BRANCH = register("peach_branch",
+            new PeachBranchBlock(FabricBlockSettings.copyOf(Blocks.OAK_LOG)
+                    .ticksRandomly()
+                    .nonOpaque()
+                    .strength(0.4f)));
+
+    public static final Block PEACH_PLANKS = register("peach_planks",
+            new Block(FabricBlockSettings.copyOf(Blocks.OAK_PLANKS)));
+
     // 🌱 桃源基础方块（带自定义逻辑）
     public static final Block PEACH_BLOSSOM_DIRT = register("peach_blossom_dirt",
             new PeachBlossomDirtBlock(FabricBlockSettings.copyOf(Blocks.DIRT)));

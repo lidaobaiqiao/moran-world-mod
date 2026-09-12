@@ -1,0 +1,111 @@
+{
+  "type": "minecraft:block",
+  "pools": [
+    {
+      "rolls": 1.0,
+      "bonus_rolls": 0.0,
+      "entries": [
+        {
+          "type": "minecraft:alternatives",
+          "children": [
+            {
+              "type": "minecraft:item",
+              "name": "moran_mod:thick_peach_trunk",
+              "conditions": [
+                {
+                  "condition": "minecraft:block_state_property",
+                  "block": "moran_mod:peach_branch",
+                  "properties": {
+                    "growth": "7"
+                  }
+                }
+              ]
+            },
+            {
+              "type": "minecraft:item",
+              "name": "moran_mod:thick_peach_trunk",
+              "conditions": [
+                {
+                  "condition": "minecraft:block_state_property",
+                  "block": "moran_mod:peach_branch",
+                  "properties": {
+                    "growth": "8"
+                  }
+                }
+              ]
+            },
+            {
+              "type": "minecraft:item",
+              "name": "moran_mod:thick_peach_branch",
+              "conditions": [
+                {
+                  "condition": "minecraft:any_of",
+                  "terms": [
+                    {
+                      "condition": "minecraft:block_state_property",
+                      "block": "moran_mod:peach_branch",
+                      "properties": {
+                        "growth": "3"
+                      }
+                    },
+                    {
+                      "condition": "minecraft:block_state_property",
+                      "block": "moran_mod:peach_branch",
+                      "properties": {
+                        "growth": "4"
+                      }
+                    },
+                    {
+                      "condition": "minecraft:block_state_property",
+                      "block": "moran_mod:peach_branch",
+                      "properties": {
+                        "growth": "5"
+                      }
+                    },
+                    {
+                      "condition": "minecraft:block_state_property",
+                      "block": "moran_mod:peach_branch",
+                      "properties": {
+                        "growth": "6"
+                      }
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "minecraft:item",
+              "name": "moran_mod:peach_branch",
+              "conditions": [
+                {
+                  "condition": "minecraft:any_of",
+                  "terms": [
+                    {
+                      "condition": "minecraft:block_state_property",
+                      "block": "moran_mod:peach_branch",
+                      "properties": {
+                        "growth": "1"
+                      }
+                    },
+                    {
+                      "condition": "minecraft:block_state_property",
+                      "block": "moran_mod:peach_branch",
+                      "properties": {
+                        "growth": "2"
+                      }
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "conditions": [
+        {
+          "condition": "minecraft:survives_explosion"
+        }
+      ]
+    }
+  ]
+}

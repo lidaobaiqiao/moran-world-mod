@@ -52,5 +52,9 @@
   "block.moran_mod.plum_sapling": "寒梅树苗",
   "block.moran_mod.ginkgo_log": "银杏原木",
   "block.moran_mod.ginkgo_leaves": "银杏树叶",
-  "block.moran_mod.ginkgo_sapling": "银杏树苗"
+  "block.moran_mod.ginkgo_sapling": "银杏树苗",
+  "block.moran_mod.peach_branch": "桃源树枝",
+  "block.moran_mod.peach_planks": "桃源木板",
+  "item.moran_mod.thick_peach_branch": "粗壮桃源树枝",
+  "item.moran_mod.thick_peach_trunk": "粗壮桃源树干"
 }

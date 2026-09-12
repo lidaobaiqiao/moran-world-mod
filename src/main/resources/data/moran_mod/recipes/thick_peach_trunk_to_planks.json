@@ -1,0 +1,12 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "ingredients": [
+    {
+      "item": "moran_mod:thick_peach_trunk"
+    }
+  ],
+  "result": {
+    "item": "moran_mod:peach_planks",
+    "count": 2
+  }
+}

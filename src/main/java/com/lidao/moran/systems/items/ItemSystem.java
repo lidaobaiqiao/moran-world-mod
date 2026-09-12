@@ -33,6 +33,10 @@ public class ItemSystem {
     // 🎣 竹筏相关物品
     public static final Item BAMBOO_RAFT = register("bamboo_raft", new Item(new FabricItemSettings().maxCount(1)));
 
+    // 🌳 桃源木材料（树枝方块本身是 BlockItem，在 BlockSystem 自动注册）
+    public static final Item THICK_PEACH_BRANCH = register("thick_peach_branch", new Item(new FabricItemSettings()));
+    public static final Item THICK_PEACH_TRUNK = register("thick_peach_trunk", new Item(new FabricItemSettings()));
+
     public static void initialize() {
         LOGGER.info("✅ 物品系统就绪（竹筏：乘坐静止 5 秒传送至桃花源）");
     }

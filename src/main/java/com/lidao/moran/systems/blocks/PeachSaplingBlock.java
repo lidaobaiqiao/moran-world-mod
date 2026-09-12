@@ -37,7 +37,7 @@ public class PeachSaplingBlock extends SaplingBlock {
     
     @Override
     public void generate(ServerWorld world, BlockPos pos, BlockState state, Random random) {
-        // 调用父类的生成方法
-        super.generate(world, pos, state, random);
+        // 树苗成熟后不再生成原版树结构：变成生长度 1 的桃源树枝，由 PeachBranchBlock 接管生长
+        world.setBlockState(pos, BlockSystem.PEACH_BRANCH.getDefaultState(), Block.NOTIFY_ALL);
     }
 }

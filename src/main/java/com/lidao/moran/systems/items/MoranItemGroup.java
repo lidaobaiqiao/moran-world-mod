@@ -32,6 +32,8 @@ public class MoranItemGroup {
                         entries.add(ItemSystem.QINGFENG_JINGHUA);
                         entries.add(ItemSystem.CRYSTAL_SHARD);
                         entries.add(ItemSystem.IMMORTAL_INGOT);
+                        entries.add(ItemSystem.THICK_PEACH_BRANCH);
+                        entries.add(ItemSystem.THICK_PEACH_TRUNK);
                         // 工具
                         entries.add(ItemSystem.MORAN_SWORD);
                         entries.add(ItemSystem.BAMBOO_RAFT);
@@ -40,6 +42,8 @@ public class MoranItemGroup {
                         entries.add(BlockSystem.PEACH_BLOSSOM_LEAVES);
                         entries.add(BlockSystem.PEACH_FALLEN_LEAVES);
                         entries.add(BlockSystem.PEACH_SAPLING);
+                        entries.add(BlockSystem.PEACH_BRANCH);
+                        entries.add(BlockSystem.PEACH_PLANKS);
                         // 地面系方块
                         entries.add(BlockSystem.PEACH_BLOSSOM_GRASS_BLOCK);
                         entries.add(BlockSystem.PEACH_BLOSSOM_DIRT);

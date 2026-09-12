@@ -15,7 +15,7 @@ public class MoranModDataGenerator implements DataGeneratorEntrypoint {
 
     /**
      * 为所有方块生成"掉落自身"的战利品表，输出到 src/main/generated。
-     * 桃花树叶已有手工维护的战利品表（掉树苗逻辑），跳过以免生成重复资源。
+     * 桃花树叶（掉树苗）、桃源树枝（按生长度分档）、桃源木板（手写）已有手工战利品表，跳过以免生成重复资源。
      */
     private static class MoranBlockLootTableProvider extends FabricBlockLootTableProvider {
         private MoranBlockLootTableProvider(FabricDataOutput output) {
@@ -25,7 +25,9 @@ public class MoranModDataGenerator implements DataGeneratorEntrypoint {
         @Override
         public void generate() {
             for (Block block : BlockSystem.getAllBlocks()) {
-                if (block == BlockSystem.PEACH_BLOSSOM_LEAVES) {
+                if (block == BlockSystem.PEACH_BLOSSOM_LEAVES
+                        || block == BlockSystem.PEACH_BRANCH
+                        || block == BlockSystem.PEACH_PLANKS) {
                     continue;
                 }
                 addDrop(block);
