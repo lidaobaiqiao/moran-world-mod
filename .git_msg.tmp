@@ -1,7 +1,5 @@
-修复：枝干方块 settings 复制陷阱导致启动崩溃
+模型：八档枝干直径定稿 2/4/6/8/10/12/14/16（用户定稿）
 
-- copyOf(OAK_LOG) 会连原版原木的 mapColor lambda 一起复制
-  （该 lambda 急切读取 axis 属性决定颜色）
-- 枝干方块没有 axis 属性，状态构造时急切求值即抛 IAE 启动崩溃
-- 改为 copyOf(OAK_PLANKS)（无状态 lambda），runServer 无头验证启动通过
-- 教训：copyOf 只能复制与目标方块属性兼容的 settings
+- 引擎 HALF_WIDTH 同步（生长度1直径2px 细枝 → 生长度8直径16px 满格树干）
+- 主干/侧芽 40 个模型重生成：显式 UV 取贴图中央带，细柱不再整张压扁纹理
+- 侧芽端面用年轮贴图中心区域

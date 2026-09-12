@@ -45,8 +45,8 @@ public class MoranBranchBlock extends Block implements Fertilizable {
 
     private final TreeSpecies species;
 
-    /** 各生长度的枝干横截面半宽，1-2 是可穿行的细枝，7-8 是满格树干 */
-    private static final double[] HALF_WIDTH = {0, 2, 3, 4, 5, 6, 7, 8, 8};
+    /** 各生长度的枝干横截面半宽：直径 2/4/6/8/10/12/14/16（用户定稿），1-2 是可穿行的细枝，8 为满格 */
+    private static final double[] HALF_WIDTH = {0, 1, 2, 3, 4, 5, 6, 7, 8};
     private static final VoxelShape[] TRUNK_SHAPES = new VoxelShape[9];
     private static final Map<Direction, VoxelShape[]> BUD_SHAPES = new EnumMap<>(Direction.class);
 
