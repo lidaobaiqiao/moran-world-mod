@@ -49,8 +49,10 @@ public class BlockSystem {
                             .breakInstantly()));
 
     // 🌳 桃源树枝：八段生长的活树干（树苗长成，逐节变粗）
+    // 注意：settings 不能 copyOf(OAK_LOG)——会复制其按 axis 属性求值的 mapColor lambda，
+    // 本方块没有 axis 属性，状态构造时急切求值即崩（copyOf 只能复制无状态 lambda 的方块）
     public static final Block PEACH_BRANCH = register("peach_branch",
-            new MoranBranchBlock(Trees.PEACH, FabricBlockSettings.copyOf(Blocks.OAK_LOG)
+            new MoranBranchBlock(Trees.PEACH, FabricBlockSettings.copyOf(Blocks.OAK_PLANKS)
                     .nonOpaque()
                     .strength(0.4f)));
 
