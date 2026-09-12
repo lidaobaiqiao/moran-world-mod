@@ -5,6 +5,7 @@ import net.minecraft.block.Blocks;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
+import net.minecraft.world.LightType;
 import net.minecraft.util.math.random.Random;
 import net.minecraft.world.WorldView;
 
@@ -255,7 +256,10 @@ public class TreeSpecies {
      * 垂柳覆写时叠加近水要求。
      */
     public boolean checkEnvironment(ServerWorld world, BlockPos pos, int hydration) {
-        if (world.getLightLevel(pos.up()) < minLight) {
+        // 天空光存储值与时间无关（夜间 15 仍是 15），避免夜间加载区块的野生树被误冻结
+        int light = Math.max(world.getLightLevel(LightType.SKY, pos.up()),
+                world.getLightLevel(LightType.BLOCK, pos.up()));
+        if (light < minLight) {
             return false;
         }
         float temperature = world.getBiome(pos).value().getTemperature();

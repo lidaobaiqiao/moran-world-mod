@@ -1,5 +1,5 @@
 {
-  "type": "minecraft:simple_block",
+  "type": "moran_mod:moran_tree_seed",
   "config": {
     "schedule_tick": true,
     "to_place": {

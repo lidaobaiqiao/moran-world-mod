@@ -125,6 +125,9 @@ public class BlockSystem {
         }
         // 树种档案绑定方块实例（引擎 ↔ 档案 互相接通）
         Trees.PEACH.bind(PEACH_BRANCH, PEACH_FLOWER_BUD, PEACH_BLOSSOM_LEAVES);
+        // 野生树种子特征类型注册（simple_block 的 schedule_tick 字段是死字段，必须自建特征）
+        Registry.register(Registries.FEATURE, new Identifier(MoranMod.MOD_ID, "moran_tree_seed"),
+                com.lidao.moran.systems.worldgen.MoranTreeSeedFeature.INSTANCE);
         LOGGER.info("✅ 方块系统就绪：{} 个方块及其物品已注册", ALL_BLOCKS.size());
     }
 

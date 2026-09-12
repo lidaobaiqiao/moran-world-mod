@@ -1,6 +1,13 @@
-修复：野生桃花树不生长——simple_block 特征补 schedule_tick
+修复：野生树自启动 + 树叶消失（双根因）
 
-- simple_block 以 flags=2 放置方块，该 flag 下 onBlockAdded 不被调用，
-  引擎的生长请求从未登记，野生树保持幼枝不生长
-- 启用特征自带的 schedule_tick 选项（官方为生成期放置预留的调度入口），
-  放置即登记第一次请求，随后自然链式请求接管
+1) 野生树不生长：SimpleBlockFeature 的 schedule_tick 字段在 1.20.1 是
+   死字段（字节码确认从不调用 scheduleBlockTick），且 flags=2 放置不触发
+   onBlockAdded——生长请求从未登记。
+   新增自定义特征 MoranTreeSeedFeature（moran_mod:moran_tree_seed）：
+   放置 natural 种子并当场 scheduleBlockTick，链式请求接管。
+2) 其他树种树叶消失：树叶 distance 衰减按 minecraft:logs 标签识别原木，
+   自定义 5 种原木从未入标签 → 任意邻块更新后 distance 全部算到 7 →
+   随机刻衰减。补 data/minecraft/tags/blocks/logs.json（5 原木入标签，
+   同时修复桃花树冠的同类隐患）。
+3) 光照判定改时间无关：天空光存储值 + 方块光取大，夜间加载区块的
+   野生树不再被误判低光冻结。

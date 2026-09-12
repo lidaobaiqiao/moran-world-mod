@@ -1,0 +1,10 @@
+{
+  "replace": false,
+  "values": [
+    "moran_mod:peach_log",
+    "moran_mod:willow_log",
+    "moran_mod:pine_log",
+    "moran_mod:plum_log",
+    "moran_mod:ginkgo_log"
+  ]
+}
