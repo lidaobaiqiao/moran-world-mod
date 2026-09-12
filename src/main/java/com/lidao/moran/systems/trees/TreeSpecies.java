@@ -1,26 +1,38 @@
 package com.lidao.moran.systems.trees;
 
 import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
+import net.minecraft.block.Blocks;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.random.Random;
+import net.minecraft.world.WorldView;
+
+import java.util.HashMap;
+import java.util.Map;
 
 /**
- * 树种档案——生长库的核心抽象。
+ * 树种档案——生长库的核心抽象（v2：环境参数系统）。
  *
  * 一份档案描述一种树的生长偏好与形态：数值参数 + 少量策略钩子。
  * 生长引擎（{@link com.lidao.moran.systems.blocks.MoranBranchBlock} 与
  * {@link com.lidao.moran.systems.blocks.MoranFlowerBudBlock}）对所有树种共用，
  * 新增树种 = 写一份档案 + 注册两个方块实例，零引擎改动。
  *
+ * 表现型 = 基因型（本档案）× 环境：
+ * - 水度：半径 4 格内最近水源距离映射 0-8（同原版农田灌溉尺度），
+ *   低于 minHydration 直接算环境失败（水生树种用），同时作为生长速度软增益；
+ * - 湿度：群系 downfall（自建映射表，原版群系回退 hasPrecipitation 二值近似，
+ *   1.20.1 API 已移除 downfall 数值读取）；
+ * - 土壤：SoilProfile 三轴（排水/气密/保水），树种声明偏好区间，出区扣生长倍率；
+ * - 高度：biologicalTopMin~Max 区间内掷封顶骰，同林树木天然高矮不一。
+ *
  * 现实物候由各档案的钩子表达：
- * - 桃（默认范式）：上半部萌芽、先营养后生殖、先花后叶；
- * - 垂柳：覆写 {@link #branchChildDirection} 实现枝条渐下垂、覆写环境检测要求近水；
- * - 劲松：覆写 {@link #isBudPosition} 实现轮生枝；
- * - 寒梅：覆写 {@link #onBranchStop} 实现贴枝开花、放宽温度下限；
- * - 银杏：调低 {@code growChance} 并稀疏侧芽数值。
+ * - 桃（默认范式）：上半部萌芽、先营养后生殖、先花后叶、耐旱怕涝；
+ * - 垂柳：覆写 {@link #branchChildDirection} 枝条渐下垂、{@link #checkEnvironment} 要求水度；
+ * - 劲松：覆写 {@link #isBudPosition} 轮生枝、放宽温度下限；
+ * - 寒梅：覆写 {@link #onBranchStop} 贴枝开花、耐寒；
+ * - 银杏：调低 growChance、稀疏侧芽。
  */
 public class TreeSpecies {
 
@@ -33,9 +45,24 @@ public class TreeSpecies {
     public static final int MAX_FAILS = 3;
     public static final Direction[] HORIZONTALS = {Direction.NORTH, Direction.SOUTH, Direction.WEST, Direction.EAST};
 
+    /** 群系湿度映射表（桃花源群系取各自 biome JSON 的 downfall） */
+    private static final Map<String, Float> BIOME_HUMIDITY = new HashMap<>();
+    static {
+        BIOME_HUMIDITY.put("moran_mod:yaozhuohuayuan", 0.3F);
+        BIOME_HUMIDITY.put("moran_mod:peach_valley", 0.5F);
+        BIOME_HUMIDITY.put("moran_mod:bamboo_grove", 0.6F);
+        BIOME_HUMIDITY.put("moran_mod:farm_plains", 0.4F);
+        BIOME_HUMIDITY.put("moran_mod:green_hills", 0.5F);
+        BIOME_HUMIDITY.put("moran_mod:blossom_stream", 0.6F);
+        BIOME_HUMIDITY.put("moran_mod:mirror_lakes", 0.7F);
+        BIOME_HUMIDITY.put("moran_mod:hidden_depths", 0.4F);
+    }
+
     private final String id;
-    // —— 数值参数 ——
-    private final int biologicalTop;
+    // —— 结构参数 ——
+    private final int biologicalTopMin;
+    private final int biologicalTopMax;
+    private final float toppingChance;
     private final int trunkMaxGrowth;
     private final int topBudGrowth;
     private final int maxBuds;
@@ -44,10 +71,18 @@ public class TreeSpecies {
     private final int branchStopGrowth;
     private final float branchStopChance;
     private final float subBranchChance;
+    // —— 环境参数 ——
     private final float growChance;
     private final int minLight;
     private final float minTemperature;
     private final float maxTemperature;
+    private final int minHydration;
+    private final float minHumidity;
+    private final int[] drainageRange;
+    private final int[] aerationRange;
+    private final int[] retentionRange;
+    // —— 交互参数 ——
+    private final float pruneResponseChance;
     // —— 方块引用（注册后绑定） ——
     private Block branchBlock;
     private Block budBlock;
@@ -55,7 +90,9 @@ public class TreeSpecies {
 
     private TreeSpecies(Builder b) {
         this.id = b.id;
-        this.biologicalTop = b.biologicalTop;
+        this.biologicalTopMin = b.biologicalTopMin;
+        this.biologicalTopMax = b.biologicalTopMax;
+        this.toppingChance = b.toppingChance;
         this.trunkMaxGrowth = b.trunkMaxGrowth;
         this.topBudGrowth = b.topBudGrowth;
         this.maxBuds = b.maxBuds;
@@ -68,14 +105,28 @@ public class TreeSpecies {
         this.minLight = b.minLight;
         this.minTemperature = b.minTemperature;
         this.maxTemperature = b.maxTemperature;
+        this.minHydration = b.minHydration;
+        this.minHumidity = b.minHumidity;
+        this.drainageRange = b.drainageRange;
+        this.aerationRange = b.aerationRange;
+        this.retentionRange = b.retentionRange;
+        this.pruneResponseChance = b.pruneResponseChance;
     }
 
     public String id() {
         return id;
     }
 
-    public int biologicalTop() {
-        return biologicalTop;
+    public int biologicalTopMin() {
+        return biologicalTopMin;
+    }
+
+    public int biologicalTopMax() {
+        return biologicalTopMax;
+    }
+
+    public float toppingChance() {
+        return toppingChance;
     }
 
     public int trunkMaxGrowth() {
@@ -114,6 +165,10 @@ public class TreeSpecies {
         return growChance;
     }
 
+    public float pruneResponseChance() {
+        return pruneResponseChance;
+    }
+
     /** 注册完成后绑定本树种的三类方块实例 */
     public void bind(Block branch, Block bud, Block leaves) {
         this.branchBlock = branch;
@@ -133,15 +188,84 @@ public class TreeSpecies {
         return leavesBlock;
     }
 
+    // ===== 环境参数系统 =====
+
+    /** 水度：半径 4 格内最近水源映射 0-8（每格距离扣 2，同原版农田灌溉尺度） */
+    public static int hydration(WorldView world, BlockPos pos) {
+        for (int d = 0; d <= 4; d++) {
+            for (int dx = -d; dx <= d; dx++) {
+                for (int dz = -d; dz <= d; dz++) {
+                    if (Math.max(Math.abs(dx), Math.abs(dz)) != d) {
+                        continue; // 只扫当前距离环，最近水源优先
+                    }
+                    for (int dy = 0; dy >= -1; dy--) {
+                        if (world.getBlockState(pos.add(dx, dy, dz)).isOf(Blocks.WATER)) {
+                            return Math.max(0, 8 - 2 * d);
+                        }
+                    }
+                }
+            }
+        }
+        return 0;
+    }
+
+    /** 群系湿度：桃花源群系查表，其余回退「是否有降水」二值近似 */
+    public static float biomeHumidity(ServerWorld world, BlockPos pos) {
+        String id = world.getBiome(pos).getKey()
+                .map(k -> k.getValue().toString())
+                .orElse("");
+        Float v = BIOME_HUMIDITY.get(id);
+        if (v != null) {
+            return v;
+        }
+        return world.getBiome(pos).value().hasPrecipitation() ? 0.6F : 0.15F;
+    }
+
+    /** 水度生长因子：干土 0.6 倍速 → 饱和 1.0 倍速 */
+    public float hydrationFactor(int hydration) {
+        return 0.6F + hydration * 0.05F;
+    }
+
+    /** 单轴土壤因子：在偏好区间内 1.0，偏离每格扣 0.15 */
+    private static float axisFactor(int value, int[] range) {
+        if (value >= range[0] && value <= range[1]) {
+            return 1.0F;
+        }
+        int dist = value < range[0] ? range[0] - value : value - range[1];
+        return Math.max(0.0F, 1.0F - dist * 0.15F);
+    }
+
+    /** 土壤生长因子：三轴乘法累积，下限 0.3 */
+    public float soilFactor(SoilProfile soil) {
+        float f = axisFactor(soil.drainage(), drainageRange)
+                * axisFactor(soil.aeration(), aerationRange)
+                * axisFactor(soil.retention(), retentionRange);
+        return Math.max(0.3F, f);
+    }
+
+    /** 有效生长概率 = 基础 × 水度因子 × 土壤因子 */
+    public float effectiveGrowChance(ServerWorld world, BlockPos pos, int hydration, SoilProfile soil) {
+        return growChance * hydrationFactor(hydration) * soilFactor(soil);
+    }
+
     // ===== 策略钩子（默认实现 = 桃树范式，树种按需覆写） =====
 
-    /** 生长环境检测：光照与温度（垂柳覆写时叠加近水要求） */
-    public boolean checkEnvironment(ServerWorld world, BlockPos pos) {
+    /**
+     * 生长环境检测：光照、温度、水度硬门槛（水生树种用）、群系湿度硬门槛。
+     * 垂柳覆写时叠加近水要求。
+     */
+    public boolean checkEnvironment(ServerWorld world, BlockPos pos, int hydration) {
         if (world.getLightLevel(pos.up()) < minLight) {
             return false;
         }
         float temperature = world.getBiome(pos).value().getTemperature();
-        return temperature >= minTemperature && temperature <= maxTemperature;
+        if (temperature < minTemperature || temperature > maxTemperature) {
+            return false;
+        }
+        if (hydration < minHydration) {
+            return false;
+        }
+        return biomeHumidity(world, pos) >= minHumidity;
     }
 
     /** 该主干方块是否处于可萌发侧芽的位置。默认：当前高度的上半部分（现实：主枝自上部萌发） */
@@ -206,7 +330,9 @@ public class TreeSpecies {
 
     public static class Builder {
         private final String id;
-        private int biologicalTop = 7;
+        private int biologicalTopMin = 7;
+        private int biologicalTopMax = 10;
+        private float toppingChance = 0.25F;
         private int trunkMaxGrowth = 8;
         private int topBudGrowth = 5;
         private int maxBuds = 4;
@@ -219,12 +345,21 @@ public class TreeSpecies {
         private int minLight = 9;
         private float minTemperature = 0.3F;
         private float maxTemperature = 1.2F;
+        private int minHydration = 0;
+        private float minHumidity = 0.0F;
+        private int[] drainageRange = {4, 8};
+        private int[] aerationRange = {3, 8};
+        private int[] retentionRange = {2, 6};
+        private float pruneResponseChance = 0.5F;
 
         private Builder(String id) {
             this.id = id;
         }
 
-        public Builder biologicalTop(int v) { this.biologicalTop = v; return this; }
+        /** 生物顶端高度区间：主干在 min~max 之间掷封顶骰，同一片林子天然高矮不一 */
+        public Builder biologicalTop(int min, int max) { this.biologicalTopMin = min; this.biologicalTopMax = max; return this; }
+        /** 区间内每次抽高的封顶概率 */
+        public Builder toppingChance(float v) { this.toppingChance = v; return this; }
         public Builder trunkMaxGrowth(int v) { this.trunkMaxGrowth = v; return this; }
         public Builder topBudGrowth(int v) { this.topBudGrowth = v; return this; }
         public Builder maxBuds(int v) { this.maxBuds = v; return this; }
@@ -236,6 +371,19 @@ public class TreeSpecies {
         public Builder growChance(float v) { this.growChance = v; return this; }
         public Builder minLight(int v) { this.minLight = v; return this; }
         public Builder temperature(float min, float max) { this.minTemperature = min; this.maxTemperature = max; return this; }
+        /** 最低水度（硬条件）：水生/喜水树种设 >0 */
+        public Builder minHydration(int v) { this.minHydration = v; return this; }
+        /** 最低群系湿度（硬条件） */
+        public Builder minHumidity(float v) { this.minHumidity = v; return this; }
+        /** 土壤偏好区间：排水/气密/保水 各 min,max */
+        public Builder soilPreference(int dMin, int dMax, int aMin, int aMax, int rMin, int rMax) {
+            this.drainageRange = new int[]{dMin, dMax};
+            this.aerationRange = new int[]{aMin, aMax};
+            this.retentionRange = new int[]{rMin, rMax};
+            return this;
+        }
+        /** 修剪响应：断口相邻枝干萌发新芽的概率 */
+        public Builder pruneResponseChance(float v) { this.pruneResponseChance = v; return this; }
 
         public TreeSpecies build() {
             return new TreeSpecies(this);

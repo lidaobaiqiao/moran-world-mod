@@ -1,963 +1,1923 @@
 {
   "variants": {
-    "facing=up,dormant=false,fails=0,growth=1": {
+    "facing=up,dormant=false,fails=0,growth=1,topped=false": {
       "model": "moran_mod:block/peach_branch_trunk_g1"
     },
-    "facing=north,dormant=false,fails=0,growth=1": {
+    "facing=north,dormant=false,fails=0,growth=1,topped=false": {
       "model": "moran_mod:block/peach_branch_bud_g1_north"
     },
-    "facing=south,dormant=false,fails=0,growth=1": {
+    "facing=south,dormant=false,fails=0,growth=1,topped=false": {
       "model": "moran_mod:block/peach_branch_bud_g1_south"
     },
-    "facing=east,dormant=false,fails=0,growth=1": {
+    "facing=east,dormant=false,fails=0,growth=1,topped=false": {
       "model": "moran_mod:block/peach_branch_bud_g1_east"
     },
-    "facing=west,dormant=false,fails=0,growth=1": {
+    "facing=west,dormant=false,fails=0,growth=1,topped=false": {
       "model": "moran_mod:block/peach_branch_bud_g1_west"
     },
-    "facing=up,dormant=true,fails=0,growth=1": {
+    "facing=up,dormant=false,fails=0,growth=1,topped=true": {
       "model": "moran_mod:block/peach_branch_trunk_g1"
     },
-    "facing=north,dormant=true,fails=0,growth=1": {
+    "facing=north,dormant=false,fails=0,growth=1,topped=true": {
       "model": "moran_mod:block/peach_branch_bud_g1_north"
     },
-    "facing=south,dormant=true,fails=0,growth=1": {
+    "facing=south,dormant=false,fails=0,growth=1,topped=true": {
       "model": "moran_mod:block/peach_branch_bud_g1_south"
     },
-    "facing=east,dormant=true,fails=0,growth=1": {
+    "facing=east,dormant=false,fails=0,growth=1,topped=true": {
       "model": "moran_mod:block/peach_branch_bud_g1_east"
     },
-    "facing=west,dormant=true,fails=0,growth=1": {
+    "facing=west,dormant=false,fails=0,growth=1,topped=true": {
       "model": "moran_mod:block/peach_branch_bud_g1_west"
     },
-    "facing=up,dormant=false,fails=1,growth=1": {
+    "facing=up,dormant=true,fails=0,growth=1,topped=false": {
       "model": "moran_mod:block/peach_branch_trunk_g1"
     },
-    "facing=north,dormant=false,fails=1,growth=1": {
+    "facing=north,dormant=true,fails=0,growth=1,topped=false": {
       "model": "moran_mod:block/peach_branch_bud_g1_north"
     },
-    "facing=south,dormant=false,fails=1,growth=1": {
+    "facing=south,dormant=true,fails=0,growth=1,topped=false": {
       "model": "moran_mod:block/peach_branch_bud_g1_south"
     },
-    "facing=east,dormant=false,fails=1,growth=1": {
+    "facing=east,dormant=true,fails=0,growth=1,topped=false": {
       "model": "moran_mod:block/peach_branch_bud_g1_east"
     },
-    "facing=west,dormant=false,fails=1,growth=1": {
+    "facing=west,dormant=true,fails=0,growth=1,topped=false": {
       "model": "moran_mod:block/peach_branch_bud_g1_west"
     },
-    "facing=up,dormant=true,fails=1,growth=1": {
+    "facing=up,dormant=true,fails=0,growth=1,topped=true": {
       "model": "moran_mod:block/peach_branch_trunk_g1"
     },
-    "facing=north,dormant=true,fails=1,growth=1": {
+    "facing=north,dormant=true,fails=0,growth=1,topped=true": {
       "model": "moran_mod:block/peach_branch_bud_g1_north"
     },
-    "facing=south,dormant=true,fails=1,growth=1": {
+    "facing=south,dormant=true,fails=0,growth=1,topped=true": {
       "model": "moran_mod:block/peach_branch_bud_g1_south"
     },
-    "facing=east,dormant=true,fails=1,growth=1": {
+    "facing=east,dormant=true,fails=0,growth=1,topped=true": {
       "model": "moran_mod:block/peach_branch_bud_g1_east"
     },
-    "facing=west,dormant=true,fails=1,growth=1": {
+    "facing=west,dormant=true,fails=0,growth=1,topped=true": {
       "model": "moran_mod:block/peach_branch_bud_g1_west"
     },
-    "facing=up,dormant=false,fails=2,growth=1": {
+    "facing=up,dormant=false,fails=1,growth=1,topped=false": {
       "model": "moran_mod:block/peach_branch_trunk_g1"
     },
-    "facing=north,dormant=false,fails=2,growth=1": {
+    "facing=north,dormant=false,fails=1,growth=1,topped=false": {
       "model": "moran_mod:block/peach_branch_bud_g1_north"
     },
-    "facing=south,dormant=false,fails=2,growth=1": {
+    "facing=south,dormant=false,fails=1,growth=1,topped=false": {
       "model": "moran_mod:block/peach_branch_bud_g1_south"
     },
-    "facing=east,dormant=false,fails=2,growth=1": {
+    "facing=east,dormant=false,fails=1,growth=1,topped=false": {
       "model": "moran_mod:block/peach_branch_bud_g1_east"
     },
-    "facing=west,dormant=false,fails=2,growth=1": {
+    "facing=west,dormant=false,fails=1,growth=1,topped=false": {
       "model": "moran_mod:block/peach_branch_bud_g1_west"
     },
-    "facing=up,dormant=true,fails=2,growth=1": {
+    "facing=up,dormant=false,fails=1,growth=1,topped=true": {
       "model": "moran_mod:block/peach_branch_trunk_g1"
     },
-    "facing=north,dormant=true,fails=2,growth=1": {
+    "facing=north,dormant=false,fails=1,growth=1,topped=true": {
       "model": "moran_mod:block/peach_branch_bud_g1_north"
     },
-    "facing=south,dormant=true,fails=2,growth=1": {
+    "facing=south,dormant=false,fails=1,growth=1,topped=true": {
       "model": "moran_mod:block/peach_branch_bud_g1_south"
     },
-    "facing=east,dormant=true,fails=2,growth=1": {
+    "facing=east,dormant=false,fails=1,growth=1,topped=true": {
       "model": "moran_mod:block/peach_branch_bud_g1_east"
     },
-    "facing=west,dormant=true,fails=2,growth=1": {
+    "facing=west,dormant=false,fails=1,growth=1,topped=true": {
       "model": "moran_mod:block/peach_branch_bud_g1_west"
     },
-    "facing=up,dormant=false,fails=3,growth=1": {
+    "facing=up,dormant=true,fails=1,growth=1,topped=false": {
       "model": "moran_mod:block/peach_branch_trunk_g1"
     },
-    "facing=north,dormant=false,fails=3,growth=1": {
+    "facing=north,dormant=true,fails=1,growth=1,topped=false": {
       "model": "moran_mod:block/peach_branch_bud_g1_north"
     },
-    "facing=south,dormant=false,fails=3,growth=1": {
+    "facing=south,dormant=true,fails=1,growth=1,topped=false": {
       "model": "moran_mod:block/peach_branch_bud_g1_south"
     },
-    "facing=east,dormant=false,fails=3,growth=1": {
+    "facing=east,dormant=true,fails=1,growth=1,topped=false": {
       "model": "moran_mod:block/peach_branch_bud_g1_east"
     },
-    "facing=west,dormant=false,fails=3,growth=1": {
+    "facing=west,dormant=true,fails=1,growth=1,topped=false": {
       "model": "moran_mod:block/peach_branch_bud_g1_west"
     },
-    "facing=up,dormant=true,fails=3,growth=1": {
+    "facing=up,dormant=true,fails=1,growth=1,topped=true": {
       "model": "moran_mod:block/peach_branch_trunk_g1"
     },
-    "facing=north,dormant=true,fails=3,growth=1": {
+    "facing=north,dormant=true,fails=1,growth=1,topped=true": {
       "model": "moran_mod:block/peach_branch_bud_g1_north"
     },
-    "facing=south,dormant=true,fails=3,growth=1": {
+    "facing=south,dormant=true,fails=1,growth=1,topped=true": {
       "model": "moran_mod:block/peach_branch_bud_g1_south"
     },
-    "facing=east,dormant=true,fails=3,growth=1": {
+    "facing=east,dormant=true,fails=1,growth=1,topped=true": {
       "model": "moran_mod:block/peach_branch_bud_g1_east"
     },
-    "facing=west,dormant=true,fails=3,growth=1": {
+    "facing=west,dormant=true,fails=1,growth=1,topped=true": {
       "model": "moran_mod:block/peach_branch_bud_g1_west"
     },
-    "facing=up,dormant=false,fails=0,growth=2": {
+    "facing=up,dormant=false,fails=2,growth=1,topped=false": {
+      "model": "moran_mod:block/peach_branch_trunk_g1"
+    },
+    "facing=north,dormant=false,fails=2,growth=1,topped=false": {
+      "model": "moran_mod:block/peach_branch_bud_g1_north"
+    },
+    "facing=south,dormant=false,fails=2,growth=1,topped=false": {
+      "model": "moran_mod:block/peach_branch_bud_g1_south"
+    },
+    "facing=east,dormant=false,fails=2,growth=1,topped=false": {
+      "model": "moran_mod:block/peach_branch_bud_g1_east"
+    },
+    "facing=west,dormant=false,fails=2,growth=1,topped=false": {
+      "model": "moran_mod:block/peach_branch_bud_g1_west"
+    },
+    "facing=up,dormant=false,fails=2,growth=1,topped=true": {
+      "model": "moran_mod:block/peach_branch_trunk_g1"
+    },
+    "facing=north,dormant=false,fails=2,growth=1,topped=true": {
+      "model": "moran_mod:block/peach_branch_bud_g1_north"
+    },
+    "facing=south,dormant=false,fails=2,growth=1,topped=true": {
+      "model": "moran_mod:block/peach_branch_bud_g1_south"
+    },
+    "facing=east,dormant=false,fails=2,growth=1,topped=true": {
+      "model": "moran_mod:block/peach_branch_bud_g1_east"
+    },
+    "facing=west,dormant=false,fails=2,growth=1,topped=true": {
+      "model": "moran_mod:block/peach_branch_bud_g1_west"
+    },
+    "facing=up,dormant=true,fails=2,growth=1,topped=false": {
+      "model": "moran_mod:block/peach_branch_trunk_g1"
+    },
+    "facing=north,dormant=true,fails=2,growth=1,topped=false": {
+      "model": "moran_mod:block/peach_branch_bud_g1_north"
+    },
+    "facing=south,dormant=true,fails=2,growth=1,topped=false": {
+      "model": "moran_mod:block/peach_branch_bud_g1_south"
+    },
+    "facing=east,dormant=true,fails=2,growth=1,topped=false": {
+      "model": "moran_mod:block/peach_branch_bud_g1_east"
+    },
+    "facing=west,dormant=true,fails=2,growth=1,topped=false": {
+      "model": "moran_mod:block/peach_branch_bud_g1_west"
+    },
+    "facing=up,dormant=true,fails=2,growth=1,topped=true": {
+      "model": "moran_mod:block/peach_branch_trunk_g1"
+    },
+    "facing=north,dormant=true,fails=2,growth=1,topped=true": {
+      "model": "moran_mod:block/peach_branch_bud_g1_north"
+    },
+    "facing=south,dormant=true,fails=2,growth=1,topped=true": {
+      "model": "moran_mod:block/peach_branch_bud_g1_south"
+    },
+    "facing=east,dormant=true,fails=2,growth=1,topped=true": {
+      "model": "moran_mod:block/peach_branch_bud_g1_east"
+    },
+    "facing=west,dormant=true,fails=2,growth=1,topped=true": {
+      "model": "moran_mod:block/peach_branch_bud_g1_west"
+    },
+    "facing=up,dormant=false,fails=3,growth=1,topped=false": {
+      "model": "moran_mod:block/peach_branch_trunk_g1"
+    },
+    "facing=north,dormant=false,fails=3,growth=1,topped=false": {
+      "model": "moran_mod:block/peach_branch_bud_g1_north"
+    },
+    "facing=south,dormant=false,fails=3,growth=1,topped=false": {
+      "model": "moran_mod:block/peach_branch_bud_g1_south"
+    },
+    "facing=east,dormant=false,fails=3,growth=1,topped=false": {
+      "model": "moran_mod:block/peach_branch_bud_g1_east"
+    },
+    "facing=west,dormant=false,fails=3,growth=1,topped=false": {
+      "model": "moran_mod:block/peach_branch_bud_g1_west"
+    },
+    "facing=up,dormant=false,fails=3,growth=1,topped=true": {
+      "model": "moran_mod:block/peach_branch_trunk_g1"
+    },
+    "facing=north,dormant=false,fails=3,growth=1,topped=true": {
+      "model": "moran_mod:block/peach_branch_bud_g1_north"
+    },
+    "facing=south,dormant=false,fails=3,growth=1,topped=true": {
+      "model": "moran_mod:block/peach_branch_bud_g1_south"
+    },
+    "facing=east,dormant=false,fails=3,growth=1,topped=true": {
+      "model": "moran_mod:block/peach_branch_bud_g1_east"
+    },
+    "facing=west,dormant=false,fails=3,growth=1,topped=true": {
+      "model": "moran_mod:block/peach_branch_bud_g1_west"
+    },
+    "facing=up,dormant=true,fails=3,growth=1,topped=false": {
+      "model": "moran_mod:block/peach_branch_trunk_g1"
+    },
+    "facing=north,dormant=true,fails=3,growth=1,topped=false": {
+      "model": "moran_mod:block/peach_branch_bud_g1_north"
+    },
+    "facing=south,dormant=true,fails=3,growth=1,topped=false": {
+      "model": "moran_mod:block/peach_branch_bud_g1_south"
+    },
+    "facing=east,dormant=true,fails=3,growth=1,topped=false": {
+      "model": "moran_mod:block/peach_branch_bud_g1_east"
+    },
+    "facing=west,dormant=true,fails=3,growth=1,topped=false": {
+      "model": "moran_mod:block/peach_branch_bud_g1_west"
+    },
+    "facing=up,dormant=true,fails=3,growth=1,topped=true": {
+      "model": "moran_mod:block/peach_branch_trunk_g1"
+    },
+    "facing=north,dormant=true,fails=3,growth=1,topped=true": {
+      "model": "moran_mod:block/peach_branch_bud_g1_north"
+    },
+    "facing=south,dormant=true,fails=3,growth=1,topped=true": {
+      "model": "moran_mod:block/peach_branch_bud_g1_south"
+    },
+    "facing=east,dormant=true,fails=3,growth=1,topped=true": {
+      "model": "moran_mod:block/peach_branch_bud_g1_east"
+    },
+    "facing=west,dormant=true,fails=3,growth=1,topped=true": {
+      "model": "moran_mod:block/peach_branch_bud_g1_west"
+    },
+    "facing=up,dormant=false,fails=0,growth=2,topped=false": {
       "model": "moran_mod:block/peach_branch_trunk_g2"
     },
-    "facing=north,dormant=false,fails=0,growth=2": {
+    "facing=north,dormant=false,fails=0,growth=2,topped=false": {
       "model": "moran_mod:block/peach_branch_bud_g2_north"
     },
-    "facing=south,dormant=false,fails=0,growth=2": {
+    "facing=south,dormant=false,fails=0,growth=2,topped=false": {
       "model": "moran_mod:block/peach_branch_bud_g2_south"
     },
-    "facing=east,dormant=false,fails=0,growth=2": {
+    "facing=east,dormant=false,fails=0,growth=2,topped=false": {
       "model": "moran_mod:block/peach_branch_bud_g2_east"
     },
-    "facing=west,dormant=false,fails=0,growth=2": {
+    "facing=west,dormant=false,fails=0,growth=2,topped=false": {
       "model": "moran_mod:block/peach_branch_bud_g2_west"
     },
-    "facing=up,dormant=true,fails=0,growth=2": {
+    "facing=up,dormant=false,fails=0,growth=2,topped=true": {
       "model": "moran_mod:block/peach_branch_trunk_g2"
     },
-    "facing=north,dormant=true,fails=0,growth=2": {
+    "facing=north,dormant=false,fails=0,growth=2,topped=true": {
       "model": "moran_mod:block/peach_branch_bud_g2_north"
     },
-    "facing=south,dormant=true,fails=0,growth=2": {
+    "facing=south,dormant=false,fails=0,growth=2,topped=true": {
       "model": "moran_mod:block/peach_branch_bud_g2_south"
     },
-    "facing=east,dormant=true,fails=0,growth=2": {
+    "facing=east,dormant=false,fails=0,growth=2,topped=true": {
       "model": "moran_mod:block/peach_branch_bud_g2_east"
     },
-    "facing=west,dormant=true,fails=0,growth=2": {
+    "facing=west,dormant=false,fails=0,growth=2,topped=true": {
       "model": "moran_mod:block/peach_branch_bud_g2_west"
     },
-    "facing=up,dormant=false,fails=1,growth=2": {
+    "facing=up,dormant=true,fails=0,growth=2,topped=false": {
       "model": "moran_mod:block/peach_branch_trunk_g2"
     },
-    "facing=north,dormant=false,fails=1,growth=2": {
+    "facing=north,dormant=true,fails=0,growth=2,topped=false": {
       "model": "moran_mod:block/peach_branch_bud_g2_north"
     },
-    "facing=south,dormant=false,fails=1,growth=2": {
+    "facing=south,dormant=true,fails=0,growth=2,topped=false": {
       "model": "moran_mod:block/peach_branch_bud_g2_south"
     },
-    "facing=east,dormant=false,fails=1,growth=2": {
+    "facing=east,dormant=true,fails=0,growth=2,topped=false": {
       "model": "moran_mod:block/peach_branch_bud_g2_east"
     },
-    "facing=west,dormant=false,fails=1,growth=2": {
+    "facing=west,dormant=true,fails=0,growth=2,topped=false": {
       "model": "moran_mod:block/peach_branch_bud_g2_west"
     },
-    "facing=up,dormant=true,fails=1,growth=2": {
+    "facing=up,dormant=true,fails=0,growth=2,topped=true": {
       "model": "moran_mod:block/peach_branch_trunk_g2"
     },
-    "facing=north,dormant=true,fails=1,growth=2": {
+    "facing=north,dormant=true,fails=0,growth=2,topped=true": {
       "model": "moran_mod:block/peach_branch_bud_g2_north"
     },
-    "facing=south,dormant=true,fails=1,growth=2": {
+    "facing=south,dormant=true,fails=0,growth=2,topped=true": {
       "model": "moran_mod:block/peach_branch_bud_g2_south"
     },
-    "facing=east,dormant=true,fails=1,growth=2": {
+    "facing=east,dormant=true,fails=0,growth=2,topped=true": {
       "model": "moran_mod:block/peach_branch_bud_g2_east"
     },
-    "facing=west,dormant=true,fails=1,growth=2": {
+    "facing=west,dormant=true,fails=0,growth=2,topped=true": {
       "model": "moran_mod:block/peach_branch_bud_g2_west"
     },
-    "facing=up,dormant=false,fails=2,growth=2": {
+    "facing=up,dormant=false,fails=1,growth=2,topped=false": {
       "model": "moran_mod:block/peach_branch_trunk_g2"
     },
-    "facing=north,dormant=false,fails=2,growth=2": {
+    "facing=north,dormant=false,fails=1,growth=2,topped=false": {
       "model": "moran_mod:block/peach_branch_bud_g2_north"
     },
-    "facing=south,dormant=false,fails=2,growth=2": {
+    "facing=south,dormant=false,fails=1,growth=2,topped=false": {
       "model": "moran_mod:block/peach_branch_bud_g2_south"
     },
-    "facing=east,dormant=false,fails=2,growth=2": {
+    "facing=east,dormant=false,fails=1,growth=2,topped=false": {
       "model": "moran_mod:block/peach_branch_bud_g2_east"
     },
-    "facing=west,dormant=false,fails=2,growth=2": {
+    "facing=west,dormant=false,fails=1,growth=2,topped=false": {
       "model": "moran_mod:block/peach_branch_bud_g2_west"
     },
-    "facing=up,dormant=true,fails=2,growth=2": {
+    "facing=up,dormant=false,fails=1,growth=2,topped=true": {
       "model": "moran_mod:block/peach_branch_trunk_g2"
     },
-    "facing=north,dormant=true,fails=2,growth=2": {
+    "facing=north,dormant=false,fails=1,growth=2,topped=true": {
       "model": "moran_mod:block/peach_branch_bud_g2_north"
     },
-    "facing=south,dormant=true,fails=2,growth=2": {
+    "facing=south,dormant=false,fails=1,growth=2,topped=true": {
       "model": "moran_mod:block/peach_branch_bud_g2_south"
     },
-    "facing=east,dormant=true,fails=2,growth=2": {
+    "facing=east,dormant=false,fails=1,growth=2,topped=true": {
       "model": "moran_mod:block/peach_branch_bud_g2_east"
     },
-    "facing=west,dormant=true,fails=2,growth=2": {
+    "facing=west,dormant=false,fails=1,growth=2,topped=true": {
       "model": "moran_mod:block/peach_branch_bud_g2_west"
     },
-    "facing=up,dormant=false,fails=3,growth=2": {
+    "facing=up,dormant=true,fails=1,growth=2,topped=false": {
       "model": "moran_mod:block/peach_branch_trunk_g2"
     },
-    "facing=north,dormant=false,fails=3,growth=2": {
+    "facing=north,dormant=true,fails=1,growth=2,topped=false": {
       "model": "moran_mod:block/peach_branch_bud_g2_north"
     },
-    "facing=south,dormant=false,fails=3,growth=2": {
+    "facing=south,dormant=true,fails=1,growth=2,topped=false": {
       "model": "moran_mod:block/peach_branch_bud_g2_south"
     },
-    "facing=east,dormant=false,fails=3,growth=2": {
+    "facing=east,dormant=true,fails=1,growth=2,topped=false": {
       "model": "moran_mod:block/peach_branch_bud_g2_east"
     },
-    "facing=west,dormant=false,fails=3,growth=2": {
+    "facing=west,dormant=true,fails=1,growth=2,topped=false": {
       "model": "moran_mod:block/peach_branch_bud_g2_west"
     },
-    "facing=up,dormant=true,fails=3,growth=2": {
+    "facing=up,dormant=true,fails=1,growth=2,topped=true": {
       "model": "moran_mod:block/peach_branch_trunk_g2"
     },
-    "facing=north,dormant=true,fails=3,growth=2": {
+    "facing=north,dormant=true,fails=1,growth=2,topped=true": {
       "model": "moran_mod:block/peach_branch_bud_g2_north"
     },
-    "facing=south,dormant=true,fails=3,growth=2": {
+    "facing=south,dormant=true,fails=1,growth=2,topped=true": {
       "model": "moran_mod:block/peach_branch_bud_g2_south"
     },
-    "facing=east,dormant=true,fails=3,growth=2": {
+    "facing=east,dormant=true,fails=1,growth=2,topped=true": {
       "model": "moran_mod:block/peach_branch_bud_g2_east"
     },
-    "facing=west,dormant=true,fails=3,growth=2": {
+    "facing=west,dormant=true,fails=1,growth=2,topped=true": {
       "model": "moran_mod:block/peach_branch_bud_g2_west"
     },
-    "facing=up,dormant=false,fails=0,growth=3": {
+    "facing=up,dormant=false,fails=2,growth=2,topped=false": {
+      "model": "moran_mod:block/peach_branch_trunk_g2"
+    },
+    "facing=north,dormant=false,fails=2,growth=2,topped=false": {
+      "model": "moran_mod:block/peach_branch_bud_g2_north"
+    },
+    "facing=south,dormant=false,fails=2,growth=2,topped=false": {
+      "model": "moran_mod:block/peach_branch_bud_g2_south"
+    },
+    "facing=east,dormant=false,fails=2,growth=2,topped=false": {
+      "model": "moran_mod:block/peach_branch_bud_g2_east"
+    },
+    "facing=west,dormant=false,fails=2,growth=2,topped=false": {
+      "model": "moran_mod:block/peach_branch_bud_g2_west"
+    },
+    "facing=up,dormant=false,fails=2,growth=2,topped=true": {
+      "model": "moran_mod:block/peach_branch_trunk_g2"
+    },
+    "facing=north,dormant=false,fails=2,growth=2,topped=true": {
+      "model": "moran_mod:block/peach_branch_bud_g2_north"
+    },
+    "facing=south,dormant=false,fails=2,growth=2,topped=true": {
+      "model": "moran_mod:block/peach_branch_bud_g2_south"
+    },
+    "facing=east,dormant=false,fails=2,growth=2,topped=true": {
+      "model": "moran_mod:block/peach_branch_bud_g2_east"
+    },
+    "facing=west,dormant=false,fails=2,growth=2,topped=true": {
+      "model": "moran_mod:block/peach_branch_bud_g2_west"
+    },
+    "facing=up,dormant=true,fails=2,growth=2,topped=false": {
+      "model": "moran_mod:block/peach_branch_trunk_g2"
+    },
+    "facing=north,dormant=true,fails=2,growth=2,topped=false": {
+      "model": "moran_mod:block/peach_branch_bud_g2_north"
+    },
+    "facing=south,dormant=true,fails=2,growth=2,topped=false": {
+      "model": "moran_mod:block/peach_branch_bud_g2_south"
+    },
+    "facing=east,dormant=true,fails=2,growth=2,topped=false": {
+      "model": "moran_mod:block/peach_branch_bud_g2_east"
+    },
+    "facing=west,dormant=true,fails=2,growth=2,topped=false": {
+      "model": "moran_mod:block/peach_branch_bud_g2_west"
+    },
+    "facing=up,dormant=true,fails=2,growth=2,topped=true": {
+      "model": "moran_mod:block/peach_branch_trunk_g2"
+    },
+    "facing=north,dormant=true,fails=2,growth=2,topped=true": {
+      "model": "moran_mod:block/peach_branch_bud_g2_north"
+    },
+    "facing=south,dormant=true,fails=2,growth=2,topped=true": {
+      "model": "moran_mod:block/peach_branch_bud_g2_south"
+    },
+    "facing=east,dormant=true,fails=2,growth=2,topped=true": {
+      "model": "moran_mod:block/peach_branch_bud_g2_east"
+    },
+    "facing=west,dormant=true,fails=2,growth=2,topped=true": {
+      "model": "moran_mod:block/peach_branch_bud_g2_west"
+    },
+    "facing=up,dormant=false,fails=3,growth=2,topped=false": {
+      "model": "moran_mod:block/peach_branch_trunk_g2"
+    },
+    "facing=north,dormant=false,fails=3,growth=2,topped=false": {
+      "model": "moran_mod:block/peach_branch_bud_g2_north"
+    },
+    "facing=south,dormant=false,fails=3,growth=2,topped=false": {
+      "model": "moran_mod:block/peach_branch_bud_g2_south"
+    },
+    "facing=east,dormant=false,fails=3,growth=2,topped=false": {
+      "model": "moran_mod:block/peach_branch_bud_g2_east"
+    },
+    "facing=west,dormant=false,fails=3,growth=2,topped=false": {
+      "model": "moran_mod:block/peach_branch_bud_g2_west"
+    },
+    "facing=up,dormant=false,fails=3,growth=2,topped=true": {
+      "model": "moran_mod:block/peach_branch_trunk_g2"
+    },
+    "facing=north,dormant=false,fails=3,growth=2,topped=true": {
+      "model": "moran_mod:block/peach_branch_bud_g2_north"
+    },
+    "facing=south,dormant=false,fails=3,growth=2,topped=true": {
+      "model": "moran_mod:block/peach_branch_bud_g2_south"
+    },
+    "facing=east,dormant=false,fails=3,growth=2,topped=true": {
+      "model": "moran_mod:block/peach_branch_bud_g2_east"
+    },
+    "facing=west,dormant=false,fails=3,growth=2,topped=true": {
+      "model": "moran_mod:block/peach_branch_bud_g2_west"
+    },
+    "facing=up,dormant=true,fails=3,growth=2,topped=false": {
+      "model": "moran_mod:block/peach_branch_trunk_g2"
+    },
+    "facing=north,dormant=true,fails=3,growth=2,topped=false": {
+      "model": "moran_mod:block/peach_branch_bud_g2_north"
+    },
+    "facing=south,dormant=true,fails=3,growth=2,topped=false": {
+      "model": "moran_mod:block/peach_branch_bud_g2_south"
+    },
+    "facing=east,dormant=true,fails=3,growth=2,topped=false": {
+      "model": "moran_mod:block/peach_branch_bud_g2_east"
+    },
+    "facing=west,dormant=true,fails=3,growth=2,topped=false": {
+      "model": "moran_mod:block/peach_branch_bud_g2_west"
+    },
+    "facing=up,dormant=true,fails=3,growth=2,topped=true": {
+      "model": "moran_mod:block/peach_branch_trunk_g2"
+    },
+    "facing=north,dormant=true,fails=3,growth=2,topped=true": {
+      "model": "moran_mod:block/peach_branch_bud_g2_north"
+    },
+    "facing=south,dormant=true,fails=3,growth=2,topped=true": {
+      "model": "moran_mod:block/peach_branch_bud_g2_south"
+    },
+    "facing=east,dormant=true,fails=3,growth=2,topped=true": {
+      "model": "moran_mod:block/peach_branch_bud_g2_east"
+    },
+    "facing=west,dormant=true,fails=3,growth=2,topped=true": {
+      "model": "moran_mod:block/peach_branch_bud_g2_west"
+    },
+    "facing=up,dormant=false,fails=0,growth=3,topped=false": {
       "model": "moran_mod:block/peach_branch_trunk_g3"
     },
-    "facing=north,dormant=false,fails=0,growth=3": {
+    "facing=north,dormant=false,fails=0,growth=3,topped=false": {
       "model": "moran_mod:block/peach_branch_bud_g3_north"
     },
-    "facing=south,dormant=false,fails=0,growth=3": {
+    "facing=south,dormant=false,fails=0,growth=3,topped=false": {
       "model": "moran_mod:block/peach_branch_bud_g3_south"
     },
-    "facing=east,dormant=false,fails=0,growth=3": {
+    "facing=east,dormant=false,fails=0,growth=3,topped=false": {
       "model": "moran_mod:block/peach_branch_bud_g3_east"
     },
-    "facing=west,dormant=false,fails=0,growth=3": {
+    "facing=west,dormant=false,fails=0,growth=3,topped=false": {
       "model": "moran_mod:block/peach_branch_bud_g3_west"
     },
-    "facing=up,dormant=true,fails=0,growth=3": {
+    "facing=up,dormant=false,fails=0,growth=3,topped=true": {
       "model": "moran_mod:block/peach_branch_trunk_g3"
     },
-    "facing=north,dormant=true,fails=0,growth=3": {
+    "facing=north,dormant=false,fails=0,growth=3,topped=true": {
       "model": "moran_mod:block/peach_branch_bud_g3_north"
     },
-    "facing=south,dormant=true,fails=0,growth=3": {
+    "facing=south,dormant=false,fails=0,growth=3,topped=true": {
       "model": "moran_mod:block/peach_branch_bud_g3_south"
     },
-    "facing=east,dormant=true,fails=0,growth=3": {
+    "facing=east,dormant=false,fails=0,growth=3,topped=true": {
       "model": "moran_mod:block/peach_branch_bud_g3_east"
     },
-    "facing=west,dormant=true,fails=0,growth=3": {
+    "facing=west,dormant=false,fails=0,growth=3,topped=true": {
       "model": "moran_mod:block/peach_branch_bud_g3_west"
     },
-    "facing=up,dormant=false,fails=1,growth=3": {
+    "facing=up,dormant=true,fails=0,growth=3,topped=false": {
       "model": "moran_mod:block/peach_branch_trunk_g3"
     },
-    "facing=north,dormant=false,fails=1,growth=3": {
+    "facing=north,dormant=true,fails=0,growth=3,topped=false": {
       "model": "moran_mod:block/peach_branch_bud_g3_north"
     },
-    "facing=south,dormant=false,fails=1,growth=3": {
+    "facing=south,dormant=true,fails=0,growth=3,topped=false": {
       "model": "moran_mod:block/peach_branch_bud_g3_south"
     },
-    "facing=east,dormant=false,fails=1,growth=3": {
+    "facing=east,dormant=true,fails=0,growth=3,topped=false": {
       "model": "moran_mod:block/peach_branch_bud_g3_east"
     },
-    "facing=west,dormant=false,fails=1,growth=3": {
+    "facing=west,dormant=true,fails=0,growth=3,topped=false": {
       "model": "moran_mod:block/peach_branch_bud_g3_west"
     },
-    "facing=up,dormant=true,fails=1,growth=3": {
+    "facing=up,dormant=true,fails=0,growth=3,topped=true": {
       "model": "moran_mod:block/peach_branch_trunk_g3"
     },
-    "facing=north,dormant=true,fails=1,growth=3": {
+    "facing=north,dormant=true,fails=0,growth=3,topped=true": {
       "model": "moran_mod:block/peach_branch_bud_g3_north"
     },
-    "facing=south,dormant=true,fails=1,growth=3": {
+    "facing=south,dormant=true,fails=0,growth=3,topped=true": {
       "model": "moran_mod:block/peach_branch_bud_g3_south"
     },
-    "facing=east,dormant=true,fails=1,growth=3": {
+    "facing=east,dormant=true,fails=0,growth=3,topped=true": {
       "model": "moran_mod:block/peach_branch_bud_g3_east"
     },
-    "facing=west,dormant=true,fails=1,growth=3": {
+    "facing=west,dormant=true,fails=0,growth=3,topped=true": {
       "model": "moran_mod:block/peach_branch_bud_g3_west"
     },
-    "facing=up,dormant=false,fails=2,growth=3": {
+    "facing=up,dormant=false,fails=1,growth=3,topped=false": {
       "model": "moran_mod:block/peach_branch_trunk_g3"
     },
-    "facing=north,dormant=false,fails=2,growth=3": {
+    "facing=north,dormant=false,fails=1,growth=3,topped=false": {
       "model": "moran_mod:block/peach_branch_bud_g3_north"
     },
-    "facing=south,dormant=false,fails=2,growth=3": {
+    "facing=south,dormant=false,fails=1,growth=3,topped=false": {
       "model": "moran_mod:block/peach_branch_bud_g3_south"
     },
-    "facing=east,dormant=false,fails=2,growth=3": {
+    "facing=east,dormant=false,fails=1,growth=3,topped=false": {
       "model": "moran_mod:block/peach_branch_bud_g3_east"
     },
-    "facing=west,dormant=false,fails=2,growth=3": {
+    "facing=west,dormant=false,fails=1,growth=3,topped=false": {
       "model": "moran_mod:block/peach_branch_bud_g3_west"
     },
-    "facing=up,dormant=true,fails=2,growth=3": {
+    "facing=up,dormant=false,fails=1,growth=3,topped=true": {
       "model": "moran_mod:block/peach_branch_trunk_g3"
     },
-    "facing=north,dormant=true,fails=2,growth=3": {
+    "facing=north,dormant=false,fails=1,growth=3,topped=true": {
       "model": "moran_mod:block/peach_branch_bud_g3_north"
     },
-    "facing=south,dormant=true,fails=2,growth=3": {
+    "facing=south,dormant=false,fails=1,growth=3,topped=true": {
       "model": "moran_mod:block/peach_branch_bud_g3_south"
     },
-    "facing=east,dormant=true,fails=2,growth=3": {
+    "facing=east,dormant=false,fails=1,growth=3,topped=true": {
       "model": "moran_mod:block/peach_branch_bud_g3_east"
     },
-    "facing=west,dormant=true,fails=2,growth=3": {
+    "facing=west,dormant=false,fails=1,growth=3,topped=true": {
       "model": "moran_mod:block/peach_branch_bud_g3_west"
     },
-    "facing=up,dormant=false,fails=3,growth=3": {
+    "facing=up,dormant=true,fails=1,growth=3,topped=false": {
       "model": "moran_mod:block/peach_branch_trunk_g3"
     },
-    "facing=north,dormant=false,fails=3,growth=3": {
+    "facing=north,dormant=true,fails=1,growth=3,topped=false": {
       "model": "moran_mod:block/peach_branch_bud_g3_north"
     },
-    "facing=south,dormant=false,fails=3,growth=3": {
+    "facing=south,dormant=true,fails=1,growth=3,topped=false": {
       "model": "moran_mod:block/peach_branch_bud_g3_south"
     },
-    "facing=east,dormant=false,fails=3,growth=3": {
+    "facing=east,dormant=true,fails=1,growth=3,topped=false": {
       "model": "moran_mod:block/peach_branch_bud_g3_east"
     },
-    "facing=west,dormant=false,fails=3,growth=3": {
+    "facing=west,dormant=true,fails=1,growth=3,topped=false": {
       "model": "moran_mod:block/peach_branch_bud_g3_west"
     },
-    "facing=up,dormant=true,fails=3,growth=3": {
+    "facing=up,dormant=true,fails=1,growth=3,topped=true": {
       "model": "moran_mod:block/peach_branch_trunk_g3"
     },
-    "facing=north,dormant=true,fails=3,growth=3": {
+    "facing=north,dormant=true,fails=1,growth=3,topped=true": {
       "model": "moran_mod:block/peach_branch_bud_g3_north"
     },
-    "facing=south,dormant=true,fails=3,growth=3": {
+    "facing=south,dormant=true,fails=1,growth=3,topped=true": {
       "model": "moran_mod:block/peach_branch_bud_g3_south"
     },
-    "facing=east,dormant=true,fails=3,growth=3": {
+    "facing=east,dormant=true,fails=1,growth=3,topped=true": {
       "model": "moran_mod:block/peach_branch_bud_g3_east"
     },
-    "facing=west,dormant=true,fails=3,growth=3": {
+    "facing=west,dormant=true,fails=1,growth=3,topped=true": {
       "model": "moran_mod:block/peach_branch_bud_g3_west"
     },
-    "facing=up,dormant=false,fails=0,growth=4": {
+    "facing=up,dormant=false,fails=2,growth=3,topped=false": {
+      "model": "moran_mod:block/peach_branch_trunk_g3"
+    },
+    "facing=north,dormant=false,fails=2,growth=3,topped=false": {
+      "model": "moran_mod:block/peach_branch_bud_g3_north"
+    },
+    "facing=south,dormant=false,fails=2,growth=3,topped=false": {
+      "model": "moran_mod:block/peach_branch_bud_g3_south"
+    },
+    "facing=east,dormant=false,fails=2,growth=3,topped=false": {
+      "model": "moran_mod:block/peach_branch_bud_g3_east"
+    },
+    "facing=west,dormant=false,fails=2,growth=3,topped=false": {
+      "model": "moran_mod:block/peach_branch_bud_g3_west"
+    },
+    "facing=up,dormant=false,fails=2,growth=3,topped=true": {
+      "model": "moran_mod:block/peach_branch_trunk_g3"
+    },
+    "facing=north,dormant=false,fails=2,growth=3,topped=true": {
+      "model": "moran_mod:block/peach_branch_bud_g3_north"
+    },
+    "facing=south,dormant=false,fails=2,growth=3,topped=true": {
+      "model": "moran_mod:block/peach_branch_bud_g3_south"
+    },
+    "facing=east,dormant=false,fails=2,growth=3,topped=true": {
+      "model": "moran_mod:block/peach_branch_bud_g3_east"
+    },
+    "facing=west,dormant=false,fails=2,growth=3,topped=true": {
+      "model": "moran_mod:block/peach_branch_bud_g3_west"
+    },
+    "facing=up,dormant=true,fails=2,growth=3,topped=false": {
+      "model": "moran_mod:block/peach_branch_trunk_g3"
+    },
+    "facing=north,dormant=true,fails=2,growth=3,topped=false": {
+      "model": "moran_mod:block/peach_branch_bud_g3_north"
+    },
+    "facing=south,dormant=true,fails=2,growth=3,topped=false": {
+      "model": "moran_mod:block/peach_branch_bud_g3_south"
+    },
+    "facing=east,dormant=true,fails=2,growth=3,topped=false": {
+      "model": "moran_mod:block/peach_branch_bud_g3_east"
+    },
+    "facing=west,dormant=true,fails=2,growth=3,topped=false": {
+      "model": "moran_mod:block/peach_branch_bud_g3_west"
+    },
+    "facing=up,dormant=true,fails=2,growth=3,topped=true": {
+      "model": "moran_mod:block/peach_branch_trunk_g3"
+    },
+    "facing=north,dormant=true,fails=2,growth=3,topped=true": {
+      "model": "moran_mod:block/peach_branch_bud_g3_north"
+    },
+    "facing=south,dormant=true,fails=2,growth=3,topped=true": {
+      "model": "moran_mod:block/peach_branch_bud_g3_south"
+    },
+    "facing=east,dormant=true,fails=2,growth=3,topped=true": {
+      "model": "moran_mod:block/peach_branch_bud_g3_east"
+    },
+    "facing=west,dormant=true,fails=2,growth=3,topped=true": {
+      "model": "moran_mod:block/peach_branch_bud_g3_west"
+    },
+    "facing=up,dormant=false,fails=3,growth=3,topped=false": {
+      "model": "moran_mod:block/peach_branch_trunk_g3"
+    },
+    "facing=north,dormant=false,fails=3,growth=3,topped=false": {
+      "model": "moran_mod:block/peach_branch_bud_g3_north"
+    },
+    "facing=south,dormant=false,fails=3,growth=3,topped=false": {
+      "model": "moran_mod:block/peach_branch_bud_g3_south"
+    },
+    "facing=east,dormant=false,fails=3,growth=3,topped=false": {
+      "model": "moran_mod:block/peach_branch_bud_g3_east"
+    },
+    "facing=west,dormant=false,fails=3,growth=3,topped=false": {
+      "model": "moran_mod:block/peach_branch_bud_g3_west"
+    },
+    "facing=up,dormant=false,fails=3,growth=3,topped=true": {
+      "model": "moran_mod:block/peach_branch_trunk_g3"
+    },
+    "facing=north,dormant=false,fails=3,growth=3,topped=true": {
+      "model": "moran_mod:block/peach_branch_bud_g3_north"
+    },
+    "facing=south,dormant=false,fails=3,growth=3,topped=true": {
+      "model": "moran_mod:block/peach_branch_bud_g3_south"
+    },
+    "facing=east,dormant=false,fails=3,growth=3,topped=true": {
+      "model": "moran_mod:block/peach_branch_bud_g3_east"
+    },
+    "facing=west,dormant=false,fails=3,growth=3,topped=true": {
+      "model": "moran_mod:block/peach_branch_bud_g3_west"
+    },
+    "facing=up,dormant=true,fails=3,growth=3,topped=false": {
+      "model": "moran_mod:block/peach_branch_trunk_g3"
+    },
+    "facing=north,dormant=true,fails=3,growth=3,topped=false": {
+      "model": "moran_mod:block/peach_branch_bud_g3_north"
+    },
+    "facing=south,dormant=true,fails=3,growth=3,topped=false": {
+      "model": "moran_mod:block/peach_branch_bud_g3_south"
+    },
+    "facing=east,dormant=true,fails=3,growth=3,topped=false": {
+      "model": "moran_mod:block/peach_branch_bud_g3_east"
+    },
+    "facing=west,dormant=true,fails=3,growth=3,topped=false": {
+      "model": "moran_mod:block/peach_branch_bud_g3_west"
+    },
+    "facing=up,dormant=true,fails=3,growth=3,topped=true": {
+      "model": "moran_mod:block/peach_branch_trunk_g3"
+    },
+    "facing=north,dormant=true,fails=3,growth=3,topped=true": {
+      "model": "moran_mod:block/peach_branch_bud_g3_north"
+    },
+    "facing=south,dormant=true,fails=3,growth=3,topped=true": {
+      "model": "moran_mod:block/peach_branch_bud_g3_south"
+    },
+    "facing=east,dormant=true,fails=3,growth=3,topped=true": {
+      "model": "moran_mod:block/peach_branch_bud_g3_east"
+    },
+    "facing=west,dormant=true,fails=3,growth=3,topped=true": {
+      "model": "moran_mod:block/peach_branch_bud_g3_west"
+    },
+    "facing=up,dormant=false,fails=0,growth=4,topped=false": {
       "model": "moran_mod:block/peach_branch_trunk_g4"
     },
-    "facing=north,dormant=false,fails=0,growth=4": {
+    "facing=north,dormant=false,fails=0,growth=4,topped=false": {
       "model": "moran_mod:block/peach_branch_bud_g4_north"
     },
-    "facing=south,dormant=false,fails=0,growth=4": {
+    "facing=south,dormant=false,fails=0,growth=4,topped=false": {
       "model": "moran_mod:block/peach_branch_bud_g4_south"
     },
-    "facing=east,dormant=false,fails=0,growth=4": {
+    "facing=east,dormant=false,fails=0,growth=4,topped=false": {
       "model": "moran_mod:block/peach_branch_bud_g4_east"
     },
-    "facing=west,dormant=false,fails=0,growth=4": {
+    "facing=west,dormant=false,fails=0,growth=4,topped=false": {
       "model": "moran_mod:block/peach_branch_bud_g4_west"
     },
-    "facing=up,dormant=true,fails=0,growth=4": {
+    "facing=up,dormant=false,fails=0,growth=4,topped=true": {
       "model": "moran_mod:block/peach_branch_trunk_g4"
     },
-    "facing=north,dormant=true,fails=0,growth=4": {
+    "facing=north,dormant=false,fails=0,growth=4,topped=true": {
       "model": "moran_mod:block/peach_branch_bud_g4_north"
     },
-    "facing=south,dormant=true,fails=0,growth=4": {
+    "facing=south,dormant=false,fails=0,growth=4,topped=true": {
       "model": "moran_mod:block/peach_branch_bud_g4_south"
     },
-    "facing=east,dormant=true,fails=0,growth=4": {
+    "facing=east,dormant=false,fails=0,growth=4,topped=true": {
       "model": "moran_mod:block/peach_branch_bud_g4_east"
     },
-    "facing=west,dormant=true,fails=0,growth=4": {
+    "facing=west,dormant=false,fails=0,growth=4,topped=true": {
       "model": "moran_mod:block/peach_branch_bud_g4_west"
     },
-    "facing=up,dormant=false,fails=1,growth=4": {
+    "facing=up,dormant=true,fails=0,growth=4,topped=false": {
       "model": "moran_mod:block/peach_branch_trunk_g4"
     },
-    "facing=north,dormant=false,fails=1,growth=4": {
+    "facing=north,dormant=true,fails=0,growth=4,topped=false": {
       "model": "moran_mod:block/peach_branch_bud_g4_north"
     },
-    "facing=south,dormant=false,fails=1,growth=4": {
+    "facing=south,dormant=true,fails=0,growth=4,topped=false": {
       "model": "moran_mod:block/peach_branch_bud_g4_south"
     },
-    "facing=east,dormant=false,fails=1,growth=4": {
+    "facing=east,dormant=true,fails=0,growth=4,topped=false": {
       "model": "moran_mod:block/peach_branch_bud_g4_east"
     },
-    "facing=west,dormant=false,fails=1,growth=4": {
+    "facing=west,dormant=true,fails=0,growth=4,topped=false": {
       "model": "moran_mod:block/peach_branch_bud_g4_west"
     },
-    "facing=up,dormant=true,fails=1,growth=4": {
+    "facing=up,dormant=true,fails=0,growth=4,topped=true": {
       "model": "moran_mod:block/peach_branch_trunk_g4"
     },
-    "facing=north,dormant=true,fails=1,growth=4": {
+    "facing=north,dormant=true,fails=0,growth=4,topped=true": {
       "model": "moran_mod:block/peach_branch_bud_g4_north"
     },
-    "facing=south,dormant=true,fails=1,growth=4": {
+    "facing=south,dormant=true,fails=0,growth=4,topped=true": {
       "model": "moran_mod:block/peach_branch_bud_g4_south"
     },
-    "facing=east,dormant=true,fails=1,growth=4": {
+    "facing=east,dormant=true,fails=0,growth=4,topped=true": {
       "model": "moran_mod:block/peach_branch_bud_g4_east"
     },
-    "facing=west,dormant=true,fails=1,growth=4": {
+    "facing=west,dormant=true,fails=0,growth=4,topped=true": {
       "model": "moran_mod:block/peach_branch_bud_g4_west"
     },
-    "facing=up,dormant=false,fails=2,growth=4": {
+    "facing=up,dormant=false,fails=1,growth=4,topped=false": {
       "model": "moran_mod:block/peach_branch_trunk_g4"
     },
-    "facing=north,dormant=false,fails=2,growth=4": {
+    "facing=north,dormant=false,fails=1,growth=4,topped=false": {
       "model": "moran_mod:block/peach_branch_bud_g4_north"
     },
-    "facing=south,dormant=false,fails=2,growth=4": {
+    "facing=south,dormant=false,fails=1,growth=4,topped=false": {
       "model": "moran_mod:block/peach_branch_bud_g4_south"
     },
-    "facing=east,dormant=false,fails=2,growth=4": {
+    "facing=east,dormant=false,fails=1,growth=4,topped=false": {
       "model": "moran_mod:block/peach_branch_bud_g4_east"
     },
-    "facing=west,dormant=false,fails=2,growth=4": {
+    "facing=west,dormant=false,fails=1,growth=4,topped=false": {
       "model": "moran_mod:block/peach_branch_bud_g4_west"
     },
-    "facing=up,dormant=true,fails=2,growth=4": {
+    "facing=up,dormant=false,fails=1,growth=4,topped=true": {
       "model": "moran_mod:block/peach_branch_trunk_g4"
     },
-    "facing=north,dormant=true,fails=2,growth=4": {
+    "facing=north,dormant=false,fails=1,growth=4,topped=true": {
       "model": "moran_mod:block/peach_branch_bud_g4_north"
     },
-    "facing=south,dormant=true,fails=2,growth=4": {
+    "facing=south,dormant=false,fails=1,growth=4,topped=true": {
       "model": "moran_mod:block/peach_branch_bud_g4_south"
     },
-    "facing=east,dormant=true,fails=2,growth=4": {
+    "facing=east,dormant=false,fails=1,growth=4,topped=true": {
       "model": "moran_mod:block/peach_branch_bud_g4_east"
     },
-    "facing=west,dormant=true,fails=2,growth=4": {
+    "facing=west,dormant=false,fails=1,growth=4,topped=true": {
       "model": "moran_mod:block/peach_branch_bud_g4_west"
     },
-    "facing=up,dormant=false,fails=3,growth=4": {
+    "facing=up,dormant=true,fails=1,growth=4,topped=false": {
       "model": "moran_mod:block/peach_branch_trunk_g4"
     },
-    "facing=north,dormant=false,fails=3,growth=4": {
+    "facing=north,dormant=true,fails=1,growth=4,topped=false": {
       "model": "moran_mod:block/peach_branch_bud_g4_north"
     },
-    "facing=south,dormant=false,fails=3,growth=4": {
+    "facing=south,dormant=true,fails=1,growth=4,topped=false": {
       "model": "moran_mod:block/peach_branch_bud_g4_south"
     },
-    "facing=east,dormant=false,fails=3,growth=4": {
+    "facing=east,dormant=true,fails=1,growth=4,topped=false": {
       "model": "moran_mod:block/peach_branch_bud_g4_east"
     },
-    "facing=west,dormant=false,fails=3,growth=4": {
+    "facing=west,dormant=true,fails=1,growth=4,topped=false": {
       "model": "moran_mod:block/peach_branch_bud_g4_west"
     },
-    "facing=up,dormant=true,fails=3,growth=4": {
+    "facing=up,dormant=true,fails=1,growth=4,topped=true": {
       "model": "moran_mod:block/peach_branch_trunk_g4"
     },
-    "facing=north,dormant=true,fails=3,growth=4": {
+    "facing=north,dormant=true,fails=1,growth=4,topped=true": {
       "model": "moran_mod:block/peach_branch_bud_g4_north"
     },
-    "facing=south,dormant=true,fails=3,growth=4": {
+    "facing=south,dormant=true,fails=1,growth=4,topped=true": {
       "model": "moran_mod:block/peach_branch_bud_g4_south"
     },
-    "facing=east,dormant=true,fails=3,growth=4": {
+    "facing=east,dormant=true,fails=1,growth=4,topped=true": {
       "model": "moran_mod:block/peach_branch_bud_g4_east"
     },
-    "facing=west,dormant=true,fails=3,growth=4": {
+    "facing=west,dormant=true,fails=1,growth=4,topped=true": {
       "model": "moran_mod:block/peach_branch_bud_g4_west"
     },
-    "facing=up,dormant=false,fails=0,growth=5": {
+    "facing=up,dormant=false,fails=2,growth=4,topped=false": {
+      "model": "moran_mod:block/peach_branch_trunk_g4"
+    },
+    "facing=north,dormant=false,fails=2,growth=4,topped=false": {
+      "model": "moran_mod:block/peach_branch_bud_g4_north"
+    },
+    "facing=south,dormant=false,fails=2,growth=4,topped=false": {
+      "model": "moran_mod:block/peach_branch_bud_g4_south"
+    },
+    "facing=east,dormant=false,fails=2,growth=4,topped=false": {
+      "model": "moran_mod:block/peach_branch_bud_g4_east"
+    },
+    "facing=west,dormant=false,fails=2,growth=4,topped=false": {
+      "model": "moran_mod:block/peach_branch_bud_g4_west"
+    },
+    "facing=up,dormant=false,fails=2,growth=4,topped=true": {
+      "model": "moran_mod:block/peach_branch_trunk_g4"
+    },
+    "facing=north,dormant=false,fails=2,growth=4,topped=true": {
+      "model": "moran_mod:block/peach_branch_bud_g4_north"
+    },
+    "facing=south,dormant=false,fails=2,growth=4,topped=true": {
+      "model": "moran_mod:block/peach_branch_bud_g4_south"
+    },
+    "facing=east,dormant=false,fails=2,growth=4,topped=true": {
+      "model": "moran_mod:block/peach_branch_bud_g4_east"
+    },
+    "facing=west,dormant=false,fails=2,growth=4,topped=true": {
+      "model": "moran_mod:block/peach_branch_bud_g4_west"
+    },
+    "facing=up,dormant=true,fails=2,growth=4,topped=false": {
+      "model": "moran_mod:block/peach_branch_trunk_g4"
+    },
+    "facing=north,dormant=true,fails=2,growth=4,topped=false": {
+      "model": "moran_mod:block/peach_branch_bud_g4_north"
+    },
+    "facing=south,dormant=true,fails=2,growth=4,topped=false": {
+      "model": "moran_mod:block/peach_branch_bud_g4_south"
+    },
+    "facing=east,dormant=true,fails=2,growth=4,topped=false": {
+      "model": "moran_mod:block/peach_branch_bud_g4_east"
+    },
+    "facing=west,dormant=true,fails=2,growth=4,topped=false": {
+      "model": "moran_mod:block/peach_branch_bud_g4_west"
+    },
+    "facing=up,dormant=true,fails=2,growth=4,topped=true": {
+      "model": "moran_mod:block/peach_branch_trunk_g4"
+    },
+    "facing=north,dormant=true,fails=2,growth=4,topped=true": {
+      "model": "moran_mod:block/peach_branch_bud_g4_north"
+    },
+    "facing=south,dormant=true,fails=2,growth=4,topped=true": {
+      "model": "moran_mod:block/peach_branch_bud_g4_south"
+    },
+    "facing=east,dormant=true,fails=2,growth=4,topped=true": {
+      "model": "moran_mod:block/peach_branch_bud_g4_east"
+    },
+    "facing=west,dormant=true,fails=2,growth=4,topped=true": {
+      "model": "moran_mod:block/peach_branch_bud_g4_west"
+    },
+    "facing=up,dormant=false,fails=3,growth=4,topped=false": {
+      "model": "moran_mod:block/peach_branch_trunk_g4"
+    },
+    "facing=north,dormant=false,fails=3,growth=4,topped=false": {
+      "model": "moran_mod:block/peach_branch_bud_g4_north"
+    },
+    "facing=south,dormant=false,fails=3,growth=4,topped=false": {
+      "model": "moran_mod:block/peach_branch_bud_g4_south"
+    },
+    "facing=east,dormant=false,fails=3,growth=4,topped=false": {
+      "model": "moran_mod:block/peach_branch_bud_g4_east"
+    },
+    "facing=west,dormant=false,fails=3,growth=4,topped=false": {
+      "model": "moran_mod:block/peach_branch_bud_g4_west"
+    },
+    "facing=up,dormant=false,fails=3,growth=4,topped=true": {
+      "model": "moran_mod:block/peach_branch_trunk_g4"
+    },
+    "facing=north,dormant=false,fails=3,growth=4,topped=true": {
+      "model": "moran_mod:block/peach_branch_bud_g4_north"
+    },
+    "facing=south,dormant=false,fails=3,growth=4,topped=true": {
+      "model": "moran_mod:block/peach_branch_bud_g4_south"
+    },
+    "facing=east,dormant=false,fails=3,growth=4,topped=true": {
+      "model": "moran_mod:block/peach_branch_bud_g4_east"
+    },
+    "facing=west,dormant=false,fails=3,growth=4,topped=true": {
+      "model": "moran_mod:block/peach_branch_bud_g4_west"
+    },
+    "facing=up,dormant=true,fails=3,growth=4,topped=false": {
+      "model": "moran_mod:block/peach_branch_trunk_g4"
+    },
+    "facing=north,dormant=true,fails=3,growth=4,topped=false": {
+      "model": "moran_mod:block/peach_branch_bud_g4_north"
+    },
+    "facing=south,dormant=true,fails=3,growth=4,topped=false": {
+      "model": "moran_mod:block/peach_branch_bud_g4_south"
+    },
+    "facing=east,dormant=true,fails=3,growth=4,topped=false": {
+      "model": "moran_mod:block/peach_branch_bud_g4_east"
+    },
+    "facing=west,dormant=true,fails=3,growth=4,topped=false": {
+      "model": "moran_mod:block/peach_branch_bud_g4_west"
+    },
+    "facing=up,dormant=true,fails=3,growth=4,topped=true": {
+      "model": "moran_mod:block/peach_branch_trunk_g4"
+    },
+    "facing=north,dormant=true,fails=3,growth=4,topped=true": {
+      "model": "moran_mod:block/peach_branch_bud_g4_north"
+    },
+    "facing=south,dormant=true,fails=3,growth=4,topped=true": {
+      "model": "moran_mod:block/peach_branch_bud_g4_south"
+    },
+    "facing=east,dormant=true,fails=3,growth=4,topped=true": {
+      "model": "moran_mod:block/peach_branch_bud_g4_east"
+    },
+    "facing=west,dormant=true,fails=3,growth=4,topped=true": {
+      "model": "moran_mod:block/peach_branch_bud_g4_west"
+    },
+    "facing=up,dormant=false,fails=0,growth=5,topped=false": {
       "model": "moran_mod:block/peach_branch_trunk_g5"
     },
-    "facing=north,dormant=false,fails=0,growth=5": {
+    "facing=north,dormant=false,fails=0,growth=5,topped=false": {
       "model": "moran_mod:block/peach_branch_bud_g5_north"
     },
-    "facing=south,dormant=false,fails=0,growth=5": {
+    "facing=south,dormant=false,fails=0,growth=5,topped=false": {
       "model": "moran_mod:block/peach_branch_bud_g5_south"
     },
-    "facing=east,dormant=false,fails=0,growth=5": {
+    "facing=east,dormant=false,fails=0,growth=5,topped=false": {
       "model": "moran_mod:block/peach_branch_bud_g5_east"
     },
-    "facing=west,dormant=false,fails=0,growth=5": {
+    "facing=west,dormant=false,fails=0,growth=5,topped=false": {
       "model": "moran_mod:block/peach_branch_bud_g5_west"
     },
-    "facing=up,dormant=true,fails=0,growth=5": {
+    "facing=up,dormant=false,fails=0,growth=5,topped=true": {
       "model": "moran_mod:block/peach_branch_trunk_g5"
     },
-    "facing=north,dormant=true,fails=0,growth=5": {
+    "facing=north,dormant=false,fails=0,growth=5,topped=true": {
       "model": "moran_mod:block/peach_branch_bud_g5_north"
     },
-    "facing=south,dormant=true,fails=0,growth=5": {
+    "facing=south,dormant=false,fails=0,growth=5,topped=true": {
       "model": "moran_mod:block/peach_branch_bud_g5_south"
     },
-    "facing=east,dormant=true,fails=0,growth=5": {
+    "facing=east,dormant=false,fails=0,growth=5,topped=true": {
       "model": "moran_mod:block/peach_branch_bud_g5_east"
     },
-    "facing=west,dormant=true,fails=0,growth=5": {
+    "facing=west,dormant=false,fails=0,growth=5,topped=true": {
       "model": "moran_mod:block/peach_branch_bud_g5_west"
     },
-    "facing=up,dormant=false,fails=1,growth=5": {
+    "facing=up,dormant=true,fails=0,growth=5,topped=false": {
       "model": "moran_mod:block/peach_branch_trunk_g5"
     },
-    "facing=north,dormant=false,fails=1,growth=5": {
+    "facing=north,dormant=true,fails=0,growth=5,topped=false": {
       "model": "moran_mod:block/peach_branch_bud_g5_north"
     },
-    "facing=south,dormant=false,fails=1,growth=5": {
+    "facing=south,dormant=true,fails=0,growth=5,topped=false": {
       "model": "moran_mod:block/peach_branch_bud_g5_south"
     },
-    "facing=east,dormant=false,fails=1,growth=5": {
+    "facing=east,dormant=true,fails=0,growth=5,topped=false": {
       "model": "moran_mod:block/peach_branch_bud_g5_east"
     },
-    "facing=west,dormant=false,fails=1,growth=5": {
+    "facing=west,dormant=true,fails=0,growth=5,topped=false": {
       "model": "moran_mod:block/peach_branch_bud_g5_west"
     },
-    "facing=up,dormant=true,fails=1,growth=5": {
+    "facing=up,dormant=true,fails=0,growth=5,topped=true": {
       "model": "moran_mod:block/peach_branch_trunk_g5"
     },
-    "facing=north,dormant=true,fails=1,growth=5": {
+    "facing=north,dormant=true,fails=0,growth=5,topped=true": {
       "model": "moran_mod:block/peach_branch_bud_g5_north"
     },
-    "facing=south,dormant=true,fails=1,growth=5": {
+    "facing=south,dormant=true,fails=0,growth=5,topped=true": {
       "model": "moran_mod:block/peach_branch_bud_g5_south"
     },
-    "facing=east,dormant=true,fails=1,growth=5": {
+    "facing=east,dormant=true,fails=0,growth=5,topped=true": {
       "model": "moran_mod:block/peach_branch_bud_g5_east"
     },
-    "facing=west,dormant=true,fails=1,growth=5": {
+    "facing=west,dormant=true,fails=0,growth=5,topped=true": {
       "model": "moran_mod:block/peach_branch_bud_g5_west"
     },
-    "facing=up,dormant=false,fails=2,growth=5": {
+    "facing=up,dormant=false,fails=1,growth=5,topped=false": {
       "model": "moran_mod:block/peach_branch_trunk_g5"
     },
-    "facing=north,dormant=false,fails=2,growth=5": {
+    "facing=north,dormant=false,fails=1,growth=5,topped=false": {
       "model": "moran_mod:block/peach_branch_bud_g5_north"
     },
-    "facing=south,dormant=false,fails=2,growth=5": {
+    "facing=south,dormant=false,fails=1,growth=5,topped=false": {
       "model": "moran_mod:block/peach_branch_bud_g5_south"
     },
-    "facing=east,dormant=false,fails=2,growth=5": {
+    "facing=east,dormant=false,fails=1,growth=5,topped=false": {
       "model": "moran_mod:block/peach_branch_bud_g5_east"
     },
-    "facing=west,dormant=false,fails=2,growth=5": {
+    "facing=west,dormant=false,fails=1,growth=5,topped=false": {
       "model": "moran_mod:block/peach_branch_bud_g5_west"
     },
-    "facing=up,dormant=true,fails=2,growth=5": {
+    "facing=up,dormant=false,fails=1,growth=5,topped=true": {
       "model": "moran_mod:block/peach_branch_trunk_g5"
     },
-    "facing=north,dormant=true,fails=2,growth=5": {
+    "facing=north,dormant=false,fails=1,growth=5,topped=true": {
       "model": "moran_mod:block/peach_branch_bud_g5_north"
     },
-    "facing=south,dormant=true,fails=2,growth=5": {
+    "facing=south,dormant=false,fails=1,growth=5,topped=true": {
       "model": "moran_mod:block/peach_branch_bud_g5_south"
     },
-    "facing=east,dormant=true,fails=2,growth=5": {
+    "facing=east,dormant=false,fails=1,growth=5,topped=true": {
       "model": "moran_mod:block/peach_branch_bud_g5_east"
     },
-    "facing=west,dormant=true,fails=2,growth=5": {
+    "facing=west,dormant=false,fails=1,growth=5,topped=true": {
       "model": "moran_mod:block/peach_branch_bud_g5_west"
     },
-    "facing=up,dormant=false,fails=3,growth=5": {
+    "facing=up,dormant=true,fails=1,growth=5,topped=false": {
       "model": "moran_mod:block/peach_branch_trunk_g5"
     },
-    "facing=north,dormant=false,fails=3,growth=5": {
+    "facing=north,dormant=true,fails=1,growth=5,topped=false": {
       "model": "moran_mod:block/peach_branch_bud_g5_north"
     },
-    "facing=south,dormant=false,fails=3,growth=5": {
+    "facing=south,dormant=true,fails=1,growth=5,topped=false": {
       "model": "moran_mod:block/peach_branch_bud_g5_south"
     },
-    "facing=east,dormant=false,fails=3,growth=5": {
+    "facing=east,dormant=true,fails=1,growth=5,topped=false": {
       "model": "moran_mod:block/peach_branch_bud_g5_east"
     },
-    "facing=west,dormant=false,fails=3,growth=5": {
+    "facing=west,dormant=true,fails=1,growth=5,topped=false": {
       "model": "moran_mod:block/peach_branch_bud_g5_west"
     },
-    "facing=up,dormant=true,fails=3,growth=5": {
+    "facing=up,dormant=true,fails=1,growth=5,topped=true": {
       "model": "moran_mod:block/peach_branch_trunk_g5"
     },
-    "facing=north,dormant=true,fails=3,growth=5": {
+    "facing=north,dormant=true,fails=1,growth=5,topped=true": {
       "model": "moran_mod:block/peach_branch_bud_g5_north"
     },
-    "facing=south,dormant=true,fails=3,growth=5": {
+    "facing=south,dormant=true,fails=1,growth=5,topped=true": {
       "model": "moran_mod:block/peach_branch_bud_g5_south"
     },
-    "facing=east,dormant=true,fails=3,growth=5": {
+    "facing=east,dormant=true,fails=1,growth=5,topped=true": {
       "model": "moran_mod:block/peach_branch_bud_g5_east"
     },
-    "facing=west,dormant=true,fails=3,growth=5": {
+    "facing=west,dormant=true,fails=1,growth=5,topped=true": {
       "model": "moran_mod:block/peach_branch_bud_g5_west"
     },
-    "facing=up,dormant=false,fails=0,growth=6": {
+    "facing=up,dormant=false,fails=2,growth=5,topped=false": {
+      "model": "moran_mod:block/peach_branch_trunk_g5"
+    },
+    "facing=north,dormant=false,fails=2,growth=5,topped=false": {
+      "model": "moran_mod:block/peach_branch_bud_g5_north"
+    },
+    "facing=south,dormant=false,fails=2,growth=5,topped=false": {
+      "model": "moran_mod:block/peach_branch_bud_g5_south"
+    },
+    "facing=east,dormant=false,fails=2,growth=5,topped=false": {
+      "model": "moran_mod:block/peach_branch_bud_g5_east"
+    },
+    "facing=west,dormant=false,fails=2,growth=5,topped=false": {
+      "model": "moran_mod:block/peach_branch_bud_g5_west"
+    },
+    "facing=up,dormant=false,fails=2,growth=5,topped=true": {
+      "model": "moran_mod:block/peach_branch_trunk_g5"
+    },
+    "facing=north,dormant=false,fails=2,growth=5,topped=true": {
+      "model": "moran_mod:block/peach_branch_bud_g5_north"
+    },
+    "facing=south,dormant=false,fails=2,growth=5,topped=true": {
+      "model": "moran_mod:block/peach_branch_bud_g5_south"
+    },
+    "facing=east,dormant=false,fails=2,growth=5,topped=true": {
+      "model": "moran_mod:block/peach_branch_bud_g5_east"
+    },
+    "facing=west,dormant=false,fails=2,growth=5,topped=true": {
+      "model": "moran_mod:block/peach_branch_bud_g5_west"
+    },
+    "facing=up,dormant=true,fails=2,growth=5,topped=false": {
+      "model": "moran_mod:block/peach_branch_trunk_g5"
+    },
+    "facing=north,dormant=true,fails=2,growth=5,topped=false": {
+      "model": "moran_mod:block/peach_branch_bud_g5_north"
+    },
+    "facing=south,dormant=true,fails=2,growth=5,topped=false": {
+      "model": "moran_mod:block/peach_branch_bud_g5_south"
+    },
+    "facing=east,dormant=true,fails=2,growth=5,topped=false": {
+      "model": "moran_mod:block/peach_branch_bud_g5_east"
+    },
+    "facing=west,dormant=true,fails=2,growth=5,topped=false": {
+      "model": "moran_mod:block/peach_branch_bud_g5_west"
+    },
+    "facing=up,dormant=true,fails=2,growth=5,topped=true": {
+      "model": "moran_mod:block/peach_branch_trunk_g5"
+    },
+    "facing=north,dormant=true,fails=2,growth=5,topped=true": {
+      "model": "moran_mod:block/peach_branch_bud_g5_north"
+    },
+    "facing=south,dormant=true,fails=2,growth=5,topped=true": {
+      "model": "moran_mod:block/peach_branch_bud_g5_south"
+    },
+    "facing=east,dormant=true,fails=2,growth=5,topped=true": {
+      "model": "moran_mod:block/peach_branch_bud_g5_east"
+    },
+    "facing=west,dormant=true,fails=2,growth=5,topped=true": {
+      "model": "moran_mod:block/peach_branch_bud_g5_west"
+    },
+    "facing=up,dormant=false,fails=3,growth=5,topped=false": {
+      "model": "moran_mod:block/peach_branch_trunk_g5"
+    },
+    "facing=north,dormant=false,fails=3,growth=5,topped=false": {
+      "model": "moran_mod:block/peach_branch_bud_g5_north"
+    },
+    "facing=south,dormant=false,fails=3,growth=5,topped=false": {
+      "model": "moran_mod:block/peach_branch_bud_g5_south"
+    },
+    "facing=east,dormant=false,fails=3,growth=5,topped=false": {
+      "model": "moran_mod:block/peach_branch_bud_g5_east"
+    },
+    "facing=west,dormant=false,fails=3,growth=5,topped=false": {
+      "model": "moran_mod:block/peach_branch_bud_g5_west"
+    },
+    "facing=up,dormant=false,fails=3,growth=5,topped=true": {
+      "model": "moran_mod:block/peach_branch_trunk_g5"
+    },
+    "facing=north,dormant=false,fails=3,growth=5,topped=true": {
+      "model": "moran_mod:block/peach_branch_bud_g5_north"
+    },
+    "facing=south,dormant=false,fails=3,growth=5,topped=true": {
+      "model": "moran_mod:block/peach_branch_bud_g5_south"
+    },
+    "facing=east,dormant=false,fails=3,growth=5,topped=true": {
+      "model": "moran_mod:block/peach_branch_bud_g5_east"
+    },
+    "facing=west,dormant=false,fails=3,growth=5,topped=true": {
+      "model": "moran_mod:block/peach_branch_bud_g5_west"
+    },
+    "facing=up,dormant=true,fails=3,growth=5,topped=false": {
+      "model": "moran_mod:block/peach_branch_trunk_g5"
+    },
+    "facing=north,dormant=true,fails=3,growth=5,topped=false": {
+      "model": "moran_mod:block/peach_branch_bud_g5_north"
+    },
+    "facing=south,dormant=true,fails=3,growth=5,topped=false": {
+      "model": "moran_mod:block/peach_branch_bud_g5_south"
+    },
+    "facing=east,dormant=true,fails=3,growth=5,topped=false": {
+      "model": "moran_mod:block/peach_branch_bud_g5_east"
+    },
+    "facing=west,dormant=true,fails=3,growth=5,topped=false": {
+      "model": "moran_mod:block/peach_branch_bud_g5_west"
+    },
+    "facing=up,dormant=true,fails=3,growth=5,topped=true": {
+      "model": "moran_mod:block/peach_branch_trunk_g5"
+    },
+    "facing=north,dormant=true,fails=3,growth=5,topped=true": {
+      "model": "moran_mod:block/peach_branch_bud_g5_north"
+    },
+    "facing=south,dormant=true,fails=3,growth=5,topped=true": {
+      "model": "moran_mod:block/peach_branch_bud_g5_south"
+    },
+    "facing=east,dormant=true,fails=3,growth=5,topped=true": {
+      "model": "moran_mod:block/peach_branch_bud_g5_east"
+    },
+    "facing=west,dormant=true,fails=3,growth=5,topped=true": {
+      "model": "moran_mod:block/peach_branch_bud_g5_west"
+    },
+    "facing=up,dormant=false,fails=0,growth=6,topped=false": {
       "model": "moran_mod:block/peach_branch_trunk_g6"
     },
-    "facing=north,dormant=false,fails=0,growth=6": {
+    "facing=north,dormant=false,fails=0,growth=6,topped=false": {
       "model": "moran_mod:block/peach_branch_bud_g6_north"
     },
-    "facing=south,dormant=false,fails=0,growth=6": {
+    "facing=south,dormant=false,fails=0,growth=6,topped=false": {
       "model": "moran_mod:block/peach_branch_bud_g6_south"
     },
-    "facing=east,dormant=false,fails=0,growth=6": {
+    "facing=east,dormant=false,fails=0,growth=6,topped=false": {
       "model": "moran_mod:block/peach_branch_bud_g6_east"
     },
-    "facing=west,dormant=false,fails=0,growth=6": {
+    "facing=west,dormant=false,fails=0,growth=6,topped=false": {
       "model": "moran_mod:block/peach_branch_bud_g6_west"
     },
-    "facing=up,dormant=true,fails=0,growth=6": {
+    "facing=up,dormant=false,fails=0,growth=6,topped=true": {
       "model": "moran_mod:block/peach_branch_trunk_g6"
     },
-    "facing=north,dormant=true,fails=0,growth=6": {
+    "facing=north,dormant=false,fails=0,growth=6,topped=true": {
       "model": "moran_mod:block/peach_branch_bud_g6_north"
     },
-    "facing=south,dormant=true,fails=0,growth=6": {
+    "facing=south,dormant=false,fails=0,growth=6,topped=true": {
       "model": "moran_mod:block/peach_branch_bud_g6_south"
     },
-    "facing=east,dormant=true,fails=0,growth=6": {
+    "facing=east,dormant=false,fails=0,growth=6,topped=true": {
       "model": "moran_mod:block/peach_branch_bud_g6_east"
     },
-    "facing=west,dormant=true,fails=0,growth=6": {
+    "facing=west,dormant=false,fails=0,growth=6,topped=true": {
       "model": "moran_mod:block/peach_branch_bud_g6_west"
     },
-    "facing=up,dormant=false,fails=1,growth=6": {
+    "facing=up,dormant=true,fails=0,growth=6,topped=false": {
       "model": "moran_mod:block/peach_branch_trunk_g6"
     },
-    "facing=north,dormant=false,fails=1,growth=6": {
+    "facing=north,dormant=true,fails=0,growth=6,topped=false": {
       "model": "moran_mod:block/peach_branch_bud_g6_north"
     },
-    "facing=south,dormant=false,fails=1,growth=6": {
+    "facing=south,dormant=true,fails=0,growth=6,topped=false": {
       "model": "moran_mod:block/peach_branch_bud_g6_south"
     },
-    "facing=east,dormant=false,fails=1,growth=6": {
+    "facing=east,dormant=true,fails=0,growth=6,topped=false": {
       "model": "moran_mod:block/peach_branch_bud_g6_east"
     },
-    "facing=west,dormant=false,fails=1,growth=6": {
+    "facing=west,dormant=true,fails=0,growth=6,topped=false": {
       "model": "moran_mod:block/peach_branch_bud_g6_west"
     },
-    "facing=up,dormant=true,fails=1,growth=6": {
+    "facing=up,dormant=true,fails=0,growth=6,topped=true": {
       "model": "moran_mod:block/peach_branch_trunk_g6"
     },
-    "facing=north,dormant=true,fails=1,growth=6": {
+    "facing=north,dormant=true,fails=0,growth=6,topped=true": {
       "model": "moran_mod:block/peach_branch_bud_g6_north"
     },
-    "facing=south,dormant=true,fails=1,growth=6": {
+    "facing=south,dormant=true,fails=0,growth=6,topped=true": {
       "model": "moran_mod:block/peach_branch_bud_g6_south"
     },
-    "facing=east,dormant=true,fails=1,growth=6": {
+    "facing=east,dormant=true,fails=0,growth=6,topped=true": {
       "model": "moran_mod:block/peach_branch_bud_g6_east"
     },
-    "facing=west,dormant=true,fails=1,growth=6": {
+    "facing=west,dormant=true,fails=0,growth=6,topped=true": {
       "model": "moran_mod:block/peach_branch_bud_g6_west"
     },
-    "facing=up,dormant=false,fails=2,growth=6": {
+    "facing=up,dormant=false,fails=1,growth=6,topped=false": {
       "model": "moran_mod:block/peach_branch_trunk_g6"
     },
-    "facing=north,dormant=false,fails=2,growth=6": {
+    "facing=north,dormant=false,fails=1,growth=6,topped=false": {
       "model": "moran_mod:block/peach_branch_bud_g6_north"
     },
-    "facing=south,dormant=false,fails=2,growth=6": {
+    "facing=south,dormant=false,fails=1,growth=6,topped=false": {
       "model": "moran_mod:block/peach_branch_bud_g6_south"
     },
-    "facing=east,dormant=false,fails=2,growth=6": {
+    "facing=east,dormant=false,fails=1,growth=6,topped=false": {
       "model": "moran_mod:block/peach_branch_bud_g6_east"
     },
-    "facing=west,dormant=false,fails=2,growth=6": {
+    "facing=west,dormant=false,fails=1,growth=6,topped=false": {
       "model": "moran_mod:block/peach_branch_bud_g6_west"
     },
-    "facing=up,dormant=true,fails=2,growth=6": {
+    "facing=up,dormant=false,fails=1,growth=6,topped=true": {
       "model": "moran_mod:block/peach_branch_trunk_g6"
     },
-    "facing=north,dormant=true,fails=2,growth=6": {
+    "facing=north,dormant=false,fails=1,growth=6,topped=true": {
       "model": "moran_mod:block/peach_branch_bud_g6_north"
     },
-    "facing=south,dormant=true,fails=2,growth=6": {
+    "facing=south,dormant=false,fails=1,growth=6,topped=true": {
       "model": "moran_mod:block/peach_branch_bud_g6_south"
     },
-    "facing=east,dormant=true,fails=2,growth=6": {
+    "facing=east,dormant=false,fails=1,growth=6,topped=true": {
       "model": "moran_mod:block/peach_branch_bud_g6_east"
     },
-    "facing=west,dormant=true,fails=2,growth=6": {
+    "facing=west,dormant=false,fails=1,growth=6,topped=true": {
       "model": "moran_mod:block/peach_branch_bud_g6_west"
     },
-    "facing=up,dormant=false,fails=3,growth=6": {
+    "facing=up,dormant=true,fails=1,growth=6,topped=false": {
       "model": "moran_mod:block/peach_branch_trunk_g6"
     },
-    "facing=north,dormant=false,fails=3,growth=6": {
+    "facing=north,dormant=true,fails=1,growth=6,topped=false": {
       "model": "moran_mod:block/peach_branch_bud_g6_north"
     },
-    "facing=south,dormant=false,fails=3,growth=6": {
+    "facing=south,dormant=true,fails=1,growth=6,topped=false": {
       "model": "moran_mod:block/peach_branch_bud_g6_south"
     },
-    "facing=east,dormant=false,fails=3,growth=6": {
+    "facing=east,dormant=true,fails=1,growth=6,topped=false": {
       "model": "moran_mod:block/peach_branch_bud_g6_east"
     },
-    "facing=west,dormant=false,fails=3,growth=6": {
+    "facing=west,dormant=true,fails=1,growth=6,topped=false": {
       "model": "moran_mod:block/peach_branch_bud_g6_west"
     },
-    "facing=up,dormant=true,fails=3,growth=6": {
+    "facing=up,dormant=true,fails=1,growth=6,topped=true": {
       "model": "moran_mod:block/peach_branch_trunk_g6"
     },
-    "facing=north,dormant=true,fails=3,growth=6": {
+    "facing=north,dormant=true,fails=1,growth=6,topped=true": {
       "model": "moran_mod:block/peach_branch_bud_g6_north"
     },
-    "facing=south,dormant=true,fails=3,growth=6": {
+    "facing=south,dormant=true,fails=1,growth=6,topped=true": {
       "model": "moran_mod:block/peach_branch_bud_g6_south"
     },
-    "facing=east,dormant=true,fails=3,growth=6": {
+    "facing=east,dormant=true,fails=1,growth=6,topped=true": {
       "model": "moran_mod:block/peach_branch_bud_g6_east"
     },
-    "facing=west,dormant=true,fails=3,growth=6": {
+    "facing=west,dormant=true,fails=1,growth=6,topped=true": {
       "model": "moran_mod:block/peach_branch_bud_g6_west"
     },
-    "facing=up,dormant=false,fails=0,growth=7": {
+    "facing=up,dormant=false,fails=2,growth=6,topped=false": {
+      "model": "moran_mod:block/peach_branch_trunk_g6"
+    },
+    "facing=north,dormant=false,fails=2,growth=6,topped=false": {
+      "model": "moran_mod:block/peach_branch_bud_g6_north"
+    },
+    "facing=south,dormant=false,fails=2,growth=6,topped=false": {
+      "model": "moran_mod:block/peach_branch_bud_g6_south"
+    },
+    "facing=east,dormant=false,fails=2,growth=6,topped=false": {
+      "model": "moran_mod:block/peach_branch_bud_g6_east"
+    },
+    "facing=west,dormant=false,fails=2,growth=6,topped=false": {
+      "model": "moran_mod:block/peach_branch_bud_g6_west"
+    },
+    "facing=up,dormant=false,fails=2,growth=6,topped=true": {
+      "model": "moran_mod:block/peach_branch_trunk_g6"
+    },
+    "facing=north,dormant=false,fails=2,growth=6,topped=true": {
+      "model": "moran_mod:block/peach_branch_bud_g6_north"
+    },
+    "facing=south,dormant=false,fails=2,growth=6,topped=true": {
+      "model": "moran_mod:block/peach_branch_bud_g6_south"
+    },
+    "facing=east,dormant=false,fails=2,growth=6,topped=true": {
+      "model": "moran_mod:block/peach_branch_bud_g6_east"
+    },
+    "facing=west,dormant=false,fails=2,growth=6,topped=true": {
+      "model": "moran_mod:block/peach_branch_bud_g6_west"
+    },
+    "facing=up,dormant=true,fails=2,growth=6,topped=false": {
+      "model": "moran_mod:block/peach_branch_trunk_g6"
+    },
+    "facing=north,dormant=true,fails=2,growth=6,topped=false": {
+      "model": "moran_mod:block/peach_branch_bud_g6_north"
+    },
+    "facing=south,dormant=true,fails=2,growth=6,topped=false": {
+      "model": "moran_mod:block/peach_branch_bud_g6_south"
+    },
+    "facing=east,dormant=true,fails=2,growth=6,topped=false": {
+      "model": "moran_mod:block/peach_branch_bud_g6_east"
+    },
+    "facing=west,dormant=true,fails=2,growth=6,topped=false": {
+      "model": "moran_mod:block/peach_branch_bud_g6_west"
+    },
+    "facing=up,dormant=true,fails=2,growth=6,topped=true": {
+      "model": "moran_mod:block/peach_branch_trunk_g6"
+    },
+    "facing=north,dormant=true,fails=2,growth=6,topped=true": {
+      "model": "moran_mod:block/peach_branch_bud_g6_north"
+    },
+    "facing=south,dormant=true,fails=2,growth=6,topped=true": {
+      "model": "moran_mod:block/peach_branch_bud_g6_south"
+    },
+    "facing=east,dormant=true,fails=2,growth=6,topped=true": {
+      "model": "moran_mod:block/peach_branch_bud_g6_east"
+    },
+    "facing=west,dormant=true,fails=2,growth=6,topped=true": {
+      "model": "moran_mod:block/peach_branch_bud_g6_west"
+    },
+    "facing=up,dormant=false,fails=3,growth=6,topped=false": {
+      "model": "moran_mod:block/peach_branch_trunk_g6"
+    },
+    "facing=north,dormant=false,fails=3,growth=6,topped=false": {
+      "model": "moran_mod:block/peach_branch_bud_g6_north"
+    },
+    "facing=south,dormant=false,fails=3,growth=6,topped=false": {
+      "model": "moran_mod:block/peach_branch_bud_g6_south"
+    },
+    "facing=east,dormant=false,fails=3,growth=6,topped=false": {
+      "model": "moran_mod:block/peach_branch_bud_g6_east"
+    },
+    "facing=west,dormant=false,fails=3,growth=6,topped=false": {
+      "model": "moran_mod:block/peach_branch_bud_g6_west"
+    },
+    "facing=up,dormant=false,fails=3,growth=6,topped=true": {
+      "model": "moran_mod:block/peach_branch_trunk_g6"
+    },
+    "facing=north,dormant=false,fails=3,growth=6,topped=true": {
+      "model": "moran_mod:block/peach_branch_bud_g6_north"
+    },
+    "facing=south,dormant=false,fails=3,growth=6,topped=true": {
+      "model": "moran_mod:block/peach_branch_bud_g6_south"
+    },
+    "facing=east,dormant=false,fails=3,growth=6,topped=true": {
+      "model": "moran_mod:block/peach_branch_bud_g6_east"
+    },
+    "facing=west,dormant=false,fails=3,growth=6,topped=true": {
+      "model": "moran_mod:block/peach_branch_bud_g6_west"
+    },
+    "facing=up,dormant=true,fails=3,growth=6,topped=false": {
+      "model": "moran_mod:block/peach_branch_trunk_g6"
+    },
+    "facing=north,dormant=true,fails=3,growth=6,topped=false": {
+      "model": "moran_mod:block/peach_branch_bud_g6_north"
+    },
+    "facing=south,dormant=true,fails=3,growth=6,topped=false": {
+      "model": "moran_mod:block/peach_branch_bud_g6_south"
+    },
+    "facing=east,dormant=true,fails=3,growth=6,topped=false": {
+      "model": "moran_mod:block/peach_branch_bud_g6_east"
+    },
+    "facing=west,dormant=true,fails=3,growth=6,topped=false": {
+      "model": "moran_mod:block/peach_branch_bud_g6_west"
+    },
+    "facing=up,dormant=true,fails=3,growth=6,topped=true": {
+      "model": "moran_mod:block/peach_branch_trunk_g6"
+    },
+    "facing=north,dormant=true,fails=3,growth=6,topped=true": {
+      "model": "moran_mod:block/peach_branch_bud_g6_north"
+    },
+    "facing=south,dormant=true,fails=3,growth=6,topped=true": {
+      "model": "moran_mod:block/peach_branch_bud_g6_south"
+    },
+    "facing=east,dormant=true,fails=3,growth=6,topped=true": {
+      "model": "moran_mod:block/peach_branch_bud_g6_east"
+    },
+    "facing=west,dormant=true,fails=3,growth=6,topped=true": {
+      "model": "moran_mod:block/peach_branch_bud_g6_west"
+    },
+    "facing=up,dormant=false,fails=0,growth=7,topped=false": {
       "model": "moran_mod:block/peach_branch_trunk_g7"
     },
-    "facing=north,dormant=false,fails=0,growth=7": {
+    "facing=north,dormant=false,fails=0,growth=7,topped=false": {
       "model": "moran_mod:block/peach_branch_bud_g7_north"
     },
-    "facing=south,dormant=false,fails=0,growth=7": {
+    "facing=south,dormant=false,fails=0,growth=7,topped=false": {
       "model": "moran_mod:block/peach_branch_bud_g7_south"
     },
-    "facing=east,dormant=false,fails=0,growth=7": {
+    "facing=east,dormant=false,fails=0,growth=7,topped=false": {
       "model": "moran_mod:block/peach_branch_bud_g7_east"
     },
-    "facing=west,dormant=false,fails=0,growth=7": {
+    "facing=west,dormant=false,fails=0,growth=7,topped=false": {
       "model": "moran_mod:block/peach_branch_bud_g7_west"
     },
-    "facing=up,dormant=true,fails=0,growth=7": {
+    "facing=up,dormant=false,fails=0,growth=7,topped=true": {
       "model": "moran_mod:block/peach_branch_trunk_g7"
     },
-    "facing=north,dormant=true,fails=0,growth=7": {
+    "facing=north,dormant=false,fails=0,growth=7,topped=true": {
       "model": "moran_mod:block/peach_branch_bud_g7_north"
     },
-    "facing=south,dormant=true,fails=0,growth=7": {
+    "facing=south,dormant=false,fails=0,growth=7,topped=true": {
       "model": "moran_mod:block/peach_branch_bud_g7_south"
     },
-    "facing=east,dormant=true,fails=0,growth=7": {
+    "facing=east,dormant=false,fails=0,growth=7,topped=true": {
       "model": "moran_mod:block/peach_branch_bud_g7_east"
     },
-    "facing=west,dormant=true,fails=0,growth=7": {
+    "facing=west,dormant=false,fails=0,growth=7,topped=true": {
       "model": "moran_mod:block/peach_branch_bud_g7_west"
     },
-    "facing=up,dormant=false,fails=1,growth=7": {
+    "facing=up,dormant=true,fails=0,growth=7,topped=false": {
       "model": "moran_mod:block/peach_branch_trunk_g7"
     },
-    "facing=north,dormant=false,fails=1,growth=7": {
+    "facing=north,dormant=true,fails=0,growth=7,topped=false": {
       "model": "moran_mod:block/peach_branch_bud_g7_north"
     },
-    "facing=south,dormant=false,fails=1,growth=7": {
+    "facing=south,dormant=true,fails=0,growth=7,topped=false": {
       "model": "moran_mod:block/peach_branch_bud_g7_south"
     },
-    "facing=east,dormant=false,fails=1,growth=7": {
+    "facing=east,dormant=true,fails=0,growth=7,topped=false": {
       "model": "moran_mod:block/peach_branch_bud_g7_east"
     },
-    "facing=west,dormant=false,fails=1,growth=7": {
+    "facing=west,dormant=true,fails=0,growth=7,topped=false": {
       "model": "moran_mod:block/peach_branch_bud_g7_west"
     },
-    "facing=up,dormant=true,fails=1,growth=7": {
+    "facing=up,dormant=true,fails=0,growth=7,topped=true": {
       "model": "moran_mod:block/peach_branch_trunk_g7"
     },
-    "facing=north,dormant=true,fails=1,growth=7": {
+    "facing=north,dormant=true,fails=0,growth=7,topped=true": {
       "model": "moran_mod:block/peach_branch_bud_g7_north"
     },
-    "facing=south,dormant=true,fails=1,growth=7": {
+    "facing=south,dormant=true,fails=0,growth=7,topped=true": {
       "model": "moran_mod:block/peach_branch_bud_g7_south"
     },
-    "facing=east,dormant=true,fails=1,growth=7": {
+    "facing=east,dormant=true,fails=0,growth=7,topped=true": {
       "model": "moran_mod:block/peach_branch_bud_g7_east"
     },
-    "facing=west,dormant=true,fails=1,growth=7": {
+    "facing=west,dormant=true,fails=0,growth=7,topped=true": {
       "model": "moran_mod:block/peach_branch_bud_g7_west"
     },
-    "facing=up,dormant=false,fails=2,growth=7": {
+    "facing=up,dormant=false,fails=1,growth=7,topped=false": {
       "model": "moran_mod:block/peach_branch_trunk_g7"
     },
-    "facing=north,dormant=false,fails=2,growth=7": {
+    "facing=north,dormant=false,fails=1,growth=7,topped=false": {
       "model": "moran_mod:block/peach_branch_bud_g7_north"
     },
-    "facing=south,dormant=false,fails=2,growth=7": {
+    "facing=south,dormant=false,fails=1,growth=7,topped=false": {
       "model": "moran_mod:block/peach_branch_bud_g7_south"
     },
-    "facing=east,dormant=false,fails=2,growth=7": {
+    "facing=east,dormant=false,fails=1,growth=7,topped=false": {
       "model": "moran_mod:block/peach_branch_bud_g7_east"
     },
-    "facing=west,dormant=false,fails=2,growth=7": {
+    "facing=west,dormant=false,fails=1,growth=7,topped=false": {
       "model": "moran_mod:block/peach_branch_bud_g7_west"
     },
-    "facing=up,dormant=true,fails=2,growth=7": {
+    "facing=up,dormant=false,fails=1,growth=7,topped=true": {
       "model": "moran_mod:block/peach_branch_trunk_g7"
     },
-    "facing=north,dormant=true,fails=2,growth=7": {
+    "facing=north,dormant=false,fails=1,growth=7,topped=true": {
       "model": "moran_mod:block/peach_branch_bud_g7_north"
     },
-    "facing=south,dormant=true,fails=2,growth=7": {
+    "facing=south,dormant=false,fails=1,growth=7,topped=true": {
       "model": "moran_mod:block/peach_branch_bud_g7_south"
     },
-    "facing=east,dormant=true,fails=2,growth=7": {
+    "facing=east,dormant=false,fails=1,growth=7,topped=true": {
       "model": "moran_mod:block/peach_branch_bud_g7_east"
     },
-    "facing=west,dormant=true,fails=2,growth=7": {
+    "facing=west,dormant=false,fails=1,growth=7,topped=true": {
       "model": "moran_mod:block/peach_branch_bud_g7_west"
     },
-    "facing=up,dormant=false,fails=3,growth=7": {
+    "facing=up,dormant=true,fails=1,growth=7,topped=false": {
       "model": "moran_mod:block/peach_branch_trunk_g7"
     },
-    "facing=north,dormant=false,fails=3,growth=7": {
+    "facing=north,dormant=true,fails=1,growth=7,topped=false": {
       "model": "moran_mod:block/peach_branch_bud_g7_north"
     },
-    "facing=south,dormant=false,fails=3,growth=7": {
+    "facing=south,dormant=true,fails=1,growth=7,topped=false": {
       "model": "moran_mod:block/peach_branch_bud_g7_south"
     },
-    "facing=east,dormant=false,fails=3,growth=7": {
+    "facing=east,dormant=true,fails=1,growth=7,topped=false": {
       "model": "moran_mod:block/peach_branch_bud_g7_east"
     },
-    "facing=west,dormant=false,fails=3,growth=7": {
+    "facing=west,dormant=true,fails=1,growth=7,topped=false": {
       "model": "moran_mod:block/peach_branch_bud_g7_west"
     },
-    "facing=up,dormant=true,fails=3,growth=7": {
+    "facing=up,dormant=true,fails=1,growth=7,topped=true": {
       "model": "moran_mod:block/peach_branch_trunk_g7"
     },
-    "facing=north,dormant=true,fails=3,growth=7": {
+    "facing=north,dormant=true,fails=1,growth=7,topped=true": {
       "model": "moran_mod:block/peach_branch_bud_g7_north"
     },
-    "facing=south,dormant=true,fails=3,growth=7": {
+    "facing=south,dormant=true,fails=1,growth=7,topped=true": {
       "model": "moran_mod:block/peach_branch_bud_g7_south"
     },
-    "facing=east,dormant=true,fails=3,growth=7": {
+    "facing=east,dormant=true,fails=1,growth=7,topped=true": {
       "model": "moran_mod:block/peach_branch_bud_g7_east"
     },
-    "facing=west,dormant=true,fails=3,growth=7": {
+    "facing=west,dormant=true,fails=1,growth=7,topped=true": {
       "model": "moran_mod:block/peach_branch_bud_g7_west"
     },
-    "facing=up,dormant=false,fails=0,growth=8": {
+    "facing=up,dormant=false,fails=2,growth=7,topped=false": {
+      "model": "moran_mod:block/peach_branch_trunk_g7"
+    },
+    "facing=north,dormant=false,fails=2,growth=7,topped=false": {
+      "model": "moran_mod:block/peach_branch_bud_g7_north"
+    },
+    "facing=south,dormant=false,fails=2,growth=7,topped=false": {
+      "model": "moran_mod:block/peach_branch_bud_g7_south"
+    },
+    "facing=east,dormant=false,fails=2,growth=7,topped=false": {
+      "model": "moran_mod:block/peach_branch_bud_g7_east"
+    },
+    "facing=west,dormant=false,fails=2,growth=7,topped=false": {
+      "model": "moran_mod:block/peach_branch_bud_g7_west"
+    },
+    "facing=up,dormant=false,fails=2,growth=7,topped=true": {
+      "model": "moran_mod:block/peach_branch_trunk_g7"
+    },
+    "facing=north,dormant=false,fails=2,growth=7,topped=true": {
+      "model": "moran_mod:block/peach_branch_bud_g7_north"
+    },
+    "facing=south,dormant=false,fails=2,growth=7,topped=true": {
+      "model": "moran_mod:block/peach_branch_bud_g7_south"
+    },
+    "facing=east,dormant=false,fails=2,growth=7,topped=true": {
+      "model": "moran_mod:block/peach_branch_bud_g7_east"
+    },
+    "facing=west,dormant=false,fails=2,growth=7,topped=true": {
+      "model": "moran_mod:block/peach_branch_bud_g7_west"
+    },
+    "facing=up,dormant=true,fails=2,growth=7,topped=false": {
+      "model": "moran_mod:block/peach_branch_trunk_g7"
+    },
+    "facing=north,dormant=true,fails=2,growth=7,topped=false": {
+      "model": "moran_mod:block/peach_branch_bud_g7_north"
+    },
+    "facing=south,dormant=true,fails=2,growth=7,topped=false": {
+      "model": "moran_mod:block/peach_branch_bud_g7_south"
+    },
+    "facing=east,dormant=true,fails=2,growth=7,topped=false": {
+      "model": "moran_mod:block/peach_branch_bud_g7_east"
+    },
+    "facing=west,dormant=true,fails=2,growth=7,topped=false": {
+      "model": "moran_mod:block/peach_branch_bud_g7_west"
+    },
+    "facing=up,dormant=true,fails=2,growth=7,topped=true": {
+      "model": "moran_mod:block/peach_branch_trunk_g7"
+    },
+    "facing=north,dormant=true,fails=2,growth=7,topped=true": {
+      "model": "moran_mod:block/peach_branch_bud_g7_north"
+    },
+    "facing=south,dormant=true,fails=2,growth=7,topped=true": {
+      "model": "moran_mod:block/peach_branch_bud_g7_south"
+    },
+    "facing=east,dormant=true,fails=2,growth=7,topped=true": {
+      "model": "moran_mod:block/peach_branch_bud_g7_east"
+    },
+    "facing=west,dormant=true,fails=2,growth=7,topped=true": {
+      "model": "moran_mod:block/peach_branch_bud_g7_west"
+    },
+    "facing=up,dormant=false,fails=3,growth=7,topped=false": {
+      "model": "moran_mod:block/peach_branch_trunk_g7"
+    },
+    "facing=north,dormant=false,fails=3,growth=7,topped=false": {
+      "model": "moran_mod:block/peach_branch_bud_g7_north"
+    },
+    "facing=south,dormant=false,fails=3,growth=7,topped=false": {
+      "model": "moran_mod:block/peach_branch_bud_g7_south"
+    },
+    "facing=east,dormant=false,fails=3,growth=7,topped=false": {
+      "model": "moran_mod:block/peach_branch_bud_g7_east"
+    },
+    "facing=west,dormant=false,fails=3,growth=7,topped=false": {
+      "model": "moran_mod:block/peach_branch_bud_g7_west"
+    },
+    "facing=up,dormant=false,fails=3,growth=7,topped=true": {
+      "model": "moran_mod:block/peach_branch_trunk_g7"
+    },
+    "facing=north,dormant=false,fails=3,growth=7,topped=true": {
+      "model": "moran_mod:block/peach_branch_bud_g7_north"
+    },
+    "facing=south,dormant=false,fails=3,growth=7,topped=true": {
+      "model": "moran_mod:block/peach_branch_bud_g7_south"
+    },
+    "facing=east,dormant=false,fails=3,growth=7,topped=true": {
+      "model": "moran_mod:block/peach_branch_bud_g7_east"
+    },
+    "facing=west,dormant=false,fails=3,growth=7,topped=true": {
+      "model": "moran_mod:block/peach_branch_bud_g7_west"
+    },
+    "facing=up,dormant=true,fails=3,growth=7,topped=false": {
+      "model": "moran_mod:block/peach_branch_trunk_g7"
+    },
+    "facing=north,dormant=true,fails=3,growth=7,topped=false": {
+      "model": "moran_mod:block/peach_branch_bud_g7_north"
+    },
+    "facing=south,dormant=true,fails=3,growth=7,topped=false": {
+      "model": "moran_mod:block/peach_branch_bud_g7_south"
+    },
+    "facing=east,dormant=true,fails=3,growth=7,topped=false": {
+      "model": "moran_mod:block/peach_branch_bud_g7_east"
+    },
+    "facing=west,dormant=true,fails=3,growth=7,topped=false": {
+      "model": "moran_mod:block/peach_branch_bud_g7_west"
+    },
+    "facing=up,dormant=true,fails=3,growth=7,topped=true": {
+      "model": "moran_mod:block/peach_branch_trunk_g7"
+    },
+    "facing=north,dormant=true,fails=3,growth=7,topped=true": {
+      "model": "moran_mod:block/peach_branch_bud_g7_north"
+    },
+    "facing=south,dormant=true,fails=3,growth=7,topped=true": {
+      "model": "moran_mod:block/peach_branch_bud_g7_south"
+    },
+    "facing=east,dormant=true,fails=3,growth=7,topped=true": {
+      "model": "moran_mod:block/peach_branch_bud_g7_east"
+    },
+    "facing=west,dormant=true,fails=3,growth=7,topped=true": {
+      "model": "moran_mod:block/peach_branch_bud_g7_west"
+    },
+    "facing=up,dormant=false,fails=0,growth=8,topped=false": {
       "model": "moran_mod:block/peach_branch_trunk_g8"
     },
-    "facing=north,dormant=false,fails=0,growth=8": {
+    "facing=north,dormant=false,fails=0,growth=8,topped=false": {
       "model": "moran_mod:block/peach_branch_bud_g8_north"
     },
-    "facing=south,dormant=false,fails=0,growth=8": {
+    "facing=south,dormant=false,fails=0,growth=8,topped=false": {
       "model": "moran_mod:block/peach_branch_bud_g8_south"
     },
-    "facing=east,dormant=false,fails=0,growth=8": {
+    "facing=east,dormant=false,fails=0,growth=8,topped=false": {
       "model": "moran_mod:block/peach_branch_bud_g8_east"
     },
-    "facing=west,dormant=false,fails=0,growth=8": {
+    "facing=west,dormant=false,fails=0,growth=8,topped=false": {
       "model": "moran_mod:block/peach_branch_bud_g8_west"
     },
-    "facing=up,dormant=true,fails=0,growth=8": {
+    "facing=up,dormant=false,fails=0,growth=8,topped=true": {
       "model": "moran_mod:block/peach_branch_trunk_g8"
     },
-    "facing=north,dormant=true,fails=0,growth=8": {
+    "facing=north,dormant=false,fails=0,growth=8,topped=true": {
       "model": "moran_mod:block/peach_branch_bud_g8_north"
     },
-    "facing=south,dormant=true,fails=0,growth=8": {
+    "facing=south,dormant=false,fails=0,growth=8,topped=true": {
       "model": "moran_mod:block/peach_branch_bud_g8_south"
     },
-    "facing=east,dormant=true,fails=0,growth=8": {
+    "facing=east,dormant=false,fails=0,growth=8,topped=true": {
       "model": "moran_mod:block/peach_branch_bud_g8_east"
     },
-    "facing=west,dormant=true,fails=0,growth=8": {
+    "facing=west,dormant=false,fails=0,growth=8,topped=true": {
       "model": "moran_mod:block/peach_branch_bud_g8_west"
     },
-    "facing=up,dormant=false,fails=1,growth=8": {
+    "facing=up,dormant=true,fails=0,growth=8,topped=false": {
       "model": "moran_mod:block/peach_branch_trunk_g8"
     },
-    "facing=north,dormant=false,fails=1,growth=8": {
+    "facing=north,dormant=true,fails=0,growth=8,topped=false": {
       "model": "moran_mod:block/peach_branch_bud_g8_north"
     },
-    "facing=south,dormant=false,fails=1,growth=8": {
+    "facing=south,dormant=true,fails=0,growth=8,topped=false": {
       "model": "moran_mod:block/peach_branch_bud_g8_south"
     },
-    "facing=east,dormant=false,fails=1,growth=8": {
+    "facing=east,dormant=true,fails=0,growth=8,topped=false": {
       "model": "moran_mod:block/peach_branch_bud_g8_east"
     },
-    "facing=west,dormant=false,fails=1,growth=8": {
+    "facing=west,dormant=true,fails=0,growth=8,topped=false": {
       "model": "moran_mod:block/peach_branch_bud_g8_west"
     },
-    "facing=up,dormant=true,fails=1,growth=8": {
+    "facing=up,dormant=true,fails=0,growth=8,topped=true": {
       "model": "moran_mod:block/peach_branch_trunk_g8"
     },
-    "facing=north,dormant=true,fails=1,growth=8": {
+    "facing=north,dormant=true,fails=0,growth=8,topped=true": {
       "model": "moran_mod:block/peach_branch_bud_g8_north"
     },
-    "facing=south,dormant=true,fails=1,growth=8": {
+    "facing=south,dormant=true,fails=0,growth=8,topped=true": {
       "model": "moran_mod:block/peach_branch_bud_g8_south"
     },
-    "facing=east,dormant=true,fails=1,growth=8": {
+    "facing=east,dormant=true,fails=0,growth=8,topped=true": {
       "model": "moran_mod:block/peach_branch_bud_g8_east"
     },
-    "facing=west,dormant=true,fails=1,growth=8": {
+    "facing=west,dormant=true,fails=0,growth=8,topped=true": {
       "model": "moran_mod:block/peach_branch_bud_g8_west"
     },
-    "facing=up,dormant=false,fails=2,growth=8": {
+    "facing=up,dormant=false,fails=1,growth=8,topped=false": {
       "model": "moran_mod:block/peach_branch_trunk_g8"
     },
-    "facing=north,dormant=false,fails=2,growth=8": {
+    "facing=north,dormant=false,fails=1,growth=8,topped=false": {
       "model": "moran_mod:block/peach_branch_bud_g8_north"
     },
-    "facing=south,dormant=false,fails=2,growth=8": {
+    "facing=south,dormant=false,fails=1,growth=8,topped=false": {
       "model": "moran_mod:block/peach_branch_bud_g8_south"
     },
-    "facing=east,dormant=false,fails=2,growth=8": {
+    "facing=east,dormant=false,fails=1,growth=8,topped=false": {
       "model": "moran_mod:block/peach_branch_bud_g8_east"
     },
-    "facing=west,dormant=false,fails=2,growth=8": {
+    "facing=west,dormant=false,fails=1,growth=8,topped=false": {
       "model": "moran_mod:block/peach_branch_bud_g8_west"
     },
-    "facing=up,dormant=true,fails=2,growth=8": {
+    "facing=up,dormant=false,fails=1,growth=8,topped=true": {
       "model": "moran_mod:block/peach_branch_trunk_g8"
     },
-    "facing=north,dormant=true,fails=2,growth=8": {
+    "facing=north,dormant=false,fails=1,growth=8,topped=true": {
       "model": "moran_mod:block/peach_branch_bud_g8_north"
     },
-    "facing=south,dormant=true,fails=2,growth=8": {
+    "facing=south,dormant=false,fails=1,growth=8,topped=true": {
       "model": "moran_mod:block/peach_branch_bud_g8_south"
     },
-    "facing=east,dormant=true,fails=2,growth=8": {
+    "facing=east,dormant=false,fails=1,growth=8,topped=true": {
       "model": "moran_mod:block/peach_branch_bud_g8_east"
     },
-    "facing=west,dormant=true,fails=2,growth=8": {
+    "facing=west,dormant=false,fails=1,growth=8,topped=true": {
       "model": "moran_mod:block/peach_branch_bud_g8_west"
     },
-    "facing=up,dormant=false,fails=3,growth=8": {
+    "facing=up,dormant=true,fails=1,growth=8,topped=false": {
       "model": "moran_mod:block/peach_branch_trunk_g8"
     },
-    "facing=north,dormant=false,fails=3,growth=8": {
+    "facing=north,dormant=true,fails=1,growth=8,topped=false": {
       "model": "moran_mod:block/peach_branch_bud_g8_north"
     },
-    "facing=south,dormant=false,fails=3,growth=8": {
+    "facing=south,dormant=true,fails=1,growth=8,topped=false": {
       "model": "moran_mod:block/peach_branch_bud_g8_south"
     },
-    "facing=east,dormant=false,fails=3,growth=8": {
+    "facing=east,dormant=true,fails=1,growth=8,topped=false": {
       "model": "moran_mod:block/peach_branch_bud_g8_east"
     },
-    "facing=west,dormant=false,fails=3,growth=8": {
+    "facing=west,dormant=true,fails=1,growth=8,topped=false": {
       "model": "moran_mod:block/peach_branch_bud_g8_west"
     },
-    "facing=up,dormant=true,fails=3,growth=8": {
+    "facing=up,dormant=true,fails=1,growth=8,topped=true": {
       "model": "moran_mod:block/peach_branch_trunk_g8"
     },
-    "facing=north,dormant=true,fails=3,growth=8": {
+    "facing=north,dormant=true,fails=1,growth=8,topped=true": {
       "model": "moran_mod:block/peach_branch_bud_g8_north"
     },
-    "facing=south,dormant=true,fails=3,growth=8": {
+    "facing=south,dormant=true,fails=1,growth=8,topped=true": {
       "model": "moran_mod:block/peach_branch_bud_g8_south"
     },
-    "facing=east,dormant=true,fails=3,growth=8": {
+    "facing=east,dormant=true,fails=1,growth=8,topped=true": {
       "model": "moran_mod:block/peach_branch_bud_g8_east"
     },
-    "facing=west,dormant=true,fails=3,growth=8": {
+    "facing=west,dormant=true,fails=1,growth=8,topped=true": {
+      "model": "moran_mod:block/peach_branch_bud_g8_west"
+    },
+    "facing=up,dormant=false,fails=2,growth=8,topped=false": {
+      "model": "moran_mod:block/peach_branch_trunk_g8"
+    },
+    "facing=north,dormant=false,fails=2,growth=8,topped=false": {
+      "model": "moran_mod:block/peach_branch_bud_g8_north"
+    },
+    "facing=south,dormant=false,fails=2,growth=8,topped=false": {
+      "model": "moran_mod:block/peach_branch_bud_g8_south"
+    },
+    "facing=east,dormant=false,fails=2,growth=8,topped=false": {
+      "model": "moran_mod:block/peach_branch_bud_g8_east"
+    },
+    "facing=west,dormant=false,fails=2,growth=8,topped=false": {
+      "model": "moran_mod:block/peach_branch_bud_g8_west"
+    },
+    "facing=up,dormant=false,fails=2,growth=8,topped=true": {
+      "model": "moran_mod:block/peach_branch_trunk_g8"
+    },
+    "facing=north,dormant=false,fails=2,growth=8,topped=true": {
+      "model": "moran_mod:block/peach_branch_bud_g8_north"
+    },
+    "facing=south,dormant=false,fails=2,growth=8,topped=true": {
+      "model": "moran_mod:block/peach_branch_bud_g8_south"
+    },
+    "facing=east,dormant=false,fails=2,growth=8,topped=true": {
+      "model": "moran_mod:block/peach_branch_bud_g8_east"
+    },
+    "facing=west,dormant=false,fails=2,growth=8,topped=true": {
+      "model": "moran_mod:block/peach_branch_bud_g8_west"
+    },
+    "facing=up,dormant=true,fails=2,growth=8,topped=false": {
+      "model": "moran_mod:block/peach_branch_trunk_g8"
+    },
+    "facing=north,dormant=true,fails=2,growth=8,topped=false": {
+      "model": "moran_mod:block/peach_branch_bud_g8_north"
+    },
+    "facing=south,dormant=true,fails=2,growth=8,topped=false": {
+      "model": "moran_mod:block/peach_branch_bud_g8_south"
+    },
+    "facing=east,dormant=true,fails=2,growth=8,topped=false": {
+      "model": "moran_mod:block/peach_branch_bud_g8_east"
+    },
+    "facing=west,dormant=true,fails=2,growth=8,topped=false": {
+      "model": "moran_mod:block/peach_branch_bud_g8_west"
+    },
+    "facing=up,dormant=true,fails=2,growth=8,topped=true": {
+      "model": "moran_mod:block/peach_branch_trunk_g8"
+    },
+    "facing=north,dormant=true,fails=2,growth=8,topped=true": {
+      "model": "moran_mod:block/peach_branch_bud_g8_north"
+    },
+    "facing=south,dormant=true,fails=2,growth=8,topped=true": {
+      "model": "moran_mod:block/peach_branch_bud_g8_south"
+    },
+    "facing=east,dormant=true,fails=2,growth=8,topped=true": {
+      "model": "moran_mod:block/peach_branch_bud_g8_east"
+    },
+    "facing=west,dormant=true,fails=2,growth=8,topped=true": {
+      "model": "moran_mod:block/peach_branch_bud_g8_west"
+    },
+    "facing=up,dormant=false,fails=3,growth=8,topped=false": {
+      "model": "moran_mod:block/peach_branch_trunk_g8"
+    },
+    "facing=north,dormant=false,fails=3,growth=8,topped=false": {
+      "model": "moran_mod:block/peach_branch_bud_g8_north"
+    },
+    "facing=south,dormant=false,fails=3,growth=8,topped=false": {
+      "model": "moran_mod:block/peach_branch_bud_g8_south"
+    },
+    "facing=east,dormant=false,fails=3,growth=8,topped=false": {
+      "model": "moran_mod:block/peach_branch_bud_g8_east"
+    },
+    "facing=west,dormant=false,fails=3,growth=8,topped=false": {
+      "model": "moran_mod:block/peach_branch_bud_g8_west"
+    },
+    "facing=up,dormant=false,fails=3,growth=8,topped=true": {
+      "model": "moran_mod:block/peach_branch_trunk_g8"
+    },
+    "facing=north,dormant=false,fails=3,growth=8,topped=true": {
+      "model": "moran_mod:block/peach_branch_bud_g8_north"
+    },
+    "facing=south,dormant=false,fails=3,growth=8,topped=true": {
+      "model": "moran_mod:block/peach_branch_bud_g8_south"
+    },
+    "facing=east,dormant=false,fails=3,growth=8,topped=true": {
+      "model": "moran_mod:block/peach_branch_bud_g8_east"
+    },
+    "facing=west,dormant=false,fails=3,growth=8,topped=true": {
+      "model": "moran_mod:block/peach_branch_bud_g8_west"
+    },
+    "facing=up,dormant=true,fails=3,growth=8,topped=false": {
+      "model": "moran_mod:block/peach_branch_trunk_g8"
+    },
+    "facing=north,dormant=true,fails=3,growth=8,topped=false": {
+      "model": "moran_mod:block/peach_branch_bud_g8_north"
+    },
+    "facing=south,dormant=true,fails=3,growth=8,topped=false": {
+      "model": "moran_mod:block/peach_branch_bud_g8_south"
+    },
+    "facing=east,dormant=true,fails=3,growth=8,topped=false": {
+      "model": "moran_mod:block/peach_branch_bud_g8_east"
+    },
+    "facing=west,dormant=true,fails=3,growth=8,topped=false": {
+      "model": "moran_mod:block/peach_branch_bud_g8_west"
+    },
+    "facing=up,dormant=true,fails=3,growth=8,topped=true": {
+      "model": "moran_mod:block/peach_branch_trunk_g8"
+    },
+    "facing=north,dormant=true,fails=3,growth=8,topped=true": {
+      "model": "moran_mod:block/peach_branch_bud_g8_north"
+    },
+    "facing=south,dormant=true,fails=3,growth=8,topped=true": {
+      "model": "moran_mod:block/peach_branch_bud_g8_south"
+    },
+    "facing=east,dormant=true,fails=3,growth=8,topped=true": {
+      "model": "moran_mod:block/peach_branch_bud_g8_east"
+    },
+    "facing=west,dormant=true,fails=3,growth=8,topped=true": {
       "model": "moran_mod:block/peach_branch_bud_g8_west"
     }
   }

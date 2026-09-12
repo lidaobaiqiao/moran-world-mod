@@ -1,7 +1,8 @@
 package com.lidao.moran.systems.blocks;
 
+import com.lidao.moran.systems.trees.SoilProfile;
+import com.lidao.moran.systems.trees.Soils;
 import com.lidao.moran.systems.trees.TreeSpecies;
-import com.lidao.moran.systems.trees.Trees;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Fertilizable;
@@ -26,8 +27,8 @@ import java.util.Map;
 
 /**
  * 通用活树枝干方块——生长引擎的树干/侧枝部分，所有树种共用。
- * 行为由 {@link TreeSpecies} 档案驱动：数值参数决定节奏与形态，
- * 策略钩子决定萌芽分布、延伸方向与开花方式（详见 TreeSpecies 类注释）。
+ * 行为由 {@link TreeSpecies} 档案驱动，环境参数系统接入：
+ * 水度（生长速度软增益 + 硬门槛）、土壤三轴偏好、空间竞争、向光性、修剪响应。
  *
  * 掉落按生长度分档（见各树种枝干方块的战利品表）：
  * 1-2 桃源树枝，3-6 粗壮桃源树枝，7-8 粗壮桃源树干。
@@ -39,6 +40,8 @@ public class MoranBranchBlock extends Block implements Fertilizable {
             List.of(Direction.UP, Direction.NORTH, Direction.SOUTH, Direction.WEST, Direction.EAST));
     public static final IntProperty FAILS = IntProperty.of("fails", 0, TreeSpecies.MAX_FAILS);
     public static final BooleanProperty DORMANT = BooleanProperty.of("dormant");
+    /** 主干封顶标记：到顶决策持久化，唤醒侧芽与顶花苞由此驱动 */
+    public static final BooleanProperty TOPPED = BooleanProperty.of("topped");
 
     private final TreeSpecies species;
 
@@ -76,7 +79,8 @@ public class MoranBranchBlock extends Block implements Fertilizable {
                 .with(GROWTH, 1)
                 .with(FACING, Direction.UP)
                 .with(FAILS, 0)
-                .with(DORMANT, false));
+                .with(DORMANT, false)
+                .with(TOPPED, false));
     }
 
     public TreeSpecies species() {
@@ -85,7 +89,7 @@ public class MoranBranchBlock extends Block implements Fertilizable {
 
     @Override
     protected void appendProperties(StateManager.Builder<Block, BlockState> builder) {
-        builder.add(GROWTH, FACING, FAILS, DORMANT);
+        builder.add(GROWTH, FACING, FAILS, DORMANT, TOPPED);
     }
 
     @Override
@@ -111,24 +115,31 @@ public class MoranBranchBlock extends Block implements Fertilizable {
             return;
         }
 
-        if (species.checkEnvironment(world, pos)) {
-            // 条件满足：掷随机数决定本次是否生长；骰子失败不计入休眠次数
-            if (random.nextFloat() < species.growChance()) {
-                growPart(state, world, pos, random);
-                if (!(world.getBlockState(pos).getBlock() instanceof MoranBranchBlock)) {
-                    return;
-                }
-                if (world.getBlockState(pos).get(FAILS) != 0) {
-                    world.setBlockState(pos, world.getBlockState(pos).with(FAILS, 0), Block.NOTIFY_ALL);
-                }
-            }
-            world.scheduleBlockTick(pos, this, TreeSpecies.REQUEST_INTERVAL);
-        } else {
+        // 环境取样：沿主干向下找根，土壤取根部下方，水度在根层测
+        BlockPos root = rootPos(world, pos, species.biologicalTopMax());
+        SoilProfile soil = Soils.of(world, root.down());
+        int hydration = TreeSpecies.hydration(world, root);
+
+        if (!species.checkEnvironment(world, pos, hydration)) {
             int next = fails + 1;
             world.setBlockState(pos, state.with(FAILS, next), Block.NOTIFY_ALL);
             // 连续 3 次条件不满足：休眠 24 分钟
-            world.scheduleBlockTick(pos, this, next >= TreeSpecies.MAX_FAILS ? TreeSpecies.DORMANT_TICKS : TreeSpecies.REQUEST_INTERVAL);
+            world.scheduleBlockTick(pos, this,
+                    next >= TreeSpecies.MAX_FAILS ? TreeSpecies.DORMANT_TICKS : TreeSpecies.REQUEST_INTERVAL);
+            return;
         }
+
+        // 条件满足：有效概率 = 基础 × 水度因子 × 土壤因子；骰子失败不计入休眠次数
+        if (random.nextFloat() < species.effectiveGrowChance(world, pos, hydration, soil)) {
+            growPart(state, world, pos, random);
+            if (!(world.getBlockState(pos).getBlock() instanceof MoranBranchBlock)) {
+                return;
+            }
+            if (world.getBlockState(pos).get(FAILS) != 0) {
+                world.setBlockState(pos, world.getBlockState(pos).with(FAILS, 0), Block.NOTIFY_ALL);
+            }
+        }
+        world.scheduleBlockTick(pos, this, TreeSpecies.REQUEST_INTERVAL);
     }
 
     /** 执行一次生长：自身成熟度 +1，再按身份推进结构（抽高/侧芽/侧枝/开花） */
@@ -145,23 +156,36 @@ public class MoranBranchBlock extends Block implements Fertilizable {
         }
 
         if (trunk) {
-            growTrunk(world, pos, random, growth);
+            growTrunk(state, world, pos, random, growth);
         } else {
             growBranch(world, pos, random, growth, facing);
         }
     }
 
-    /** 主干生长：抽高 → 到顶后唤醒侧芽并长顶花苞 */
-    private void growTrunk(ServerWorld world, BlockPos pos, Random random, int growth) {
+    /** 主干生长：抽高与封顶决策 → 到顶唤醒侧芽并长顶花苞 */
+    private void growTrunk(BlockState state, ServerWorld world, BlockPos pos, Random random, int growth) {
         BlockPos above = pos.up();
         boolean top = !(world.getBlockState(above).getBlock() instanceof MoranBranchBlock);
-        int height = heightBelow(world, pos, species.biologicalTop()) + 1;
-        boolean topped = height >= species.biologicalTop() || (top && !world.getBlockState(above).isAir());
+        int height = heightBelow(world, pos, species.biologicalTopMax()) + 1;
 
-        if (topped) {
+        // 封顶决策（只在顶端做一次，结果持久化为 TOPPED）：
+        // 高度达上限强制封顶；进入区间后每次抽高前掷封顶骰；上方被遮挡视为到顶
+        if (top && !state.get(TOPPED)) {
+            boolean canExtend = world.getBlockState(above).isAir();
+            boolean capped = height >= species.biologicalTopMax() || !canExtend;
+            boolean rollStop = height >= species.biologicalTopMin()
+                    && random.nextFloat() < species.toppingChance();
+            if (capped || (canExtend && rollStop)) {
+                state = state.with(TOPPED, true);
+                world.setBlockState(pos, state, Block.NOTIFY_ALL);
+            }
+        }
+
+        if (state.get(TOPPED)) {
             // 到顶：唤醒全部休眠侧芽（幂等），侧枝期开始
             wakeDormantBuds(world, pos);
-            if (top && growth >= species.topBudGrowth() && world.getBlockState(above).isAir()) {
+            if (top && growth >= species.topBudGrowth() && world.getBlockState(above).isAir()
+                    && !(world.getBlockState(above).getBlock() instanceof MoranFlowerBudBlock)) {
                 // 顶端方块成熟度达标：长出顶花苞
                 world.setBlockState(above, species.budBlock().getDefaultState(), Block.NOTIFY_ALL);
             }
@@ -172,13 +196,17 @@ public class MoranBranchBlock extends Block implements Fertilizable {
             }
         }
 
-        // 抽高期：按树种偏好萌发休眠侧芽（数量上限内，概率随数量递减 → 密集侧枝）
-        if (!topped && growth >= 2) {
+        // 抽高期：按树种偏好萌发休眠侧芽（数量上限内 + 概率递减 + 向光 + 空间竞争）
+        if (!state.get(TOPPED) && growth >= 2) {
             int buds = countBudsAroundTrunk(world, pos);
             if (buds < species.maxBuds()
                     && species.isBudPosition(world, pos, height, height + trunkSegmentsAbove(world, pos))
                     && random.nextInt(species.budChanceDenom()) < (species.maxBuds() - buds)) {
-                tryGrowBud(world, pos, random, true);
+                Direction d = phototropicDirection(world, pos, random);
+                BlockPos p = pos.offset(d);
+                if (world.getBlockState(p).isAir() && !isCrowded(world, p)) {
+                    world.setBlockState(p, getDefaultState().with(FACING, d).with(DORMANT, true), Block.NOTIFY_ALL);
+                }
             }
         }
     }
@@ -202,12 +230,86 @@ public class MoranBranchBlock extends Block implements Fertilizable {
         }
     }
 
-    private void tryGrowBud(ServerWorld world, BlockPos pos, Random random, boolean dormant) {
-        Direction d = TreeSpecies.HORIZONTALS[random.nextInt(TreeSpecies.HORIZONTALS.length)];
-        BlockPos p = pos.offset(d);
-        if (world.getBlockState(p).isAir()) {
-            world.setBlockState(p, getDefaultState().with(FACING, d).with(DORMANT, dormant), Block.NOTIFY_ALL);
+    /**
+     * 修剪响应：枝干被剪断后，断口相邻的枝干按档案概率向断口萌发新芽
+     * （现实园艺：修剪促萌蘖——玩家由此可以主动塑形自己的树）。
+     */
+    @Override
+    public void onStateReplaced(BlockState state, World world, BlockPos pos, BlockState newState, boolean moved) {
+        super.onStateReplaced(state, world, pos, newState, moved);
+        if (world.isClient
+                || newState.getBlock() instanceof MoranBranchBlock
+                || world.getRandom().nextFloat() >= species.pruneResponseChance()) {
+            return;
         }
+        for (Direction d : Direction.values()) {
+            BlockPos n = pos.offset(d);
+            BlockState neighbor = world.getBlockState(n);
+            if (neighbor.getBlock() instanceof MoranBranchBlock) {
+                // 断口处生成朝向母体的新芽（growth=1），立即登记生长请求
+                world.setBlockState(pos, neighbor
+                        .with(FACING, d.getOpposite())
+                        .with(GROWTH, 1)
+                        .with(DORMANT, false)
+                        .with(TOPPED, false)
+                        .with(FAILS, 0), Block.NOTIFY_ALL);
+                world.scheduleBlockTick(pos, neighbor.getBlock(), TreeSpecies.REQUEST_INTERVAL);
+                break;
+            }
+        }
+    }
+
+    /** 根部位置：沿同柱向下找第一个非枝干方块（土壤在其下方） */
+    public static BlockPos rootPos(WorldView world, BlockPos pos, int maxDepth) {
+        BlockPos p = pos;
+        for (int i = 0; i < maxDepth; i++) {
+            BlockState below = world.getBlockState(p.down());
+            if (below.getBlock() instanceof MoranBranchBlock || below.isAir()) {
+                p = p.down();
+                continue;
+            }
+            break;
+        }
+        return p;
+    }
+
+    /** 向光性近似（开口度启发式）：各水平方向数 2 格内空气 + 上方开口，加权随机 */
+    private Direction phototropicDirection(ServerWorld world, BlockPos pos, Random random) {
+        int totalWeight = 0;
+        int[] weights = new int[TreeSpecies.HORIZONTALS.length];
+        for (int i = 0; i < TreeSpecies.HORIZONTALS.length; i++) {
+            Direction d = TreeSpecies.HORIZONTALS[i];
+            int open = 0;
+            for (int step = 1; step <= 2; step++) {
+                if (world.getBlockState(pos.offset(d, step)).isAir()) {
+                    open++;
+                }
+            }
+            if (world.getBlockState(pos.offset(d).up()).isAir()) {
+                open++;
+            }
+            weights[i] = 1 + open;
+            totalWeight += weights[i];
+        }
+        int roll = random.nextInt(totalWeight);
+        for (int i = 0; i < TreeSpecies.HORIZONTALS.length; i++) {
+            roll -= weights[i];
+            if (roll < 0) {
+                return TreeSpecies.HORIZONTALS[i];
+            }
+        }
+        return TreeSpecies.HORIZONTALS[0];
+    }
+
+    /** 空间竞争：目标位置周围实心邻居达到阈值即压抑萌芽（密林瘦高、孤树开张的涌现来源） */
+    private static boolean isCrowded(ServerWorld world, BlockPos target) {
+        int solid = 0;
+        for (Direction d : Direction.values()) {
+            if (!world.getBlockState(target.offset(d)).isAir()) {
+                solid++;
+            }
+        }
+        return solid >= 5;
     }
 
     private static int heightBelow(ServerWorld world, BlockPos pos, int limit) {
@@ -226,7 +328,7 @@ public class MoranBranchBlock extends Block implements Fertilizable {
 
     /** 自身是否位于主干可萌发位置（由树种档案判定，默认上半部分） */
     private boolean inBudPosition(ServerWorld world, BlockPos pos) {
-        int height = heightBelow(world, pos, species.biologicalTop()) + 1;
+        int height = heightBelow(world, pos, species.biologicalTopMax()) + 1;
         int total = height + trunkSegmentsAbove(world, pos);
         return species.isBudPosition(world, pos, height, total);
     }
@@ -234,7 +336,7 @@ public class MoranBranchBlock extends Block implements Fertilizable {
     private int trunkSegmentsAbove(ServerWorld world, BlockPos pos) {
         int n = 0;
         BlockPos p = pos.up();
-        while (n < species.biologicalTop()) {
+        while (n < species.biologicalTopMax()) {
             BlockState s = world.getBlockState(p);
             if (!(s.getBlock() instanceof MoranBranchBlock) || s.get(FACING) != Direction.UP) {
                 break;

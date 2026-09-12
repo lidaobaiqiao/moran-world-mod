@@ -1,5 +1,7 @@
 package com.lidao.moran.systems.blocks;
 
+import com.lidao.moran.systems.trees.SoilProfile;
+import com.lidao.moran.systems.trees.Soils;
 import com.lidao.moran.systems.trees.TreeSpecies;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
@@ -22,7 +24,7 @@ import java.util.List;
 
 /**
  * 通用花苞方块——生长引擎的生殖生长部分，所有树种共用。
- * 复用请求-检测-休眠 AI；阶段满后由树种档案决定成熟形态
+ * 复用请求-检测-休眠 AI（含水度/土壤因子）；阶段满后由树种档案决定成熟形态
  * （桃：先花后叶化为树叶；未来松/杏可直接变叶簇）。
  */
 public class MoranFlowerBudBlock extends Block implements Fertilizable {
@@ -61,7 +63,12 @@ public class MoranFlowerBudBlock extends Block implements Fertilizable {
             return;
         }
 
-        if (!species.checkEnvironment(world, pos)) {
+        // 环境取样：花苞悬空生长，根部沿下方找土壤与水层
+        BlockPos root = MoranBranchBlock.rootPos(world, pos, 24);
+        SoilProfile soil = Soils.of(world, root.down());
+        int hydration = TreeSpecies.hydration(world, root);
+
+        if (!species.checkEnvironment(world, pos, hydration)) {
             int next = fails + 1;
             world.setBlockState(pos, state.with(FAILS, next), Block.NOTIFY_ALL);
             world.scheduleBlockTick(pos, this,
@@ -69,7 +76,7 @@ public class MoranFlowerBudBlock extends Block implements Fertilizable {
             return;
         }
 
-        if (random.nextFloat() < species.growChance()) {
+        if (random.nextFloat() < species.effectiveGrowChance(world, pos, hydration, soil)) {
             int stage = state.get(STAGE);
             if (stage >= 3) {
                 species.onBudMature(world, pos, state.get(FACING), random);

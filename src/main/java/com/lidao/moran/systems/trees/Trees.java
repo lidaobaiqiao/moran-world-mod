@@ -6,9 +6,10 @@ package com.lidao.moran.systems.trees;
  */
 public final class Trees {
 
-    /** 桃树：高大主干、上半部萌芽、花芽着生一年生枝顶与侧腋、先花后叶 */
+    /** 桃树：高大（8-12 米）、上半部萌芽、花芽着生一年生枝顶与侧腋、耐旱怕涝（排水敏感） */
     public static final TreeSpecies PEACH = TreeSpecies.builder("peach")
-            .biologicalTop(7)
+            .biologicalTop(8, 12)
+            .toppingChance(0.25F)
             .topBudGrowth(5)
             .maxBuds(4)
             .branchMaxGrowth(7)
@@ -18,6 +19,10 @@ public final class Trees {
             .growChance(0.5F)
             .minLight(9)
             .temperature(0.3F, 1.2F)
+            .minHydration(0)
+            .minHumidity(0.0F)
+            .soilPreference(4, 8, 3, 8, 2, 6)
+            .pruneResponseChance(0.5F)
             .build();
 
     private Trees() {
