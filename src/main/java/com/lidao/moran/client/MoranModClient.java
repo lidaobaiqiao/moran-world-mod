@@ -93,6 +93,10 @@ public class MoranModClient implements ClientModInitializer {
         }
         LOGGER.info("✂️ 已注册 {} 个 cutout 渲染层（树苗/树叶/落叶堆）", cutoutBlocks.length);
 
+        // 花苞：cross 透明模型
+        BlockRenderLayerMap.INSTANCE.putBlock(BlockSystem.PEACH_FLOWER_BUD, RenderLayer.getCutout());
+        BlockRenderLayerMap.INSTANCE.putItem(BlockSystem.PEACH_FLOWER_BUD.asItem(), RenderLayer.getCutout());
+
         // 草方块：模型侧面带透明像素的 overlay 草沿层，必须走原版同款 cutout_mipped
         BlockRenderLayerMap.INSTANCE.putBlock(BlockSystem.PEACH_BLOSSOM_GRASS_BLOCK, RenderLayer.getCutoutMipped());
         BlockRenderLayerMap.INSTANCE.putItem(BlockSystem.PEACH_BLOSSOM_GRASS_BLOCK.asItem(), RenderLayer.getCutoutMipped());

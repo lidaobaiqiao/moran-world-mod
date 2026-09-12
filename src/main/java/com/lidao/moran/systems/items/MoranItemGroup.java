@@ -44,6 +44,7 @@ public class MoranItemGroup {
                         entries.add(BlockSystem.PEACH_SAPLING);
                         entries.add(BlockSystem.PEACH_BRANCH);
                         entries.add(BlockSystem.PEACH_PLANKS);
+                        entries.add(BlockSystem.PEACH_FLOWER_BUD);
                         // 地面系方块
                         entries.add(BlockSystem.PEACH_BLOSSOM_GRASS_BLOCK);
                         entries.add(BlockSystem.PEACH_BLOSSOM_DIRT);

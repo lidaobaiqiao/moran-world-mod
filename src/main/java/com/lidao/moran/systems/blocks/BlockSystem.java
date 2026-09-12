@@ -56,6 +56,10 @@ public class BlockSystem {
     public static final Block PEACH_PLANKS = register("peach_planks",
             new Block(FabricBlockSettings.copyOf(Blocks.OAK_PLANKS)));
 
+    // 🌸 桃花花苞：生殖生长起点，三阶段成熟后化为桃花树叶
+    public static final Block PEACH_FLOWER_BUD = register("peach_flower_bud",
+            new PeachFlowerBudBlock(FabricBlockSettings.copyOf(Blocks.OAK_SAPLING)));
+
     // 🌱 桃源基础方块（带自定义逻辑）
     public static final Block PEACH_BLOSSOM_DIRT = register("peach_blossom_dirt",
             new PeachBlossomDirtBlock(FabricBlockSettings.copyOf(Blocks.DIRT)));

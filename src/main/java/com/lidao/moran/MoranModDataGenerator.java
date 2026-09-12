@@ -27,7 +27,8 @@ public class MoranModDataGenerator implements DataGeneratorEntrypoint {
             for (Block block : BlockSystem.getAllBlocks()) {
                 if (block == BlockSystem.PEACH_BLOSSOM_LEAVES
                         || block == BlockSystem.PEACH_BRANCH
-                        || block == BlockSystem.PEACH_PLANKS) {
+                        || block == BlockSystem.PEACH_PLANKS
+                        || block == BlockSystem.PEACH_FLOWER_BUD) {
                     continue;
                 }
                 addDrop(block);
