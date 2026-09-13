@@ -63,7 +63,6 @@ public class TreeSpecies {
     // —— 结构参数 ——
     private final int biologicalTopMin;
     private final int biologicalTopMax;
-    private final float toppingChance;
     private final int trunkMaxGrowth;
     private final int topBudGrowth;
     private final int maxBuds;
@@ -93,7 +92,6 @@ public class TreeSpecies {
         this.id = b.id;
         this.biologicalTopMin = b.biologicalTopMin;
         this.biologicalTopMax = b.biologicalTopMax;
-        this.toppingChance = b.toppingChance;
         this.trunkMaxGrowth = b.trunkMaxGrowth;
         this.topBudGrowth = b.topBudGrowth;
         this.maxBuds = b.maxBuds;
@@ -124,10 +122,6 @@ public class TreeSpecies {
 
     public int biologicalTopMax() {
         return biologicalTopMax;
-    }
-
-    public float toppingChance() {
-        return toppingChance;
     }
 
     public int trunkMaxGrowth() {
@@ -222,6 +216,39 @@ public class TreeSpecies {
         return world.getBiome(pos).value().hasPrecipitation() ? 0.6F : 0.15F;
     }
 
+    // —— 环境评分阈值（每项达标记 1 分，目标高度 = min + 分数） ——
+    /** 天空光存储值达标线（露天 15，浓荫 <11） */
+    private static final int SCORE_SKY_LIGHT = 11;
+    /** 水度达标线（4/8 = 2 格内有水） */
+    private static final int SCORE_HYDRATION = 4;
+    /** 温度适宜区间 */
+    private static final float SCORE_TEMP_MIN = 0.5F;
+    private static final float SCORE_TEMP_MAX = 0.95F;
+
+    /**
+     * 生长前一次性环境评估 → 目标高度 = biologicalTopMin + 得分数（0-4）。
+     * 光照（露天）/ 水分（近水）/ 温度（适宜）/ 土壤（三轴全落偏好区间）各占一分。
+     * 评估在根部进行，结果持久化为方块 target 属性并随生长继承——
+     * 随机生长模式下每棵树的最终高度在生长期始即已确定。
+     */
+    public int evaluateTargetHeight(net.minecraft.world.WorldView world, BlockPos root) {
+        int score = 0;
+        if (world.getLightLevel(LightType.SKY, root.up()) >= SCORE_SKY_LIGHT) {
+            score++;
+        }
+        if (hydration(world, root) >= SCORE_HYDRATION) {
+            score++;
+        }
+        float temp = world.getBiome(root).value().getTemperature();
+        if (temp >= SCORE_TEMP_MIN && temp <= SCORE_TEMP_MAX) {
+            score++;
+        }
+        if (soilFactor(Soils.of(world, root.down())) >= 1.0F) {
+            score++;
+        }
+        return Math.min(biologicalTopMax, biologicalTopMin + score);
+    }
+
     /** 水度生长因子：干土 0.6 倍速 → 饱和 1.0 倍速 */
     public float hydrationFactor(int hydration) {
         return 0.6F + hydration * 0.05F;
@@ -272,9 +299,9 @@ public class TreeSpecies {
         return biomeHumidity(world, pos) >= minHumidity;
     }
 
-    /** 该主干方块是否处于可萌发侧芽的位置。默认：当前树高的上半部分（现实：主枝自上部萌发） */
-    public boolean isBudPosition(ServerWorld world, BlockPos pos, int height, int totalHeight) {
-        return height > totalHeight / 2;
+    /** 该主干方块是否处于可萌发侧芽的位置。默认：预定目标高度的上半部分（现实：主枝自上部萌发） */
+    public boolean isBudPosition(ServerWorld world, BlockPos pos, int height, int targetHeight) {
+        return height > targetHeight / 2;
     }
 
     /** 侧枝延伸时子枝的方向。默认：直线延伸（垂柳覆写为渐下垂） */
@@ -335,9 +362,8 @@ public class TreeSpecies {
 
     public static class Builder {
         private final String id;
-        private int biologicalTopMin = 7;
-        private int biologicalTopMax = 10;
-        private float toppingChance = 0.25F;
+        private int biologicalTopMin = 8;
+        private int biologicalTopMax = 12;
         private int trunkMaxGrowth = 8;
         private int topBudGrowth = 5;
         private int maxBuds = 4;
@@ -363,8 +389,6 @@ public class TreeSpecies {
 
         /** 生物顶端高度区间：主干在 min~max 之间掷封顶骰，同一片林子天然高矮不一 */
         public Builder biologicalTop(int min, int max) { this.biologicalTopMin = min; this.biologicalTopMax = max; return this; }
-        /** 区间内每次抽高的封顶概率 */
-        public Builder toppingChance(float v) { this.toppingChance = v; return this; }
         public Builder trunkMaxGrowth(int v) { this.trunkMaxGrowth = v; return this; }
         public Builder topBudGrowth(int v) { this.topBudGrowth = v; return this; }
         public Builder maxBuds(int v) { this.maxBuds = v; return this; }

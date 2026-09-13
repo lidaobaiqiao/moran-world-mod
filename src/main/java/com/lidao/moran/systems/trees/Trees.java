@@ -9,7 +9,6 @@ public final class Trees {
     /** 桃树：高大（8-12 米）、上半部萌芽、花芽着生一年生枝顶与侧腋、耐旱怕涝（排水敏感） */
     public static final TreeSpecies PEACH = TreeSpecies.builder("peach")
             .biologicalTop(8, 12)
-            .toppingChance(0.25F)
             .topBudGrowth(5)
             .maxBuds(6)
             .budChanceDenom(4)

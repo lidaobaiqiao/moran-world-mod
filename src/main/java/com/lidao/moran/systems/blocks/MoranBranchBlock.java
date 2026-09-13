@@ -45,6 +45,8 @@ public class MoranBranchBlock extends Block implements Fertilizable {
     public static final int NATURAL_INTERVAL = 2;
     /** 野生模式（世界生成）：0.1s 一次请求、条件过即立即生长、条件失败直接冻结 */
     public static final BooleanProperty NATURAL = BooleanProperty.of("natural");
+    /** 目标高度（8-12）：生长前环境评估一次确定（8 + 光照/水分/温度/土壤各一分），生长全程继承 */
+    public static final IntProperty TARGET = IntProperty.of("target", 8, 12);
     /** 主干封顶标记：到顶决策持久化，唤醒侧芽与顶花苞由此驱动 */
     public static final BooleanProperty TOPPED = BooleanProperty.of("topped");
 
@@ -86,7 +88,8 @@ public class MoranBranchBlock extends Block implements Fertilizable {
                 .with(FAILS, 0)
                 .with(DORMANT, false)
                 .with(TOPPED, false)
-                .with(NATURAL, false));
+                .with(NATURAL, false)
+                .with(TARGET, 8));
     }
 
     public TreeSpecies species() {
@@ -95,7 +98,7 @@ public class MoranBranchBlock extends Block implements Fertilizable {
 
     @Override
     protected void appendProperties(StateManager.Builder<Block, BlockState> builder) {
-        builder.add(GROWTH, FACING, FAILS, DORMANT, TOPPED, NATURAL);
+        builder.add(GROWTH, FACING, FAILS, DORMANT, TOPPED, NATURAL, TARGET);
     }
 
     @Override
@@ -189,13 +192,10 @@ public class MoranBranchBlock extends Block implements Fertilizable {
         int height = heightBelow(world, pos, species.biologicalTopMax()) + 1;
 
         // 封顶决策（只在顶端做一次，结果持久化为 TOPPED）：
-        // 高度达上限强制封顶；进入区间后每次抽高前掷封顶骰；上方被遮挡视为到顶
+        // 高度达目标（生长前环境评估确定）即封顶；上方被遮挡视为到顶
         if (top && !state.get(TOPPED)) {
             boolean canExtend = world.getBlockState(above).isAir();
-            boolean capped = height >= species.biologicalTopMax() || !canExtend;
-            boolean rollStop = height >= species.biologicalTopMin()
-                    && random.nextFloat() < species.toppingChance();
-            if (capped || (canExtend && rollStop)) {
+            if (height >= state.get(TARGET) || !canExtend) {
                 state = state.with(TOPPED, true);
                 world.setBlockState(pos, state, Block.NOTIFY_ALL);
             }
@@ -214,17 +214,18 @@ public class MoranBranchBlock extends Block implements Fertilizable {
             // 抽高期：自身 >= 2 才能向上生新节（新节恒为 1，「新块最大为自身减一」）
             if (growth >= 2) {
                 world.setBlockState(above, getDefaultState()
-                        .with(NATURAL, state.get(NATURAL)), Block.NOTIFY_ALL);
+                        .with(NATURAL, state.get(NATURAL))
+                        .with(TARGET, state.get(TARGET)), Block.NOTIFY_ALL);
             }
         }
 
-        // 侧芽萌发：相位门控 = 主干至少长到生物顶端下限（防止矮树期落芽、树长高后芽挂底部）；
-        // 位置 = 当前树高上半部分（树种判定），数量上限内概率递减，向光 + 空间竞争。
+        // 侧芽萌发：位置 = 预定目标高度的上半部分（树种判定，矮树期天然不触发），
+        // 数量上限内概率递减，向光 + 空间竞争。
         // 抽高期萌发的为休眠态（到顶统一唤醒）；封顶后补芽直接苏醒态（密度受 maxBuds 硬上限约束）
-        if (growth >= 2 && height >= species.biologicalTopMin()) {
+        if (growth >= 2) {
             int buds = countBudsAroundTrunk(world, pos);
             if (buds < species.maxBuds()
-                    && species.isBudPosition(world, pos, height, height + trunkSegmentsAbove(world, pos))
+                    && species.isBudPosition(world, pos, height, state.get(TARGET))
                     && random.nextInt(species.budChanceDenom()) < (species.maxBuds() - buds)) {
                 Direction d = phototropicDirection(world, pos, random);
                 BlockPos p = pos.offset(d);
@@ -232,7 +233,8 @@ public class MoranBranchBlock extends Block implements Fertilizable {
                     boolean dormant = !treeTopped(world, pos);
                     world.setBlockState(p, getDefaultState()
                             .with(FACING, d).with(DORMANT, dormant)
-                            .with(NATURAL, state.get(NATURAL)), Block.NOTIFY_ALL);
+                            .with(NATURAL, state.get(NATURAL))
+                            .with(TARGET, state.get(TARGET)), Block.NOTIFY_ALL);
                 }
             }
         }
@@ -257,7 +259,8 @@ public class MoranBranchBlock extends Block implements Fertilizable {
         if (growth >= 2 && chainPos < MAX_BRANCH_CHAIN && tipAir
                 && random.nextFloat() < BRANCH_EXTEND_CHANCE) {
             world.setBlockState(tip, getDefaultState()
-                    .with(FACING, facing).with(NATURAL, state.get(NATURAL)), Block.NOTIFY_ALL);
+                    .with(FACING, facing).with(NATURAL, state.get(NATURAL))
+                    .with(TARGET, state.get(TARGET)), Block.NOTIFY_ALL);
             return;
         }
 
@@ -268,7 +271,8 @@ public class MoranBranchBlock extends Block implements Fertilizable {
                 BlockPos sp = pos.offset(side);
                 if (world.getBlockState(sp).isAir() && random.nextFloat() < species.subBranchChance()) {
                     world.setBlockState(sp, getDefaultState()
-                            .with(FACING, side).with(NATURAL, state.get(NATURAL)), Block.NOTIFY_ALL);
+                            .with(FACING, side).with(NATURAL, state.get(NATURAL))
+                            .with(TARGET, state.get(TARGET)), Block.NOTIFY_ALL);
                     return;
                 }
             }
@@ -295,6 +299,9 @@ public class MoranBranchBlock extends Block implements Fertilizable {
             return;
         }
         for (Direction d : Direction.values()) {
+            if (d == Direction.UP) {
+                continue; // 断口在上方时 facing=DOWN 不在合法值域，跳过
+            }
             BlockPos n = pos.offset(d);
             BlockState neighbor = world.getBlockState(n);
             if (neighbor.getBlock() instanceof MoranBranchBlock) {
@@ -304,7 +311,8 @@ public class MoranBranchBlock extends Block implements Fertilizable {
                         .with(GROWTH, 1)
                         .with(DORMANT, false)
                         .with(TOPPED, false)
-                        .with(FAILS, 0), Block.NOTIFY_ALL);
+                        .with(FAILS, 0)
+                        .with(TARGET, neighbor.contains(TARGET) ? neighbor.get(TARGET) : 8), Block.NOTIFY_ALL);
                 world.scheduleBlockTick(pos, neighbor.getBlock(),
                         neighbor.contains(NATURAL) && neighbor.get(NATURAL)
                                 ? NATURAL_INTERVAL : TreeSpecies.REQUEST_INTERVAL);
@@ -415,8 +423,7 @@ public class MoranBranchBlock extends Block implements Fertilizable {
     /** 自身是否位于主干可萌发位置（由树种档案判定，默认上半部分） */
     private boolean inBudPosition(ServerWorld world, BlockPos pos) {
         int height = heightBelow(world, pos, species.biologicalTopMax()) + 1;
-        int total = height + trunkSegmentsAbove(world, pos);
-        return species.isBudPosition(world, pos, height, total);
+        return species.isBudPosition(world, pos, height, world.getBlockState(pos).get(TARGET));
     }
 
     private int trunkSegmentsAbove(ServerWorld world, BlockPos pos) {

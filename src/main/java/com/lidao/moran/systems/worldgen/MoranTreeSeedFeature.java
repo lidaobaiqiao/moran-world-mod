@@ -31,6 +31,9 @@ public class MoranTreeSeedFeature extends Feature<SimpleBlockFeatureConfig> {
         if (!state.canPlaceAt(context.getWorld(), pos)) {
             return false;
         }
+        // 生长前一次性环境评估 → 目标高度（持久化于方块，随生长继承）
+        int target = com.lidao.moran.systems.trees.Trees.PEACH.evaluateTargetHeight(context.getWorld(), pos);
+        state = state.with(com.lidao.moran.systems.blocks.MoranBranchBlock.TARGET, target);
         context.getWorld().setBlockState(pos, state, 2);
         // 登记第一次野生生长请求（0.1 秒），此后由引擎链式自续
         context.getWorld().scheduleBlockTick(pos, state.getBlock(), MoranBranchBlock.NATURAL_INTERVAL);
