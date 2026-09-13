@@ -174,8 +174,11 @@ public class MoranBranchBlock extends Block implements Fertilizable {
         int growth = state.get(GROWTH);
         boolean trunk = facing == Direction.UP;
 
-        // 自身成熟：主干至 trunkMaxGrowth，侧枝至 branchMaxGrowth
-        int cap = trunk ? species.trunkMaxGrowth() : species.branchMaxGrowth();
+        // 自身成熟：主干至 trunkMaxGrowth；侧枝至 min(档案上限, 养分值)——
+        // 养分从根部发起（主干=当前 growth），沿结构传递递减：
+        // 同链每节距离损耗、换向分叉分流损耗，末梢天然细小（侧枝恒细于母干）
+        int cap = trunk ? species.trunkMaxGrowth()
+                : Math.min(species.branchMaxGrowth(), nutritionAt(world, pos, facing));
         if (growth < cap) {
             growth += 1;
             world.setBlockState(pos, state.with(GROWTH, growth), Block.NOTIFY_ALL);
@@ -492,6 +495,30 @@ public class MoranBranchBlock extends Block implements Fertilizable {
         }
     }
 
+    /**
+     * 本格养分值：沿结构回溯到主干（根部养分发起，主干养分 = 其当前 growth），
+     * 途中同链延伸每节扣距离损耗，换向分叉扣分叉损耗。主干长粗后侧枝上限自动放开。
+     */
+    private int nutritionAt(ServerWorld world, BlockPos pos, Direction facing) {
+        int decay = 0;
+        Direction dir = facing;
+        BlockPos p = pos;
+        for (int i = 0; i < 24; i++) {
+            BlockPos back = p.offset(dir.getOpposite());
+            BlockState s = world.getBlockState(back);
+            if (!(s.getBlock() instanceof MoranBranchBlock)) {
+                return Math.max(1, species.trunkMaxGrowth() - decay); // 断链孤儿：按剩余养分
+            }
+            if (s.get(FACING) == Direction.UP) {
+                return Math.max(1, s.get(GROWTH) - decay);
+            }
+            decay += (s.get(FACING) == dir) ? species.chainNutritionDecay() : species.branchNutritionDecay();
+            p = back;
+            dir = s.get(FACING);
+        }
+        return 1;
+    }
+
     /** 自身在同朝向侧枝链上的位置（距主干的水平距离） */
     private static int chainPosition(ServerWorld world, BlockPos pos, Direction facing) {
         int dist = 1;
@@ -540,7 +567,8 @@ public class MoranBranchBlock extends Block implements Fertilizable {
     @Override
     public void grow(ServerWorld world, Random random, BlockPos pos, BlockState state) {
         int growth = state.get(GROWTH);
-        int cap = state.get(FACING) == Direction.UP ? species.trunkMaxGrowth() : species.branchMaxGrowth();
+        int cap = state.get(FACING) == Direction.UP ? species.trunkMaxGrowth()
+                : Math.min(species.branchMaxGrowth(), nutritionAt(world, pos, state.get(FACING)));
         if (growth < cap) {
             world.setBlockState(pos, state.with(GROWTH, growth + 1), Block.NOTIFY_ALL);
         }

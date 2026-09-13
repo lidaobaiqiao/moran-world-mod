@@ -84,6 +84,8 @@ public class TreeSpecies {
     // —— 交互参数 ——
     private final float pruneResponseChance;
     private final int minSpacing;
+    private final int branchNutritionDecay;
+    private final int chainNutritionDecay;
     // —— 方块引用（注册后绑定） ——
     private Block branchBlock;
     private Block budBlock;
@@ -112,6 +114,8 @@ public class TreeSpecies {
         this.retentionRange = b.retentionRange;
         this.pruneResponseChance = b.pruneResponseChance;
         this.minSpacing = b.minSpacing;
+        this.branchNutritionDecay = b.branchNutritionDecay;
+        this.chainNutritionDecay = b.chainNutritionDecay;
     }
 
     public String id() {
@@ -169,6 +173,16 @@ public class TreeSpecies {
     /** 最小树干间距（水平切比雪夫距离）：世界生成放置种子时的安全距离 */
     public int minSpacing() {
         return minSpacing;
+    }
+
+    /** 养分分叉损耗：每分出一级枝，养分减损（分流损失，>距离损耗） */
+    public int branchNutritionDecay() {
+        return branchNutritionDecay;
+    }
+
+    /** 养分距离损耗：同链每延伸一节，养分减损 */
+    public int chainNutritionDecay() {
+        return chainNutritionDecay;
     }
 
     /** 注册完成后绑定本树种的三类方块实例 */
@@ -375,6 +389,8 @@ public class TreeSpecies {
         private int[] retentionRange = {2, 6};
         private float pruneResponseChance = 0.5F;
         private int minSpacing = 4;
+        private int branchNutritionDecay = 2;
+        private int chainNutritionDecay = 1;
 
         private Builder(String id) {
             this.id = id;
@@ -408,6 +424,10 @@ public class TreeSpecies {
         public Builder pruneResponseChance(float v) { this.pruneResponseChance = v; return this; }
         /** 最小树干间距：世界生成种子放置的安全距离（水平切比雪夫距离） */
         public Builder minSpacing(int v) { this.minSpacing = v; return this; }
+        /** 养分分叉损耗（每分一级枝） */
+        public Builder branchNutritionDecay(int v) { this.branchNutritionDecay = v; return this; }
+        /** 养分距离损耗（同链每节） */
+        public Builder chainNutritionDecay(int v) { this.chainNutritionDecay = v; return this; }
 
         public TreeSpecies build() {
             return new TreeSpecies(this);
