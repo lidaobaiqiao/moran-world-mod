@@ -65,13 +65,16 @@ public class MoranBranchBlock extends Block implements Fertilizable {
         for (Direction d : TreeSpecies.HORIZONTALS) {
             VoxelShape[] shapes = new VoxelShape[9];
             for (int g = 1; g <= 8; g++) {
-                double h = Math.min(HALF_WIDTH[g], 6);
+                // 水平枝条截面取扁矩形：竖向半高收窄（<=3），横向保持粗度——
+                // 竖向若按主干半宽走，粗枝会渲染成 12 格高的方墩，像竖着的截干
+                double w = Math.min(HALF_WIDTH[g], 6);
+                double h = Math.min(HALF_WIDTH[g], 3);
                 shapes[g] = switch (d) {
                     // 芽块紧贴其朝向反侧的面（母体所在一侧）
-                    case EAST -> Block.createCuboidShape(0, 8 - h, 8 - h, 12, 8 + h, 8 + h);
-                    case WEST -> Block.createCuboidShape(4, 8 - h, 8 - h, 16, 8 + h, 8 + h);
-                    case SOUTH -> Block.createCuboidShape(8 - h, 8 - h, 0, 8 + h, 8 + h, 12);
-                    case NORTH -> Block.createCuboidShape(8 - h, 8 - h, 4, 8 + h, 8 + h, 16);
+                    case EAST -> Block.createCuboidShape(0, 8 - h, 8 - w, 12, 8 + h, 8 + w);
+                    case WEST -> Block.createCuboidShape(4, 8 - h, 8 - w, 16, 8 + h, 8 + w);
+                    case SOUTH -> Block.createCuboidShape(8 - w, 8 - h, 0, 8 + w, 8 + h, 12);
+                    case NORTH -> Block.createCuboidShape(8 - w, 8 - h, 4, 8 + w, 8 + h, 16);
                     default -> VoxelShapes.empty();
                 };
             }
