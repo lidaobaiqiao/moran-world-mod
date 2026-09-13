@@ -112,6 +112,20 @@ public class BlockSystem {
             new SaplingBlock(new MoranSaplingGenerator("ginkgo_tree"),
                     FabricBlockSettings.copyOf(Blocks.OAK_SAPLING).noCollision().breakInstantly()));
 
+    // 🧪 临时测试方块组：验证各档位 / 各分叉方向的侧枝模型（确认后整组删除）
+    public static final Block TEST_G1_EAST = testBlock("test_g1_east");
+    public static final Block TEST_G2_EAST = testBlock("test_g2_east");
+    public static final Block TEST_G2_WEST = testBlock("test_g2_west");
+    public static final Block TEST_G2_UP = testBlock("test_g2_up");
+    public static final Block TEST_G2_DOWN = testBlock("test_g2_down");
+    public static final Block TEST_G3_EAST = testBlock("test_g3_east");
+    public static final Block TEST_G5_EAST = testBlock("test_g5_east");
+    public static final Block TEST_G7_EAST = testBlock("test_g7_east");
+
+    private static Block testBlock(String id) {
+        return register(id, new Block(FabricBlockSettings.copyOf(Blocks.OAK_PLANKS).nonOpaque()));
+    }
+
     /**
      * 为所有方块注册 BlockItem（树苗除外——其物品在 ItemSystem 注册）。
      */

@@ -66,6 +66,15 @@ public class MoranItemGroup {
                         entries.add(BlockSystem.ANCIENT_PEACH_REALM_STONE);
                         // 生物
                         entries.add(EntitySystem.MOLING_SPAWN_EGG);
+                        // 🧪 临时测试方块组（确认渲染后连同 BlockSystem 的注册一起删）
+                        entries.add(BlockSystem.TEST_G1_EAST);
+                        entries.add(BlockSystem.TEST_G2_EAST);
+                        entries.add(BlockSystem.TEST_G2_WEST);
+                        entries.add(BlockSystem.TEST_G2_UP);
+                        entries.add(BlockSystem.TEST_G2_DOWN);
+                        entries.add(BlockSystem.TEST_G3_EAST);
+                        entries.add(BlockSystem.TEST_G5_EAST);
+                        entries.add(BlockSystem.TEST_G7_EAST);
                     })
                     .build()
     );
