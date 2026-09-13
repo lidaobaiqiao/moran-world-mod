@@ -33,7 +33,7 @@ public class PeachSpecies extends TreeSpecies {
                 .branchMaxGrowth(7)
                 .branchStopGrowth(4)
                 .branchStopChance(0.25F)
-                .subBranchChance(0.25F)
+                .subBranchChance(0.12F)
                 .growChance(0.5F)
                 .minLight(9)
                 .temperature(0.3F, 1.2F)
@@ -43,15 +43,41 @@ public class PeachSpecies extends TreeSpecies {
                 .pruneResponseChance(0.5F));
     }
 
-    /** 桃树开花：末端与四周（上方 + 两侧垂直向）生成花苞——现实桃树花芽顶腋着生 */
+    /** 链上侧腋开花概率：未长枝的侧位以花填充（现实桃树花芽满布一年生枝侧腋） */
+    private static final float AXILLARY_BUD_CHANCE = 0.6F;
+    /** 开花回溯的链深（末三节的侧腋参与开花） */
+    private static final int AXILLARY_DEPTH = 3;
+
+    /** 桃树开花：末端与四周花苞 + 链上未分枝侧腋开花填充——现实桃树花芽顶腋着生 */
     @Override
     public void onBranchStop(ServerWorld world, BlockPos pos, Direction facing, Random random, boolean natural) {
         placeBudIfAir(world, pos.offset(facing), facing, natural);
+        placeBudIfAir(world, pos.up(), Direction.UP, natural);
         Direction left = facing.rotateYCounterclockwise();
         Direction right = facing.rotateYClockwise();
-        placeBudIfAir(world, pos.up(), Direction.UP, natural);
         placeBudIfAir(world, pos.offset(left), left, natural);
         placeBudIfAir(world, pos.offset(right), right, natural);
+        // 链上回溯：未长出侧枝的侧位（上/左/右）以花填充
+        BlockPos p = pos.offset(facing.getOpposite());
+        for (int i = 0; i < AXILLARY_DEPTH; i++) {
+            net.minecraft.block.BlockState s = world.getBlockState(p);
+            if (!(s.getBlock() instanceof com.lidao.moran.systems.blocks.MoranBranchBlock)
+                    || s.get(com.lidao.moran.systems.blocks.MoranBranchBlock.FACING) != facing) {
+                break;
+            }
+            if (random.nextFloat() < AXILLARY_BUD_CHANCE) {
+                placeBudIfAir(world, p.up(), Direction.UP, natural);
+            }
+            if (random.nextFloat() < AXILLARY_BUD_CHANCE) {
+                Direction l = facing.rotateYCounterclockwise();
+                placeBudIfAir(world, p.offset(l), l, natural);
+            }
+            if (random.nextFloat() < AXILLARY_BUD_CHANCE) {
+                Direction r = facing.rotateYClockwise();
+                placeBudIfAir(world, p.offset(r), r, natural);
+            }
+            p = p.offset(facing.getOpposite());
+        }
     }
 
     /** 桃树花苞成熟：先花后叶——化为桃花树叶；顶部花苞生成小树冠（四向 + 四角半数） */

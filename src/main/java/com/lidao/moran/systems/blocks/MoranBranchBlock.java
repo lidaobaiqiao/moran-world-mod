@@ -246,7 +246,7 @@ public class MoranBranchBlock extends Block implements Fertilizable {
         }
     }
 
-    /** 侧枝链长上限（含贴干首节）：主干芽 -> 一级枝 -> 二级枝 */
+    /** 侧枝链长上限绝对值（含贴干首节）：养分高的一级枝 3 节，末级枝按营养递减 */
     private static final int MAX_BRANCH_CHAIN = 3;
     /** 侧枝末端延伸概率（主干同款的「抽高」，横向版） */
     private static final float BRANCH_EXTEND_CHANCE = 0.75F;
@@ -261,8 +261,10 @@ public class MoranBranchBlock extends Block implements Fertilizable {
         BlockPos tip = pos.offset(facing);
         boolean tipAir = world.getBlockState(tip).isAir();
 
-        // 末端延伸：链未到上限时向外长出新节（新节 maturity 1，同主干抽高）
-        if (growth >= 2 && chainPos < MAX_BRANCH_CHAIN && tipAir
+        // 末端延伸：链上限按养分递减（营养分配规律——末级枝短）：
+        // 一级枝（养分6）3 节，链尾/二级枝（养分4-5）1-2 节
+        int chainLimit = Math.max(1, Math.min(MAX_BRANCH_CHAIN, nutritionAt(world, pos, facing) - 3));
+        if (growth >= 2 && chainPos < chainLimit && tipAir
                 && random.nextFloat() < BRANCH_EXTEND_CHANCE) {
             world.setBlockState(tip, getDefaultState()
                     .with(FACING, facing).with(NATURAL, state.get(NATURAL))
