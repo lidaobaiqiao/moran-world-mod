@@ -70,11 +70,11 @@ public class MoranBranchBlock extends Block implements Fertilizable {
                 double w = Math.min(HALF_WIDTH[g], 6);
                 double h = Math.min(HALF_WIDTH[g], 3);
                 shapes[g] = switch (d) {
-                    // 芽块紧贴其朝向反侧的面（母体所在一侧）
-                    case EAST -> Block.createCuboidShape(0, 8 - h, 8 - w, 12, 8 + h, 8 + w);
-                    case WEST -> Block.createCuboidShape(4, 8 - h, 8 - w, 16, 8 + h, 8 + w);
-                    case SOUTH -> Block.createCuboidShape(8 - w, 8 - h, 0, 8 + w, 8 + h, 12);
-                    case NORTH -> Block.createCuboidShape(8 - w, 8 - h, 4, 8 + w, 8 + h, 16);
+                    // 枝条贯穿整格（长度 16）：贴干端接上主干，尖端到方块界面
+                    case EAST -> Block.createCuboidShape(0, 8 - h, 8 - w, 16, 8 + h, 8 + w);
+                    case WEST -> Block.createCuboidShape(0, 8 - h, 8 - w, 16, 8 + h, 8 + w);
+                    case SOUTH -> Block.createCuboidShape(8 - w, 8 - h, 0, 8 + w, 8 + h, 16);
+                    case NORTH -> Block.createCuboidShape(8 - w, 8 - h, 0, 8 + w, 8 + h, 16);
                     default -> VoxelShapes.empty();
                 };
             }
