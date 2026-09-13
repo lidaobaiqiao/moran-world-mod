@@ -21,3 +21,6 @@ Thumbs.db
 
 # IDE auto-build output
 bin/
+
+# WorkBuddy 工作区数据（记忆、临时日志）
+.workbuddy/
