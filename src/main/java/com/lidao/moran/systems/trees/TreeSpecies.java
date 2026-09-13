@@ -83,6 +83,7 @@ public class TreeSpecies {
     private final int[] retentionRange;
     // —— 交互参数 ——
     private final float pruneResponseChance;
+    private final int minSpacing;
     // —— 方块引用（注册后绑定） ——
     private Block branchBlock;
     private Block budBlock;
@@ -110,6 +111,7 @@ public class TreeSpecies {
         this.aerationRange = b.aerationRange;
         this.retentionRange = b.retentionRange;
         this.pruneResponseChance = b.pruneResponseChance;
+        this.minSpacing = b.minSpacing;
     }
 
     public String id() {
@@ -162,6 +164,11 @@ public class TreeSpecies {
 
     public float pruneResponseChance() {
         return pruneResponseChance;
+    }
+
+    /** 最小树干间距（水平切比雪夫距离）：世界生成放置种子时的安全距离 */
+    public int minSpacing() {
+        return minSpacing;
     }
 
     /** 注册完成后绑定本树种的三类方块实例 */
@@ -367,6 +374,7 @@ public class TreeSpecies {
         private int[] aerationRange = {3, 8};
         private int[] retentionRange = {2, 6};
         private float pruneResponseChance = 0.5F;
+        private int minSpacing = 4;
 
         private Builder(String id) {
             this.id = id;
@@ -398,6 +406,8 @@ public class TreeSpecies {
         }
         /** 修剪响应：断口相邻枝干萌发新芽的概率 */
         public Builder pruneResponseChance(float v) { this.pruneResponseChance = v; return this; }
+        /** 最小树干间距：世界生成种子放置的安全距离（水平切比雪夫距离） */
+        public Builder minSpacing(int v) { this.minSpacing = v; return this; }
 
         public TreeSpecies build() {
             return new TreeSpecies(this);
