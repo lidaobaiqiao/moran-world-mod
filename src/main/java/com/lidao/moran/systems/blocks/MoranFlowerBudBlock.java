@@ -31,7 +31,8 @@ import java.util.List;
 public class MoranFlowerBudBlock extends Block implements Fertilizable {
 
     public static final EnumProperty<Direction> FACING = EnumProperty.of("facing", Direction.class,
-            List.of(Direction.UP, Direction.NORTH, Direction.SOUTH, Direction.WEST, Direction.EAST));
+            List.of(Direction.UP, Direction.DOWN, Direction.NORTH, Direction.SOUTH,
+                    Direction.WEST, Direction.EAST));
     public static final IntProperty STAGE = IntProperty.of("stage", 1, 3);
     public static final IntProperty FAILS = IntProperty.of("fails", 0, TreeSpecies.MAX_FAILS);
     /** 野生模式（世界生成）：0.1s 请求、立即生长、失败冻结 */

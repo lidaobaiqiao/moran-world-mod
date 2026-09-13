@@ -51,13 +51,22 @@ public class PeachSpecies extends TreeSpecies {
     /** 桃树开花：末端与四周花苞 + 链上未分枝侧腋开花填充——现实桃树花芽顶腋着生 */
     @Override
     public void onBranchStop(ServerWorld world, BlockPos pos, Direction facing, Random random, boolean natural) {
+        // 末端花苞
         placeBudIfAir(world, pos.offset(facing), facing, natural);
-        placeBudIfAir(world, pos.up(), Direction.UP, natural);
-        Direction left = facing.rotateYCounterclockwise();
-        Direction right = facing.rotateYClockwise();
-        placeBudIfAir(world, pos.offset(left), left, natural);
-        placeBudIfAir(world, pos.offset(right), right, natural);
-        // 链上回溯：未长出侧枝的侧位（上/左/右）以花填充
+        // 四周花苞：水平母枝取「上 + 左 + 右」；垂直母枝（上生/下生）取四个水平向。
+        // 注意 rotateYCounterclockwise/Clockwise 对 UP/DOWN 会抛 IllegalStateException，
+        // 不能无条件调用——垂直枝必须走另一条分支。
+        Direction[] around = facing.getAxis() == Direction.Axis.Y
+                ? HORIZONTALS
+                : new Direction[]{Direction.UP, facing.rotateYCounterclockwise(), facing.rotateYClockwise()};
+        for (Direction d : around) {
+            placeBudIfAir(world, pos.offset(d), d, natural);
+        }
+        // 链上回溯：未长出侧枝的侧位以花填充。
+        // 该回溯依赖「同朝向连续链」，只对水平链成立，垂直链跳过。
+        if (facing.getAxis() == Direction.Axis.Y) {
+            return;
+        }
         BlockPos p = pos.offset(facing.getOpposite());
         for (int i = 0; i < AXILLARY_DEPTH; i++) {
             net.minecraft.block.BlockState s = world.getBlockState(p);

@@ -37,7 +37,20 @@ public class MoranBranchBlock extends Block implements Fertilizable {
 
     public static final IntProperty GROWTH = IntProperty.of("growth", 1, 8);
     public static final EnumProperty<Direction> FACING = EnumProperty.of("facing", Direction.class,
-            List.of(Direction.UP, Direction.NORTH, Direction.SOUTH, Direction.WEST, Direction.EAST));
+            List.of(Direction.UP, Direction.DOWN, Direction.NORTH, Direction.SOUTH,
+                    Direction.WEST, Direction.EAST));
+    /**
+     * 主干标记——身份与朝向分离。
+     *
+     * FACING 只描述「朝哪延伸」，不承载身份：上生子枝的 FACING 同样是 UP，
+     * 若沿用 facing==UP 判断主干，子枝会冒充主干去抽高/封顶/萌侧芽，树形直接崩。
+     * 故身份单独用本属性承载。
+     *
+     * 默认 true = 主干。主干只有「树苗长成 / 野生种子落地」一个创建入口且用默认状态，
+     * 故默认值指向主干时漏设风险最小；侧枝/子枝在四个放置处显式置 false。
+     * 旧存档的枝干缺此属性时自动落 true，老树不损。
+     */
+    public static final BooleanProperty TRUNK = BooleanProperty.of("trunk");
     public static final IntProperty FAILS = IntProperty.of("fails", 0, TreeSpecies.MAX_FAILS);
     /** 休眠侧芽：出现在主干上半部分，主干到顶后苏醒 */
     public static final BooleanProperty DORMANT = BooleanProperty.of("dormant");
@@ -80,6 +93,10 @@ public class MoranBranchBlock extends Block implements Fertilizable {
             }
             BUD_SHAPES.put(d, shapes);
         }
+        // 垂直子枝（上生/下生）：形态与主干同为竖直柱，直接复用主干形状数组。
+        // 不补这两个方向会留 null，getOutlineShape 一取即崩。
+        BUD_SHAPES.put(Direction.UP, TRUNK_SHAPES);
+        BUD_SHAPES.put(Direction.DOWN, TRUNK_SHAPES);
     }
 
     public MoranBranchBlock(TreeSpecies species, Settings settings) {
@@ -88,6 +105,7 @@ public class MoranBranchBlock extends Block implements Fertilizable {
         setDefaultState(getDefaultState()
                 .with(GROWTH, 1)
                 .with(FACING, Direction.UP)
+                .with(TRUNK, true)
                 .with(FAILS, 0)
                 .with(DORMANT, false)
                 .with(TOPPED, false)
@@ -101,7 +119,7 @@ public class MoranBranchBlock extends Block implements Fertilizable {
 
     @Override
     protected void appendProperties(StateManager.Builder<Block, BlockState> builder) {
-        builder.add(GROWTH, FACING, FAILS, DORMANT, TOPPED, NATURAL, TARGET);
+        builder.add(GROWTH, FACING, TRUNK, FAILS, DORMANT, TOPPED, NATURAL, TARGET);
     }
 
     @Override
@@ -172,7 +190,7 @@ public class MoranBranchBlock extends Block implements Fertilizable {
     private void growPart(BlockState state, ServerWorld world, BlockPos pos, Random random) {
         Direction facing = state.get(FACING);
         int growth = state.get(GROWTH);
-        boolean trunk = facing == Direction.UP;
+        boolean trunk = state.get(TRUNK);   // 身份看 TRUNK，不看 FACING（上生子枝 FACING 也是 UP）
 
         // 自身成熟：主干至 trunkMaxGrowth；侧枝至 min(档案上限, 养分值)——
         // 养分从根部发起（主干=当前 growth），沿结构传递递减：
@@ -238,7 +256,7 @@ public class MoranBranchBlock extends Block implements Fertilizable {
                 if (world.getBlockState(p).isAir() && !isCrowded(world, p)) {
                     boolean dormant = !treeTopped(world, pos);
                     world.setBlockState(p, getDefaultState()
-                            .with(FACING, d).with(DORMANT, dormant)
+                            .with(FACING, d).with(TRUNK, false).with(DORMANT, dormant)
                             .with(NATURAL, state.get(NATURAL))
                             .with(TARGET, state.get(TARGET)), Block.NOTIFY_ALL);
                 }
@@ -267,19 +285,30 @@ public class MoranBranchBlock extends Block implements Fertilizable {
         if (growth >= 2 && chainPos < chainLimit && tipAir
                 && random.nextFloat() < BRANCH_EXTEND_CHANCE) {
             world.setBlockState(tip, getDefaultState()
-                    .with(FACING, facing).with(NATURAL, state.get(NATURAL))
+                    .with(FACING, facing).with(TRUNK, false).with(NATURAL, state.get(NATURAL))
                     .with(TARGET, state.get(TARGET)), Block.NOTIFY_ALL);
             return;
         }
 
-        // 分叉：成熟 >5 且本节距主干 >1（链上第二节起），侧向一个子侧枝；
-        // 侧向被占即本节已分过叉（自然限一节一叉）
-        if (growth > 5 && chainPos > 1) {
-            for (Direction side : new Direction[]{facing.rotateYClockwise(), facing.rotateYCounterclockwise()}) {
+        // 分叉：成熟 >5 且本节距主干 >1（链上第二节起），抽出一根子侧枝；
+        // 侧向被占即本节已分过叉（自然限一节一叉）。
+        // 候选方向按母枝朝向分两类——注意 rotateYClockwise/Counterclockwise 对 UP/DOWN
+        // 返回的是自身（MC 实现如此），垂直母枝直接用会把子枝放到自己身上：
+        //   水平母枝 -> 左右两侧 + 正上/正下（即「上生」「下生」）
+        //   垂直母枝（上生/下生抽出的枝再分叉）-> 四个水平向
+        // 「自然限一节一叉」：本节已抽出过子枝就不再分叉。
+        // 原先只靠「侧向被占」间接限制，而候选方向一多（水平母枝有 4 个），
+        // 会被逐 tick 逐个占满，长成一节四叉的畸形——必须显式判定。
+        if (growth > 5 && chainPos > 1 && !hasChildBranch(world, pos, facing)) {
+            Direction[] candidates = facing.getAxis() == Direction.Axis.Y
+                    ? TreeSpecies.HORIZONTALS
+                    : new Direction[]{facing.rotateYClockwise(), facing.rotateYCounterclockwise(),
+                                      Direction.UP, Direction.DOWN};
+            for (Direction side : candidates) {
                 BlockPos sp = pos.offset(side);
                 if (world.getBlockState(sp).isAir() && random.nextFloat() < species.subBranchChance()) {
                     world.setBlockState(sp, getDefaultState()
-                            .with(FACING, side).with(NATURAL, state.get(NATURAL))
+                            .with(FACING, side).with(TRUNK, false).with(NATURAL, state.get(NATURAL))
                             .with(TARGET, state.get(TARGET)), Block.NOTIFY_ALL);
                     return;
                 }
@@ -295,6 +324,26 @@ public class MoranBranchBlock extends Block implements Fertilizable {
     }
 
     /**
+     * 本节是否已抽出过子枝。
+     *
+     * 判定：某方向上存在同族方块，且它「朝外」（FACING 指向该方向）、非主干。
+     * 同类朝向（d == selfFacing）的邻居是链上的延伸节，不是子枝，必须排除——
+     * 否则每根枝都会被自己的下一节误判成「已有子枝」，永远分不出叉。
+     */
+    private static boolean hasChildBranch(ServerWorld world, BlockPos pos, Direction selfFacing) {
+        for (Direction d : Direction.values()) {
+            if (d == selfFacing) {
+                continue;
+            }
+            BlockState s = world.getBlockState(pos.offset(d));
+            if (s.getBlock() instanceof MoranBranchBlock && !s.get(TRUNK) && s.get(FACING) == d) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
      * 修剪响应：枝干被剪断后，断口相邻的枝干按档案概率向断口萌发新芽
      * （现实园艺：修剪促萌蘖——玩家由此可以主动塑形自己的树）。
      */
@@ -306,14 +355,14 @@ public class MoranBranchBlock extends Block implements Fertilizable {
                 || world.getRandom().nextFloat() >= species.pruneResponseChance()) {
             return;
         }
+        // FACING 现已含 DOWN，断口在上方或下方都能生成朝向断口的新芽，不必再跳过 UP
         for (Direction d : Direction.values()) {
-            if (d == Direction.UP) {
-                continue; // 断口在上方时 facing=DOWN 不在合法值域，跳过
-            }
             BlockPos n = pos.offset(d);
             BlockState neighbor = world.getBlockState(n);
             if (neighbor.getBlock() instanceof MoranBranchBlock) {
-                // 断口处生成朝向母体的新芽（growth=1），立即登记生长请求
+                // 断口处生成朝向母体的新芽（growth=1），立即登记生长请求。
+                // 用 neighbor.with(...) 从邻居复制状态：TRUNK 未在下方显式列出，故自动继承——
+                // 主干断了长出来的仍是主干（继续抽高），侧枝断了长出来的仍是侧枝。
                 world.setBlockState(pos, neighbor
                         .with(FACING, d.getOpposite())
                         .with(GROWTH, 1)
@@ -334,7 +383,7 @@ public class MoranBranchBlock extends Block implements Fertilizable {
         BlockPos p = pos;
         while (true) {
             BlockState above = world.getBlockState(p.up());
-            if (above.getBlock() instanceof MoranBranchBlock && above.get(FACING) == Direction.UP) {
+            if (above.getBlock() instanceof MoranBranchBlock && above.get(TRUNK)) {
                 p = p.up();
             } else {
                 break;
@@ -346,7 +395,7 @@ public class MoranBranchBlock extends Block implements Fertilizable {
     /** 野生树是否已完成全部生长使命（可永久静默） */
     private boolean isFullyGrown(BlockState state, ServerWorld world, BlockPos pos) {
         int growth = state.get(GROWTH);
-        if (state.get(FACING) == Direction.UP) {
+        if (state.get(TRUNK)) {
             if (growth < species.trunkMaxGrowth()) {
                 return false;
             }
@@ -419,7 +468,7 @@ public class MoranBranchBlock extends Block implements Fertilizable {
         BlockPos p = pos.down();
         while (height < limit) {
             BlockState s = world.getBlockState(p);
-            if (!(s.getBlock() instanceof MoranBranchBlock) || s.get(FACING) != Direction.UP) {
+            if (!(s.getBlock() instanceof MoranBranchBlock) || !s.get(TRUNK)) {
                 break;
             }
             height++;
@@ -439,7 +488,7 @@ public class MoranBranchBlock extends Block implements Fertilizable {
         BlockPos p = pos.up();
         while (n < species.biologicalTopMax()) {
             BlockState s = world.getBlockState(p);
-            if (!(s.getBlock() instanceof MoranBranchBlock) || s.get(FACING) != Direction.UP) {
+            if (!(s.getBlock() instanceof MoranBranchBlock) || !s.get(TRUNK)) {
                 break;
             }
             n++;
@@ -463,7 +512,7 @@ public class MoranBranchBlock extends Block implements Fertilizable {
                 }
             }
             BlockState above = world.getBlockState(cur.up());
-            if (above.getBlock() instanceof MoranBranchBlock && above.get(FACING) == Direction.UP) {
+            if (above.getBlock() instanceof MoranBranchBlock && above.get(TRUNK)) {
                 cur = cur.up();
             } else {
                 return count;
@@ -489,7 +538,7 @@ public class MoranBranchBlock extends Block implements Fertilizable {
                 }
             }
             BlockState above = world.getBlockState(cur.up());
-            if (above.getBlock() instanceof MoranBranchBlock && above.get(FACING) == Direction.UP) {
+            if (above.getBlock() instanceof MoranBranchBlock && above.get(TRUNK)) {
                 cur = cur.up();
             } else {
                 return;
@@ -511,7 +560,7 @@ public class MoranBranchBlock extends Block implements Fertilizable {
             if (!(s.getBlock() instanceof MoranBranchBlock)) {
                 return Math.max(1, species.trunkMaxGrowth() - decay); // 断链孤儿：按剩余养分
             }
-            if (s.get(FACING) == Direction.UP) {
+            if (s.get(TRUNK)) {
                 return Math.max(1, s.get(GROWTH) - decay);
             }
             decay += (s.get(FACING) == dir) ? species.chainNutritionDecay() : species.branchNutritionDecay();
@@ -538,15 +587,18 @@ public class MoranBranchBlock extends Block implements Fertilizable {
 
     @Override
     public VoxelShape getOutlineShape(BlockState state, BlockView world, BlockPos pos, ShapeContext context) {
-        return state.get(FACING) == Direction.UP
-                ? TRUNK_SHAPES[state.get(GROWTH)]
-                : BUD_SHAPES.get(state.get(FACING))[state.get(GROWTH)];
+        // 主干与垂直子枝（上生/下生）同为竖直柱，共用主干形状表
+        if (state.get(TRUNK) || state.get(FACING).getAxis() == Direction.Axis.Y) {
+            return TRUNK_SHAPES[state.get(GROWTH)];
+        }
+        return BUD_SHAPES.get(state.get(FACING))[state.get(GROWTH)];
     }
 
     @Override
     public VoxelShape getCollisionShape(BlockState state, BlockView world, BlockPos pos, ShapeContext context) {
-        // 细枝可穿行，侧芽不挡路，粗壮主干才实心
-        if (state.get(FACING) != Direction.UP || state.get(GROWTH) < 3) {
+        // 细枝可穿行，侧芽不挡路，粗壮的竖直枝干才实心
+        boolean vertical = state.get(TRUNK) || state.get(FACING).getAxis() == Direction.Axis.Y;
+        if (!vertical || state.get(GROWTH) < 3) {
             return VoxelShapes.empty();
         }
         return TRUNK_SHAPES[state.get(GROWTH)];
@@ -556,7 +608,7 @@ public class MoranBranchBlock extends Block implements Fertilizable {
     @Override
     public boolean isFertilizable(WorldView world, BlockPos pos, BlockState state, boolean isClient) {
         int growth = state.get(GROWTH);
-        return state.get(FACING) == Direction.UP
+        return state.get(TRUNK)
                 ? growth < species.trunkMaxGrowth()
                 : growth < species.branchMaxGrowth();
     }
@@ -569,7 +621,7 @@ public class MoranBranchBlock extends Block implements Fertilizable {
     @Override
     public void grow(ServerWorld world, Random random, BlockPos pos, BlockState state) {
         int growth = state.get(GROWTH);
-        int cap = state.get(FACING) == Direction.UP ? species.trunkMaxGrowth()
+        int cap = state.get(TRUNK) ? species.trunkMaxGrowth()
                 : Math.min(species.branchMaxGrowth(), nutritionAt(world, pos, state.get(FACING)));
         if (growth < cap) {
             world.setBlockState(pos, state.with(GROWTH, growth + 1), Block.NOTIFY_ALL);
