@@ -574,5 +574,9 @@ public class MoranBranchBlock extends Block implements Fertilizable {
         if (growth < cap) {
             world.setBlockState(pos, state.with(GROWTH, growth + 1), Block.NOTIFY_ALL);
         }
+        // 玩家骨粉 = 重新评估环境的钥匙：冻结/中断的树由此重新登记请求，
+        // 下一拍重做环境检查——通过则继续生长，不通过维持冻结（失败被容许）
+        world.scheduleBlockTick(pos, this,
+                state.get(NATURAL) ? NATURAL_INTERVAL : TreeSpecies.REQUEST_INTERVAL);
     }
 }

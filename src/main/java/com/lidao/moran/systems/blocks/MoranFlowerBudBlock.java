@@ -129,5 +129,8 @@ public class MoranFlowerBudBlock extends Block implements Fertilizable {
         } else {
             world.setBlockState(pos, state.with(STAGE, stage + 1), Block.NOTIFY_ALL);
         }
+        // 骨粉同时确保花苞重新进入请求循环（冻结中的花苞由此复活）
+        world.scheduleBlockTick(pos, this, state.get(NATURAL)
+                ? MoranBranchBlock.NATURAL_INTERVAL : TreeSpecies.REQUEST_INTERVAL);
     }
 }
