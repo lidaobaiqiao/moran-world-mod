@@ -88,7 +88,7 @@ public class TreeSpecies {
     private Block budBlock;
     private Block leavesBlock;
 
-    private TreeSpecies(Builder b) {
+    protected TreeSpecies(Builder b) {
         this.id = b.id;
         this.biologicalTopMin = b.biologicalTopMin;
         this.biologicalTopMax = b.biologicalTopMax;
@@ -310,37 +310,22 @@ public class TreeSpecies {
     }
 
     /**
-     * 侧枝停止生长时的开花方式。默认（桃树范式）：末端与四周（上方 + 两侧垂直向）生成花苞，
-     * 此后不再生侧枝——现实桃树的花芽着生一年生枝顶端与侧腋。
+     * 侧枝停止生长时的开花方式。中性默认：仅末端生成一颗花苞。
+     * 树种覆写定制花芽着生方式（桃树范式见 PeachSpecies：末端与四周）。
      */
     public void onBranchStop(ServerWorld world, BlockPos pos, Direction facing, Random random, boolean natural) {
         placeBudIfAir(world, pos.offset(facing), facing, natural);
-        Direction left = facing.rotateYCounterclockwise();
-        Direction right = facing.rotateYClockwise();
-        placeBudIfAir(world, pos.up(), Direction.UP, natural);
-        placeBudIfAir(world, pos.offset(left), left, natural);
-        placeBudIfAir(world, pos.offset(right), right, natural);
     }
 
     /**
-     * 花苞完全成熟（先花后叶物候）。默认：化为本树种树叶；
-     * 顶部花苞（facing=up）额外生成小树冠（四向必放 + 四角半数）。
+     * 花苞完全成熟。中性默认：化为本树种树叶。
+     * 树种覆写定制成熟形态（桃树范式见 PeachSpecies：先花后叶 + 顶部带冠）。
      */
     public void onBudMature(ServerWorld world, BlockPos pos, Direction facing, Random random) {
-        world.setBlockState(pos, leavesBlock.getDefaultState(), Block.NOTIFY_ALL);
-        if (facing == Direction.UP) {
-            for (Direction d : HORIZONTALS) {
-                placeLeafIfAir(world, pos.offset(d));
-            }
-            for (Direction d : HORIZONTALS) {
-                if (random.nextBoolean()) {
-                    placeLeafIfAir(world, pos.offset(d).up());
-                }
-            }
-        }
+        world.setBlockState(pos, leavesBlock().getDefaultState(), Block.NOTIFY_ALL);
     }
 
-    void placeBudIfAir(ServerWorld world, BlockPos pos, Direction facing, boolean natural) {
+    protected void placeBudIfAir(ServerWorld world, BlockPos pos, Direction facing, boolean natural) {
         if (world.getBlockState(pos).isAir()) {
             world.setBlockState(pos, budBlock.getDefaultState()
                     .with(com.lidao.moran.systems.blocks.MoranFlowerBudBlock.FACING, facing)
@@ -348,9 +333,9 @@ public class TreeSpecies {
         }
     }
 
-    private void placeLeafIfAir(ServerWorld world, BlockPos pos) {
+    protected void placeLeafIfAir(ServerWorld world, BlockPos pos) {
         if (world.getBlockState(pos).isAir()) {
-            world.setBlockState(pos, leavesBlock.getDefaultState(), Block.NOTIFY_ALL);
+            world.setBlockState(pos, leavesBlock().getDefaultState(), Block.NOTIFY_ALL);
         }
     }
 
