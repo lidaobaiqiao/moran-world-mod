@@ -1,68 +1,82 @@
 {
   "parent": "minecraft:block/block",
   "render_type": "minecraft:cutout",
+  "credit": "Made with Blockbench (\u624b\u7ed8\u7248)",
   "textures": {
-    "side": "moran_mod:block/peach_branch_g8",
-    "end": "moran_mod:block/peach_branch_ring",
-    "particle": "moran_mod:block/peach_branch_g8"
+    "2": "moran_mod:item/peach_log",
+    "3": "moran_mod:item/thick_peach_trunk_side"
   },
   "elements": [
     {
       "from": [
         0,
-        5,
-        2
+        0,
+        0
       ],
       "to": [
         16,
-        11,
-        14
+        16,
+        16
       ],
       "faces": {
-        "up": {
-          "texture": "#side",
+        "north": {
           "uv": [
-            2,
-            5,
-            14,
-            11
-          ]
-        },
-        "down": {
-          "texture": "#side",
-          "uv": [
-            2,
-            5,
-            14,
-            11
-          ]
+            0,
+            0,
+            16,
+            16
+          ],
+          "rotation": 270,
+          "texture": "#2"
         },
         "east": {
-          "texture": "#end",
-          "uv": [
-            2,
-            2,
-            14,
-            14
-          ]
-        },
-        "north": {
-          "texture": "#side",
           "uv": [
             0,
-            5,
+            0,
             16,
-            11
-          ]
+            16
+          ],
+          "rotation": 180,
+          "texture": "#3"
         },
         "south": {
-          "texture": "#side",
           "uv": [
             0,
-            5,
+            0,
             16,
-            11
-          ]
+            16
+          ],
+          "rotation": 90,
+          "texture": "#2"
+        },
+        "west": {
+          "uv": [
+            0,
+            0,
+            16,
+            16
+          ],
+          "texture": "#3"
+        },
+        "up": {
+          "uv": [
+            0,
+            0,
+            16,
+            16
+          ],
+          "rotation": 90,
+          "texture": "#2"
+        },
+        "down": {
+          "uv": [
+            0,
+            0,
+            16,
+            16
+          ],
+          "rotation": 90,
+          "texture": "#2"
         }
       }
     }
