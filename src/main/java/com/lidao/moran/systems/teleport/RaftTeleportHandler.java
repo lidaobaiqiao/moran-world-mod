@@ -1,9 +1,9 @@
-// src/main/java/com/lidao/moran/systems/teleport/RaftTeleportHandler.java
 package com.lidao.moran.systems.teleport;
 
 import com.lidao.moran.dimensions.DimensionRegistry;
 import net.minecraft.entity.vehicle.BoatEntity;
 import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.text.Text;
 import net.minecraft.util.math.Vec3d;
 
 import java.util.Map;
@@ -11,27 +11,39 @@ import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
- * 竹筏传送处理器 - 专门处理桃花源传送
+ * 竹筏传送处理器——「缘溪行」入口。
+ *
+ * 仅竹筏（BAMBOO 船型）触发；玩家乘筏漂流 5 秒（缓慢漂移视为顺流，急划打断），
+ * 传送至桃花源后进入「豁然开朗」过场：旁观者视角掠过 3 秒，终了回到生存。
+ * 过场以 tick 计数在服务端主线程推进，不使用额外线程。
  */
 public class RaftTeleportHandler {
     private static final Map<UUID, RaftData> playerRaftData = new ConcurrentHashMap<>();
-    private static int REQUIRED_SECONDS = 5;  // 测试模式：5秒
+    /** 「豁然开朗」过场倒计时（tick），按玩家分开计 */
+    private static final Map<UUID, Integer> enlightenmentTicks = new ConcurrentHashMap<>();
+    private static final int ENLIGHTENMENT_TOTAL = 60; // 3 秒
+    private static int REQUIRED_SECONDS = 5;
     private static int REQUIRED_TICKS = REQUIRED_SECONDS * 20;
 
     public static void onPlayerTick(ServerPlayerEntity player) {
         if (player == null) return;
 
-        // 检查玩家是否已在桃花源维度
+        // 「豁然开朗」过场推进（优先于竹筏逻辑——此时玩家已在桃花源）
+        Integer remaining = enlightenmentTicks.get(player.getUuid());
+        if (remaining != null) {
+            tickEnlightenment(player, remaining);
+            return;
+        }
+
+        // 已在桃花源维度：无需竹筏逻辑
         if (DimensionRegistry.getDimensionKey("peach_blossom") != null &&
                 player.getWorld().getRegistryKey().equals(DimensionRegistry.getDimensionKey("peach_blossom"))) {
             playerRaftData.remove(player.getUuid());
             return;
         }
 
-        // 测试模式：简化检查 - 只检查是否骑乘竹筏
-        if (player.getVehicle() instanceof BoatEntity boat) {
-            // 测试模式：任何竹筏都可以触发传送
-            System.out.println("🎣 检测到玩家乘坐竹筏: " + player.getEntityName() + ", 类型: " + boat.getVariant());
+        // 仅竹筏（BAMBOO 船型）触发
+        if (player.getVehicle() instanceof BoatEntity boat && boat.getVariant() == BoatEntity.Type.BAMBOO) {
             handleRaftTeleport(player, boat);
         } else {
             playerRaftData.remove(player.getUuid());
@@ -48,27 +60,25 @@ public class RaftTeleportHandler {
             return;
         }
 
+        // 漂流判定：乘筏顺流缓慢漂移视为静止（缘溪行），急划重置
         if (currentPos.distanceTo(data.lastPosition) < 2.0) {
             data.stationaryTicks++;
 
-            // 每秒提示一次（测试模式）
+            // 每秒提示一次剩余时间
             if (data.stationaryTicks % 20 == 0) {
                 int secondsLeft = (REQUIRED_TICKS - data.stationaryTicks) / 20;
-                player.sendMessage(net.minecraft.text.Text.literal(
-                        "§e测试模式：竹筏静止中... §7(" + secondsLeft + "秒后进入桃花源)"), false);
+                player.sendMessage(Text.literal(
+                        "§e缘溪行：竹筏漂流中... §7(" + secondsLeft + "秒后忘路之远近)"), false);
             }
 
-            // 达到设定时间，触发传送
             if (data.stationaryTicks >= REQUIRED_TICKS) {
-                System.out.println("🎯 测试模式：触发传送! " + player.getEntityName() + " 静止了 " + REQUIRED_SECONDS + " 秒");
                 triggerDimensionTravel(player);
                 return;
             }
         } else {
             if (data.stationaryTicks > 0) {
-                System.out.println("移动重置: " + player.getEntityName() + " 原计时: " + data.stationaryTicks);
                 data.stationaryTicks = 0;
-                player.sendMessage(net.minecraft.text.Text.literal("§c移动打断了传送进程..."), false);
+                player.sendMessage(Text.literal("§c急桨打断了漂流..."), false);
             }
         }
 
@@ -76,31 +86,19 @@ public class RaftTeleportHandler {
     }
 
     private static void triggerDimensionTravel(ServerPlayerEntity player) {
-        // 使用维度注册表获取桃花源维度
-        System.out.println("🔍 检查维度注册表: peach_blossom");
         if (DimensionRegistry.getDimensionKey("peach_blossom") == null) {
-            System.out.println("❌ 桃花源维度未注册!");
-            player.sendMessage(net.minecraft.text.Text.literal("§c桃花源维度尚未准备好..."), false);
+            player.sendMessage(Text.literal("§c桃花源维度尚未准备好..."), false);
             return;
         }
-
-        System.out.println("✅ 桃花源维度已注册，获取维度世界...");
         net.minecraft.server.world.ServerWorld targetWorld = player.getServer()
                 .getWorld(DimensionRegistry.getDimensionKey("peach_blossom"));
-
         if (targetWorld == null) {
-            System.out.println("❌ 桃花源维度世界未加载!");
-            player.sendMessage(net.minecraft.text.Text.literal("§c桃花源维度尚未加载..."), false);
+            player.sendMessage(Text.literal("§c桃花源维度尚未加载..."), false);
             return;
         }
 
-        System.out.println("✅ 桃花源维度世界已获取，准备传送...");
-
         try {
-            // 传送前清除计时数据
             playerRaftData.remove(player.getUuid());
-
-            // 执行传送
             net.fabricmc.fabric.api.dimension.v1.FabricDimensions.teleport(
                     player,
                     targetWorld,
@@ -115,49 +113,42 @@ public class RaftTeleportHandler {
                             player.getPitch()
                     )
             );
-
-            // 触发"豁然开朗"体验
             startEnlightenmentProcess(player);
-
         } catch (Exception e) {
-            System.out.println("传送失败: " + e.getMessage());
-            e.printStackTrace();
-            player.sendMessage(net.minecraft.text.Text.literal("§c传送失败: " + e.getMessage()), false);
+            player.sendMessage(Text.literal("§c传送失败: " + e.getMessage()), false);
         }
     }
 
-    // 保持原有的"豁然开朗"体验流程
+    /**
+     * 「豁然开朗」过场：旁观者视角掠过 3 秒（SPECTATOR），
+     * 终了回到生存并点亮夜视。阶段文案按《桃花源记》行进。
+     */
     private static void startEnlightenmentProcess(ServerPlayerEntity player) {
+        enlightenmentTicks.put(player.getUuid(), ENLIGHTENMENT_TOTAL);
         player.changeGameMode(net.minecraft.world.GameMode.SPECTATOR);
-        player.sendMessage(net.minecraft.text.Text.literal("§8§l缘溪行，忘路之远近..."), false);
-
+        player.sendMessage(Text.literal("§8§l缘溪行，忘路之远近..."), false);
         player.addStatusEffect(new net.minecraft.entity.effect.StatusEffectInstance(
-                net.minecraft.entity.effect.StatusEffects.BLINDNESS, 60, 0
-        ));
-
-        player.changeGameMode(net.minecraft.world.GameMode.SURVIVAL);
-        player.sendMessage(net.minecraft.text.Text.literal("§5§l忽逢桃花林，夹岸数百步..."), false);
-        player.sendMessage(net.minecraft.text.Text.literal("§e§l复行数十步，即将豁然开朗..."), false);
-
-        // 3秒后清除失明
-        new Thread(() -> {
-            try {
-                Thread.sleep(3000);
-                player.getServer().execute(() -> {
-                    player.removeStatusEffect(net.minecraft.entity.effect.StatusEffects.BLINDNESS);
-                    player.addStatusEffect(new net.minecraft.entity.effect.StatusEffectInstance(
-                            net.minecraft.entity.effect.StatusEffects.NIGHT_VISION, 100, 0
-                    ));
-
-                    player.sendMessage(net.minecraft.text.Text.literal("§a§l豁然开朗！土地平旷，屋舍俨然..."), false);
-                    player.sendMessage(net.minecraft.text.Text.literal("§6欢迎来到桃花源！"), false);
-                });
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-        }).start();
-
+                net.minecraft.entity.effect.StatusEffects.BLINDNESS, 70, 0));
         spawnEnlightenmentParticles(player);
+    }
+
+    /** 过场推进：中段文案 → 终了回生存、点亮夜视 */
+    private static void tickEnlightenment(ServerPlayerEntity player, int remaining) {
+        if (remaining == ENLIGHTENMENT_TOTAL - 30) {
+            player.sendMessage(Text.literal("§5§l忽逢桃花林，夹岸数百步..."), false);
+            player.sendMessage(Text.literal("§e§l复行数十步，即将豁然开朗..."), false);
+        }
+        if (remaining <= 1) {
+            enlightenmentTicks.remove(player.getUuid());
+            player.removeStatusEffect(net.minecraft.entity.effect.StatusEffects.BLINDNESS);
+            player.addStatusEffect(new net.minecraft.entity.effect.StatusEffectInstance(
+                    net.minecraft.entity.effect.StatusEffects.NIGHT_VISION, 100, 0));
+            player.changeGameMode(net.minecraft.world.GameMode.SURVIVAL);
+            player.sendMessage(Text.literal("§a§l豁然开朗！土地平旷，屋舍俨然..."), false);
+            player.sendMessage(Text.literal("§6欢迎来到桃花源！"), false);
+            return;
+        }
+        enlightenmentTicks.put(player.getUuid(), remaining - 1);
     }
 
     private static void spawnEnlightenmentParticles(ServerPlayerEntity player) {
@@ -179,7 +170,6 @@ public class RaftTeleportHandler {
     public static void setRequiredSeconds(int seconds) {
         REQUIRED_SECONDS = seconds;
         REQUIRED_TICKS = REQUIRED_SECONDS * 20;
-        System.out.println("已更新静止时间: " + REQUIRED_SECONDS + " 秒 (" + REQUIRED_TICKS + " ticks)");
     }
 
     private static class RaftData {

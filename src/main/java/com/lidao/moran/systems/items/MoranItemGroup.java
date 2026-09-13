@@ -45,6 +45,19 @@ public class MoranItemGroup {
                         entries.add(BlockSystem.PEACH_BRANCH);
                         entries.add(BlockSystem.PEACH_PLANKS);
                         entries.add(BlockSystem.PEACH_FLOWER_BUD);
+                        // 五树系方块（垂柳/劲松/寒梅/银杏）
+                        entries.add(BlockSystem.WILLOW_LOG);
+                        entries.add(BlockSystem.WILLOW_LEAVES);
+                        entries.add(BlockSystem.WILLOW_SAPLING);
+                        entries.add(BlockSystem.PINE_LOG);
+                        entries.add(BlockSystem.PINE_LEAVES);
+                        entries.add(BlockSystem.PINE_SAPLING);
+                        entries.add(BlockSystem.PLUM_LOG);
+                        entries.add(BlockSystem.PLUM_LEAVES);
+                        entries.add(BlockSystem.PLUM_SAPLING);
+                        entries.add(BlockSystem.GINKGO_LOG);
+                        entries.add(BlockSystem.GINKGO_LEAVES);
+                        entries.add(BlockSystem.GINKGO_SAPLING);
                         // 地面系方块
                         entries.add(BlockSystem.PEACH_BLOSSOM_GRASS_BLOCK);
                         entries.add(BlockSystem.PEACH_BLOSSOM_DIRT);
