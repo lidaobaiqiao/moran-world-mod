@@ -18,6 +18,12 @@
     "facing=north,growth=1,trunk=false,branch=true,sub=down": {
       "model": "moran_mod:branch/north_g1__down"
     },
+    "facing=north,growth=1,trunk=false,branch=true,sub=north": {
+      "model": "moran_mod:branch/north_g1"
+    },
+    "facing=north,growth=1,trunk=false,branch=true,sub=south": {
+      "model": "moran_mod:branch/north_g1"
+    },
     "facing=north,growth=2,trunk=true": {
       "model": "moran_mod:block/peach_branch_trunk_g2"
     },
@@ -35,6 +41,12 @@
     },
     "facing=north,growth=2,trunk=false,branch=true,sub=down": {
       "model": "moran_mod:branch/north_g2__down"
+    },
+    "facing=north,growth=2,trunk=false,branch=true,sub=north": {
+      "model": "moran_mod:branch/north_g2"
+    },
+    "facing=north,growth=2,trunk=false,branch=true,sub=south": {
+      "model": "moran_mod:branch/north_g2"
     },
     "facing=north,growth=3,trunk=true": {
       "model": "moran_mod:block/peach_branch_trunk_g3"
@@ -54,6 +66,12 @@
     "facing=north,growth=3,trunk=false,branch=true,sub=down": {
       "model": "moran_mod:branch/north_g3__down"
     },
+    "facing=north,growth=3,trunk=false,branch=true,sub=north": {
+      "model": "moran_mod:branch/north_g3"
+    },
+    "facing=north,growth=3,trunk=false,branch=true,sub=south": {
+      "model": "moran_mod:branch/north_g3"
+    },
     "facing=north,growth=4,trunk=true": {
       "model": "moran_mod:block/peach_branch_trunk_g4"
     },
@@ -71,6 +89,12 @@
     },
     "facing=north,growth=4,trunk=false,branch=true,sub=down": {
       "model": "moran_mod:branch/north_g4__down"
+    },
+    "facing=north,growth=4,trunk=false,branch=true,sub=north": {
+      "model": "moran_mod:branch/north_g4"
+    },
+    "facing=north,growth=4,trunk=false,branch=true,sub=south": {
+      "model": "moran_mod:branch/north_g4"
     },
     "facing=north,growth=5,trunk=true": {
       "model": "moran_mod:block/peach_branch_trunk_g5"
@@ -90,6 +114,12 @@
     "facing=north,growth=5,trunk=false,branch=true,sub=down": {
       "model": "moran_mod:branch/north_g5__down"
     },
+    "facing=north,growth=5,trunk=false,branch=true,sub=north": {
+      "model": "moran_mod:branch/north_g5"
+    },
+    "facing=north,growth=5,trunk=false,branch=true,sub=south": {
+      "model": "moran_mod:branch/north_g5"
+    },
     "facing=north,growth=6,trunk=true": {
       "model": "moran_mod:block/peach_branch_trunk_g6"
     },
@@ -107,6 +137,12 @@
     },
     "facing=north,growth=6,trunk=false,branch=true,sub=down": {
       "model": "moran_mod:branch/north_g6__down"
+    },
+    "facing=north,growth=6,trunk=false,branch=true,sub=north": {
+      "model": "moran_mod:branch/north_g6"
+    },
+    "facing=north,growth=6,trunk=false,branch=true,sub=south": {
+      "model": "moran_mod:branch/north_g6"
     },
     "facing=north,growth=7,trunk=true": {
       "model": "moran_mod:block/peach_branch_trunk_g7"
@@ -126,10 +162,19 @@
     "facing=north,growth=7,trunk=false,branch=true,sub=down": {
       "model": "moran_mod:branch/north_g7__down"
     },
+    "facing=north,growth=7,trunk=false,branch=true,sub=north": {
+      "model": "moran_mod:branch/north_g7"
+    },
+    "facing=north,growth=7,trunk=false,branch=true,sub=south": {
+      "model": "moran_mod:branch/north_g7"
+    },
     "facing=north,growth=8,trunk=true": {
       "model": "moran_mod:block/peach_branch_trunk_g8"
     },
     "facing=north,growth=8,trunk=false,branch=false": {
+      "model": "moran_mod:branch/north_g8"
+    },
+    "facing=north,growth=8,trunk=false,branch=true": {
       "model": "moran_mod:branch/north_g8"
     },
     "facing=south,growth=1,trunk=true": {
@@ -150,6 +195,12 @@
     "facing=south,growth=1,trunk=false,branch=true,sub=down": {
       "model": "moran_mod:branch/south_g1__down"
     },
+    "facing=south,growth=1,trunk=false,branch=true,sub=north": {
+      "model": "moran_mod:branch/south_g1"
+    },
+    "facing=south,growth=1,trunk=false,branch=true,sub=south": {
+      "model": "moran_mod:branch/south_g1"
+    },
     "facing=south,growth=2,trunk=true": {
       "model": "moran_mod:block/peach_branch_trunk_g2"
     },
@@ -167,6 +218,12 @@
     },
     "facing=south,growth=2,trunk=false,branch=true,sub=down": {
       "model": "moran_mod:branch/south_g2__down"
+    },
+    "facing=south,growth=2,trunk=false,branch=true,sub=north": {
+      "model": "moran_mod:branch/south_g2"
+    },
+    "facing=south,growth=2,trunk=false,branch=true,sub=south": {
+      "model": "moran_mod:branch/south_g2"
     },
     "facing=south,growth=3,trunk=true": {
       "model": "moran_mod:block/peach_branch_trunk_g3"
@@ -186,6 +243,12 @@
     "facing=south,growth=3,trunk=false,branch=true,sub=down": {
       "model": "moran_mod:branch/south_g3__down"
     },
+    "facing=south,growth=3,trunk=false,branch=true,sub=north": {
+      "model": "moran_mod:branch/south_g3"
+    },
+    "facing=south,growth=3,trunk=false,branch=true,sub=south": {
+      "model": "moran_mod:branch/south_g3"
+    },
     "facing=south,growth=4,trunk=true": {
       "model": "moran_mod:block/peach_branch_trunk_g4"
     },
@@ -203,6 +266,12 @@
     },
     "facing=south,growth=4,trunk=false,branch=true,sub=down": {
       "model": "moran_mod:branch/south_g4__down"
+    },
+    "facing=south,growth=4,trunk=false,branch=true,sub=north": {
+      "model": "moran_mod:branch/south_g4"
+    },
+    "facing=south,growth=4,trunk=false,branch=true,sub=south": {
+      "model": "moran_mod:branch/south_g4"
     },
     "facing=south,growth=5,trunk=true": {
       "model": "moran_mod:block/peach_branch_trunk_g5"
@@ -222,6 +291,12 @@
     "facing=south,growth=5,trunk=false,branch=true,sub=down": {
       "model": "moran_mod:branch/south_g5__down"
     },
+    "facing=south,growth=5,trunk=false,branch=true,sub=north": {
+      "model": "moran_mod:branch/south_g5"
+    },
+    "facing=south,growth=5,trunk=false,branch=true,sub=south": {
+      "model": "moran_mod:branch/south_g5"
+    },
     "facing=south,growth=6,trunk=true": {
       "model": "moran_mod:block/peach_branch_trunk_g6"
     },
@@ -239,6 +314,12 @@
     },
     "facing=south,growth=6,trunk=false,branch=true,sub=down": {
       "model": "moran_mod:branch/south_g6__down"
+    },
+    "facing=south,growth=6,trunk=false,branch=true,sub=north": {
+      "model": "moran_mod:branch/south_g6"
+    },
+    "facing=south,growth=6,trunk=false,branch=true,sub=south": {
+      "model": "moran_mod:branch/south_g6"
     },
     "facing=south,growth=7,trunk=true": {
       "model": "moran_mod:block/peach_branch_trunk_g7"
@@ -258,10 +339,19 @@
     "facing=south,growth=7,trunk=false,branch=true,sub=down": {
       "model": "moran_mod:branch/south_g7__down"
     },
+    "facing=south,growth=7,trunk=false,branch=true,sub=north": {
+      "model": "moran_mod:branch/south_g7"
+    },
+    "facing=south,growth=7,trunk=false,branch=true,sub=south": {
+      "model": "moran_mod:branch/south_g7"
+    },
     "facing=south,growth=8,trunk=true": {
       "model": "moran_mod:block/peach_branch_trunk_g8"
     },
     "facing=south,growth=8,trunk=false,branch=false": {
+      "model": "moran_mod:branch/south_g8"
+    },
+    "facing=south,growth=8,trunk=false,branch=true": {
       "model": "moran_mod:branch/south_g8"
     },
     "facing=east,growth=1,trunk=true": {
@@ -282,6 +372,12 @@
     "facing=east,growth=1,trunk=false,branch=true,sub=down": {
       "model": "moran_mod:branch/east_g1__down"
     },
+    "facing=east,growth=1,trunk=false,branch=true,sub=east": {
+      "model": "moran_mod:branch/east_g1"
+    },
+    "facing=east,growth=1,trunk=false,branch=true,sub=west": {
+      "model": "moran_mod:branch/east_g1"
+    },
     "facing=east,growth=2,trunk=true": {
       "model": "moran_mod:block/peach_branch_trunk_g2"
     },
@@ -299,6 +395,12 @@
     },
     "facing=east,growth=2,trunk=false,branch=true,sub=down": {
       "model": "moran_mod:branch/east_g2__down"
+    },
+    "facing=east,growth=2,trunk=false,branch=true,sub=east": {
+      "model": "moran_mod:branch/east_g2"
+    },
+    "facing=east,growth=2,trunk=false,branch=true,sub=west": {
+      "model": "moran_mod:branch/east_g2"
     },
     "facing=east,growth=3,trunk=true": {
       "model": "moran_mod:block/peach_branch_trunk_g3"
@@ -318,6 +420,12 @@
     "facing=east,growth=3,trunk=false,branch=true,sub=down": {
       "model": "moran_mod:branch/east_g3__down"
     },
+    "facing=east,growth=3,trunk=false,branch=true,sub=east": {
+      "model": "moran_mod:branch/east_g3"
+    },
+    "facing=east,growth=3,trunk=false,branch=true,sub=west": {
+      "model": "moran_mod:branch/east_g3"
+    },
     "facing=east,growth=4,trunk=true": {
       "model": "moran_mod:block/peach_branch_trunk_g4"
     },
@@ -335,6 +443,12 @@
     },
     "facing=east,growth=4,trunk=false,branch=true,sub=down": {
       "model": "moran_mod:branch/east_g4__down"
+    },
+    "facing=east,growth=4,trunk=false,branch=true,sub=east": {
+      "model": "moran_mod:branch/east_g4"
+    },
+    "facing=east,growth=4,trunk=false,branch=true,sub=west": {
+      "model": "moran_mod:branch/east_g4"
     },
     "facing=east,growth=5,trunk=true": {
       "model": "moran_mod:block/peach_branch_trunk_g5"
@@ -354,6 +468,12 @@
     "facing=east,growth=5,trunk=false,branch=true,sub=down": {
       "model": "moran_mod:branch/east_g5__down"
     },
+    "facing=east,growth=5,trunk=false,branch=true,sub=east": {
+      "model": "moran_mod:branch/east_g5"
+    },
+    "facing=east,growth=5,trunk=false,branch=true,sub=west": {
+      "model": "moran_mod:branch/east_g5"
+    },
     "facing=east,growth=6,trunk=true": {
       "model": "moran_mod:block/peach_branch_trunk_g6"
     },
@@ -371,6 +491,12 @@
     },
     "facing=east,growth=6,trunk=false,branch=true,sub=down": {
       "model": "moran_mod:branch/east_g6__down"
+    },
+    "facing=east,growth=6,trunk=false,branch=true,sub=east": {
+      "model": "moran_mod:branch/east_g6"
+    },
+    "facing=east,growth=6,trunk=false,branch=true,sub=west": {
+      "model": "moran_mod:branch/east_g6"
     },
     "facing=east,growth=7,trunk=true": {
       "model": "moran_mod:block/peach_branch_trunk_g7"
@@ -390,10 +516,19 @@
     "facing=east,growth=7,trunk=false,branch=true,sub=down": {
       "model": "moran_mod:branch/east_g7__down"
     },
+    "facing=east,growth=7,trunk=false,branch=true,sub=east": {
+      "model": "moran_mod:branch/east_g7"
+    },
+    "facing=east,growth=7,trunk=false,branch=true,sub=west": {
+      "model": "moran_mod:branch/east_g7"
+    },
     "facing=east,growth=8,trunk=true": {
       "model": "moran_mod:block/peach_branch_trunk_g8"
     },
     "facing=east,growth=8,trunk=false,branch=false": {
+      "model": "moran_mod:branch/east_g8"
+    },
+    "facing=east,growth=8,trunk=false,branch=true": {
       "model": "moran_mod:branch/east_g8"
     },
     "facing=west,growth=1,trunk=true": {
@@ -414,6 +549,12 @@
     "facing=west,growth=1,trunk=false,branch=true,sub=down": {
       "model": "moran_mod:branch/west_g1__down"
     },
+    "facing=west,growth=1,trunk=false,branch=true,sub=east": {
+      "model": "moran_mod:branch/west_g1"
+    },
+    "facing=west,growth=1,trunk=false,branch=true,sub=west": {
+      "model": "moran_mod:branch/west_g1"
+    },
     "facing=west,growth=2,trunk=true": {
       "model": "moran_mod:block/peach_branch_trunk_g2"
     },
@@ -431,6 +572,12 @@
     },
     "facing=west,growth=2,trunk=false,branch=true,sub=down": {
       "model": "moran_mod:branch/west_g2__down"
+    },
+    "facing=west,growth=2,trunk=false,branch=true,sub=east": {
+      "model": "moran_mod:branch/west_g2"
+    },
+    "facing=west,growth=2,trunk=false,branch=true,sub=west": {
+      "model": "moran_mod:branch/west_g2"
     },
     "facing=west,growth=3,trunk=true": {
       "model": "moran_mod:block/peach_branch_trunk_g3"
@@ -450,6 +597,12 @@
     "facing=west,growth=3,trunk=false,branch=true,sub=down": {
       "model": "moran_mod:branch/west_g3__down"
     },
+    "facing=west,growth=3,trunk=false,branch=true,sub=east": {
+      "model": "moran_mod:branch/west_g3"
+    },
+    "facing=west,growth=3,trunk=false,branch=true,sub=west": {
+      "model": "moran_mod:branch/west_g3"
+    },
     "facing=west,growth=4,trunk=true": {
       "model": "moran_mod:block/peach_branch_trunk_g4"
     },
@@ -467,6 +620,12 @@
     },
     "facing=west,growth=4,trunk=false,branch=true,sub=down": {
       "model": "moran_mod:branch/west_g4__down"
+    },
+    "facing=west,growth=4,trunk=false,branch=true,sub=east": {
+      "model": "moran_mod:branch/west_g4"
+    },
+    "facing=west,growth=4,trunk=false,branch=true,sub=west": {
+      "model": "moran_mod:branch/west_g4"
     },
     "facing=west,growth=5,trunk=true": {
       "model": "moran_mod:block/peach_branch_trunk_g5"
@@ -486,6 +645,12 @@
     "facing=west,growth=5,trunk=false,branch=true,sub=down": {
       "model": "moran_mod:branch/west_g5__down"
     },
+    "facing=west,growth=5,trunk=false,branch=true,sub=east": {
+      "model": "moran_mod:branch/west_g5"
+    },
+    "facing=west,growth=5,trunk=false,branch=true,sub=west": {
+      "model": "moran_mod:branch/west_g5"
+    },
     "facing=west,growth=6,trunk=true": {
       "model": "moran_mod:block/peach_branch_trunk_g6"
     },
@@ -503,6 +668,12 @@
     },
     "facing=west,growth=6,trunk=false,branch=true,sub=down": {
       "model": "moran_mod:branch/west_g6__down"
+    },
+    "facing=west,growth=6,trunk=false,branch=true,sub=east": {
+      "model": "moran_mod:branch/west_g6"
+    },
+    "facing=west,growth=6,trunk=false,branch=true,sub=west": {
+      "model": "moran_mod:branch/west_g6"
     },
     "facing=west,growth=7,trunk=true": {
       "model": "moran_mod:block/peach_branch_trunk_g7"
@@ -522,10 +693,19 @@
     "facing=west,growth=7,trunk=false,branch=true,sub=down": {
       "model": "moran_mod:branch/west_g7__down"
     },
+    "facing=west,growth=7,trunk=false,branch=true,sub=east": {
+      "model": "moran_mod:branch/west_g7"
+    },
+    "facing=west,growth=7,trunk=false,branch=true,sub=west": {
+      "model": "moran_mod:branch/west_g7"
+    },
     "facing=west,growth=8,trunk=true": {
       "model": "moran_mod:block/peach_branch_trunk_g8"
     },
     "facing=west,growth=8,trunk=false,branch=false": {
+      "model": "moran_mod:branch/west_g8"
+    },
+    "facing=west,growth=8,trunk=false,branch=true": {
       "model": "moran_mod:branch/west_g8"
     },
     "facing=up,growth=1,trunk=true": {
@@ -546,6 +726,12 @@
     "facing=up,growth=1,trunk=false,branch=true,sub=west": {
       "model": "moran_mod:branch/up_g1__west"
     },
+    "facing=up,growth=1,trunk=false,branch=true,sub=up": {
+      "model": "moran_mod:block/peach_branch_trunk_g1"
+    },
+    "facing=up,growth=1,trunk=false,branch=true,sub=down": {
+      "model": "moran_mod:block/peach_branch_trunk_g1"
+    },
     "facing=up,growth=2,trunk=true": {
       "model": "moran_mod:block/peach_branch_trunk_g2"
     },
@@ -563,6 +749,12 @@
     },
     "facing=up,growth=2,trunk=false,branch=true,sub=west": {
       "model": "moran_mod:branch/up_g2__west"
+    },
+    "facing=up,growth=2,trunk=false,branch=true,sub=up": {
+      "model": "moran_mod:block/peach_branch_trunk_g2"
+    },
+    "facing=up,growth=2,trunk=false,branch=true,sub=down": {
+      "model": "moran_mod:block/peach_branch_trunk_g2"
     },
     "facing=up,growth=3,trunk=true": {
       "model": "moran_mod:block/peach_branch_trunk_g3"
@@ -582,6 +774,12 @@
     "facing=up,growth=3,trunk=false,branch=true,sub=west": {
       "model": "moran_mod:branch/up_g3__west"
     },
+    "facing=up,growth=3,trunk=false,branch=true,sub=up": {
+      "model": "moran_mod:block/peach_branch_trunk_g3"
+    },
+    "facing=up,growth=3,trunk=false,branch=true,sub=down": {
+      "model": "moran_mod:block/peach_branch_trunk_g3"
+    },
     "facing=up,growth=4,trunk=true": {
       "model": "moran_mod:block/peach_branch_trunk_g4"
     },
@@ -599,6 +797,12 @@
     },
     "facing=up,growth=4,trunk=false,branch=true,sub=west": {
       "model": "moran_mod:branch/up_g4__west"
+    },
+    "facing=up,growth=4,trunk=false,branch=true,sub=up": {
+      "model": "moran_mod:block/peach_branch_trunk_g4"
+    },
+    "facing=up,growth=4,trunk=false,branch=true,sub=down": {
+      "model": "moran_mod:block/peach_branch_trunk_g4"
     },
     "facing=up,growth=5,trunk=true": {
       "model": "moran_mod:block/peach_branch_trunk_g5"
@@ -618,6 +822,12 @@
     "facing=up,growth=5,trunk=false,branch=true,sub=west": {
       "model": "moran_mod:branch/up_g5__west"
     },
+    "facing=up,growth=5,trunk=false,branch=true,sub=up": {
+      "model": "moran_mod:block/peach_branch_trunk_g5"
+    },
+    "facing=up,growth=5,trunk=false,branch=true,sub=down": {
+      "model": "moran_mod:block/peach_branch_trunk_g5"
+    },
     "facing=up,growth=6,trunk=true": {
       "model": "moran_mod:block/peach_branch_trunk_g6"
     },
@@ -635,6 +845,12 @@
     },
     "facing=up,growth=6,trunk=false,branch=true,sub=west": {
       "model": "moran_mod:branch/up_g6__west"
+    },
+    "facing=up,growth=6,trunk=false,branch=true,sub=up": {
+      "model": "moran_mod:block/peach_branch_trunk_g6"
+    },
+    "facing=up,growth=6,trunk=false,branch=true,sub=down": {
+      "model": "moran_mod:block/peach_branch_trunk_g6"
     },
     "facing=up,growth=7,trunk=true": {
       "model": "moran_mod:block/peach_branch_trunk_g7"
@@ -654,10 +870,19 @@
     "facing=up,growth=7,trunk=false,branch=true,sub=west": {
       "model": "moran_mod:branch/up_g7__west"
     },
+    "facing=up,growth=7,trunk=false,branch=true,sub=up": {
+      "model": "moran_mod:block/peach_branch_trunk_g7"
+    },
+    "facing=up,growth=7,trunk=false,branch=true,sub=down": {
+      "model": "moran_mod:block/peach_branch_trunk_g7"
+    },
     "facing=up,growth=8,trunk=true": {
       "model": "moran_mod:block/peach_branch_trunk_g8"
     },
     "facing=up,growth=8,trunk=false,branch=false": {
+      "model": "moran_mod:block/peach_branch_trunk_g8"
+    },
+    "facing=up,growth=8,trunk=false,branch=true": {
       "model": "moran_mod:block/peach_branch_trunk_g8"
     },
     "facing=down,growth=1,trunk=true": {
@@ -678,6 +903,12 @@
     "facing=down,growth=1,trunk=false,branch=true,sub=west": {
       "model": "moran_mod:branch/down_g1__west"
     },
+    "facing=down,growth=1,trunk=false,branch=true,sub=up": {
+      "model": "moran_mod:block/peach_branch_trunk_g1"
+    },
+    "facing=down,growth=1,trunk=false,branch=true,sub=down": {
+      "model": "moran_mod:block/peach_branch_trunk_g1"
+    },
     "facing=down,growth=2,trunk=true": {
       "model": "moran_mod:block/peach_branch_trunk_g2"
     },
@@ -695,6 +926,12 @@
     },
     "facing=down,growth=2,trunk=false,branch=true,sub=west": {
       "model": "moran_mod:branch/down_g2__west"
+    },
+    "facing=down,growth=2,trunk=false,branch=true,sub=up": {
+      "model": "moran_mod:block/peach_branch_trunk_g2"
+    },
+    "facing=down,growth=2,trunk=false,branch=true,sub=down": {
+      "model": "moran_mod:block/peach_branch_trunk_g2"
     },
     "facing=down,growth=3,trunk=true": {
       "model": "moran_mod:block/peach_branch_trunk_g3"
@@ -714,6 +951,12 @@
     "facing=down,growth=3,trunk=false,branch=true,sub=west": {
       "model": "moran_mod:branch/down_g3__west"
     },
+    "facing=down,growth=3,trunk=false,branch=true,sub=up": {
+      "model": "moran_mod:block/peach_branch_trunk_g3"
+    },
+    "facing=down,growth=3,trunk=false,branch=true,sub=down": {
+      "model": "moran_mod:block/peach_branch_trunk_g3"
+    },
     "facing=down,growth=4,trunk=true": {
       "model": "moran_mod:block/peach_branch_trunk_g4"
     },
@@ -731,6 +974,12 @@
     },
     "facing=down,growth=4,trunk=false,branch=true,sub=west": {
       "model": "moran_mod:branch/down_g4__west"
+    },
+    "facing=down,growth=4,trunk=false,branch=true,sub=up": {
+      "model": "moran_mod:block/peach_branch_trunk_g4"
+    },
+    "facing=down,growth=4,trunk=false,branch=true,sub=down": {
+      "model": "moran_mod:block/peach_branch_trunk_g4"
     },
     "facing=down,growth=5,trunk=true": {
       "model": "moran_mod:block/peach_branch_trunk_g5"
@@ -750,6 +999,12 @@
     "facing=down,growth=5,trunk=false,branch=true,sub=west": {
       "model": "moran_mod:branch/down_g5__west"
     },
+    "facing=down,growth=5,trunk=false,branch=true,sub=up": {
+      "model": "moran_mod:block/peach_branch_trunk_g5"
+    },
+    "facing=down,growth=5,trunk=false,branch=true,sub=down": {
+      "model": "moran_mod:block/peach_branch_trunk_g5"
+    },
     "facing=down,growth=6,trunk=true": {
       "model": "moran_mod:block/peach_branch_trunk_g6"
     },
@@ -767,6 +1022,12 @@
     },
     "facing=down,growth=6,trunk=false,branch=true,sub=west": {
       "model": "moran_mod:branch/down_g6__west"
+    },
+    "facing=down,growth=6,trunk=false,branch=true,sub=up": {
+      "model": "moran_mod:block/peach_branch_trunk_g6"
+    },
+    "facing=down,growth=6,trunk=false,branch=true,sub=down": {
+      "model": "moran_mod:block/peach_branch_trunk_g6"
     },
     "facing=down,growth=7,trunk=true": {
       "model": "moran_mod:block/peach_branch_trunk_g7"
@@ -786,10 +1047,19 @@
     "facing=down,growth=7,trunk=false,branch=true,sub=west": {
       "model": "moran_mod:branch/down_g7__west"
     },
+    "facing=down,growth=7,trunk=false,branch=true,sub=up": {
+      "model": "moran_mod:block/peach_branch_trunk_g7"
+    },
+    "facing=down,growth=7,trunk=false,branch=true,sub=down": {
+      "model": "moran_mod:block/peach_branch_trunk_g7"
+    },
     "facing=down,growth=8,trunk=true": {
       "model": "moran_mod:block/peach_branch_trunk_g8"
     },
     "facing=down,growth=8,trunk=false,branch=false": {
+      "model": "moran_mod:block/peach_branch_trunk_g8"
+    },
+    "facing=down,growth=8,trunk=false,branch=true": {
       "model": "moran_mod:block/peach_branch_trunk_g8"
     }
   }

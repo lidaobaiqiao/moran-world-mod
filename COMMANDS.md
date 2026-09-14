@@ -7,7 +7,7 @@
 
 | 你想干什么 | 命令 |
 |---|---|
-| **启动游戏（最常用）** | `./gradlew runClient` |
+| **启动游戏（最常用）** | gradlew runClient |
 | 启动专用服务器（测试刷怪/维度） | `./gradlew runServer` |
 | 生成数据包资源（掉落表等，新方块后跑一次） | `./gradlew runDatagen` |
 | 打包 jar（发布/装进正式客户端） | `./gradlew build` |
