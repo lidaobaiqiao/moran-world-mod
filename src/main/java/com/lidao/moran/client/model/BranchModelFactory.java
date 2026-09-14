@@ -4,7 +4,9 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import net.minecraft.util.math.Direction;
 
+import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * 树枝模型工厂——把「枝的走向 + 档位」直接算成模型 JSON，磁盘上零模型文件。
@@ -36,31 +38,20 @@ import java.util.Set;
  * </pre>
  *
  * <h2>子枝的额外规则</h2>
- * 子枝不贯穿，沿自身轴只占 {@code [8±growth, 0|16]} 那半格，长度 {@code L = 8-growth}，
- * 截面半宽 {@code c = max(1, growth-1)}。与母枝的区别：
+ * 子枝不贯穿，沿自身轴只占 {@code [8±growth, 0|16]} 那半格：母枝占 [8-h, 8+h]，
+ * 正方向留出 [8+h, 16]、负方向留出 [0, 8-h]，**子枝把这个空间全部填满**，
+ * 所以长度不用单独指定，由空间反推（= 8 - 档位）。
+ * 截面半宽 {@code c = max(1, growth-1)}（档位减一，g1 没有更细的档）。
  * <ul>
- *   <li>贴母枝那一端的面用 {@code #missing} 占位（正常看不见）</li>
- *   <li>子枝的「几何 +Z」恒指向所在轴的正方向：上/下生共用一套面名映射，
- *       东/西生同理（作者手作件逐字节验证：下生==上生、西生==东生）。
- *       东西生的面名按 Y 轴置换 up(cap)→north、down(missing)→east、
- *       east→up、west→down、north→west、south→south，rotation 统一 +270（轴端面 +90）</li>
- *   <li>四侧面 uv 按固定 4px 槽位（east 0 / south 4 / north 8 / west 16-w），v 范围 = L；
- *       {@code c >= 5} 时槽位重叠，四面统一居中 {@code [8-c, 0, 8+c, L]}</li>
- *   <li>轴端面（朝外）uv = 居中正方形 {@code [8-c, 8-c, 8+c, 8+c]}，贴截断面</li>
+ *   <li>子枝的面数据<b>只跟轴有关</b>：手作件验证 下生==上生、西生==东生、北生==南生</li>
+ *   <li>六个面全部贴图，<b>不留 #missing 占位</b>——占位面一旦因为生长方向写反而翻到外面，
+ *       就是一块渲染不出来的面。宁可把贴母枝那端也贴满</li>
  * </ul>
- * 残留偏差（作者手作自身不一致，已确认不追，合计 110 处全为 uv 值差）：
- * g1/g2 第四侧面写死 12 而非 16-w；g3 四面用了居中；g4 侧面 v 写 3 而 L=4；
- * g1 的截断面贴在 north 面而非 up 面；g3 上/下生的 up 面 rotation=90。
  */
 public final class BranchModelFactory {
 
     private BranchModelFactory() {
     }
-
-    /** 侧面树皮 */
-    private static final String TEX_SIDE = "moran_mod:block/peach_log";
-    /** 端面截断（粗壮树干横截面） */
-    private static final String TEX_CAP = "moran_mod:item/thick_peach_trunk_side";
 
     // 方向向量表（用于正交标架与面朝向判定）
     private static final int[][] VEC = new int[6][];
@@ -78,42 +69,106 @@ public final class BranchModelFactory {
     }
 
     /**
-     * 造一个树枝模型。
+     * 一个树种提交的贴图对（对应模型头部的 textures 段）。
      *
-     * @param facing 母枝走向（本方块 FACING）
-     * @param growth 母枝档位 1~8（本方块 GROWTH）
-     * @param subs   从母枝侧面伸出的子枝方向集合（本方块的分叉方向）
+     * @param bark 树皮，贴子枝与母枝的长条侧面
+     * @param cap  截断面，贴正方形的端面
      */
-    public static JsonObject build(Direction facing, int growth, Set<Direction> subs) {
+    public record Textures(String bark, String cap) {
+    }
+
+    /** 桃花心木（当前唯一树种）提交的贴图 */
+    public static final Textures PEACH = new Textures(
+            "moran_mod:block/peach_log",
+            "moran_mod:item/thick_peach_trunk_side");
+
+    /** 生成结果缓存：同一个 (方向, 档位, 子枝集合, 贴图) 只算一次 */
+    private static final Map<String, JsonObject> CACHE = new ConcurrentHashMap<>();
+
+    /**
+     * 造一个树枝模型——「生成器相加」的结果。
+     *
+     * <p>结构：
+     * <ol>
+     *   <li><b>四侧生成器</b>：按母枝方向 + 档位，生成贯穿整格的主柱，并返回它的占位（坐标区间 + 半宽）</li>
+     *   <li><b>子枝生成器</b>（上下 / 南北 / 东西三选一）：<b>以上一步的返回值为输入</b>——
+     *       由母枝半宽推出子枝半宽（档位减一），由母枝占位推出剩余空间充当子枝长度，
+     *       填满那半格</li>
+     *   <li>还有别的子枝请求就继续相加，同一个母枝可以叠多根</li>
+     * </ol>
+     * 子枝自己长出的子枝不由这里管——那是一根新枝，由它自己的方块再走一遍同样的流程。
+     *
+     * @param facing 母枝走向（方块 FACING）
+     * @param growth 母枝档位 1~8（方块 GROWTH）
+     * @param subs   本节分出的子枝方向集合（方块 submask）
+     * @param tex    树种提交的贴图
+     */
+    public static JsonObject build(Direction facing, int growth, Set<Direction> subs, Textures tex) {
+        String key = facing.asString() + "|" + growth + "|" + canonicalSubs(subs) + "|" + tex.bark();
+        return CACHE.computeIfAbsent(key, k -> generate(facing, growth, subs, tex));
+    }
+
+    /** 子枝集合转成稳定字符串（顺序无关，保证同一状态永远同一个缓存键） */
+    private static String canonicalSubs(Set<Direction> subs) {
+        StringBuilder sb = new StringBuilder();
+        for (Direction d : DIRS) {
+            if (subs.contains(d)) {
+                sb.append(d.asString()).append('_');
+            }
+        }
+        return sb.toString();
+    }
+
+    private static JsonObject generate(Direction facing, int growth, Set<Direction> subs, Textures tex) {
         JsonObject model = new JsonObject();
-        // 继承原版 block/block：它只提供标准 display（GUI/手持的立体展示）与 gui_light=side，
-        // 不含 textures / elements，故不会覆盖下面的纹理与几何。
-        // 注意不要自己写 display —— 那会把父模型的标准 display 覆盖掉，物品栏里显示会变形。
+        // 继承原版 block/block：它只提供标准 display 与 gui_light=side，不含 textures/elements，
+        // 故不会覆盖下面的纹理与几何。不要自己写 display，否则物品栏显示会变形。
         model.addProperty("parent", "minecraft:block/block");
         model.addProperty("render_type", "minecraft:cutout");
 
         JsonObject textures = new JsonObject();
-        textures.addProperty("0", TEX_SIDE);
-        textures.addProperty("2", TEX_CAP);
-        textures.addProperty("particle", TEX_SIDE);
+        textures.addProperty("0", tex.bark());
+        textures.addProperty("2", tex.cap());
+        textures.addProperty("particle", tex.bark());
         model.add("textures", textures);
 
         JsonArray elements = new JsonArray();
 
-        // 母枝：贯穿整格（沿 facing 轴 0..16），半宽 = growth
-        elements.add(column(facing, growth, 0, 16, false));
-        // 子枝：半宽 c = max(1, growth-1)，长度 L = 8-growth
-        // 只占半格——从母枝表面(8±growth)伸到方块边界(0 或 16)，不贯穿。
-        int c = Math.max(1, growth - 1);
+        // ① 四侧生成器 —— 母枝，沿 facing 轴贯穿 0..16，半宽 = 档位
+        Footprint trunk = sideGenerator(facing, growth, tex);
+        elements.add(trunk.element);
+
+        // ② 子枝生成器 —— 以母枝的返回值为输入，逐个相加
         for (Direction sub : subs) {
-            boolean positive = sub == Direction.SOUTH || sub == Direction.EAST || sub == Direction.UP;
-            elements.add(positive
-                    ? column(sub, c, 8 + growth, 16, true)
-                    : column(sub, c, 0, 8 - growth, true));
+            elements.add(subGenerator(trunk, sub, tex));
         }
 
         model.add("elements", elements);
         return model;
+    }
+
+    /** 一根已生成柱子的占位信息，供下一层生成器当输入 */
+    private record Footprint(Direction axis, int half, int lo, int hi, JsonObject element) {
+    }
+
+    /** 四侧生成器：母枝/主干。占满整格，把占位交给下一层 */
+    private static Footprint sideGenerator(Direction facing, int growth, Textures tex) {
+        return new Footprint(facing, growth, 0, 16, column(facing, growth, 0, 16, false));
+    }
+
+    /**
+     * 子枝生成器（上下 / 南北 / 东西三选一，按子枝所在轴）。
+     *
+     * <p>输入是母枝的占位：半宽 → 子枝半宽 = max(1, 母枝半宽 - 1)（档位减一）；
+     * 母枝占 [8-h, 8+h]，于是正方向那半格 [8+h, 16]、负方向那半格 [0, 8-h] 就是
+     * 留出来的空间，全部填满——子枝长度因此不需要单独指定，由空间反推。
+     */
+    private static JsonObject subGenerator(Footprint parent, Direction sub, Textures tex) {
+        int c = Math.max(1, parent.half() - 1);
+        boolean positive = VEC[sub.ordinal()][sub.getAxis().ordinal()] > 0;
+        int lo = positive ? 8 + parent.half() : 0;
+        int hi = positive ? 16 : 8 - parent.half();
+        return column(sub, c, lo, hi, true);
     }
 
     /**
@@ -126,34 +181,18 @@ public final class BranchModelFactory {
      *              false = 母枝/主干（贯穿件，两端面都是截断面）
      */
     private static JsonObject column(Direction dir, int half, int lo, int hi, boolean isSub) {
-        // ---- 正交标架：x = y × z ----
-        // 关键：子枝的"几何 +Z"恒指向所在轴的**正方向**。
-        // 也就是说「下生」与「上生」共用同一套面名映射，只是几何占位不同（[0,8-g] vs [8+g,16]）；
-        // 「西生」与「东生」同理。作者手作件已验证：同档位下 下生==上生、西生==东生，逐字节相同。
-        Direction zWorld;
-        if (isSub) {
-            // 注：实际候选里子枝永远垂直于母枝（北/南母枝 → 东西上下，东/西母枝 → 北南上下，
-            // 垂直母枝 → 四个水平向），NORTH/SOUTH 子枝不会出现，case 只为穷举。
-            zWorld = switch (dir) {
-                case DOWN, UP -> Direction.UP;
-                case WEST, EAST -> Direction.EAST;
-                case NORTH, SOUTH -> Direction.SOUTH;
-            };
-        } else {
-            zWorld = geometricZWorld(dir);
-        }
+        // ---- 正交标架（几何用；已用手作件逐字节验证）----
+        // 子枝的几何 +Z 恒指向所在轴的**正方向**：下生==上生、西生==东生，
+        // 面数据完全相同，只是占位半格不同（[0,8-g] vs [8+g,16]）。
+        Direction zWorld = isSub ? positiveOf(dir.getAxis()) : geometricZWorld(dir);
         Direction yWorld = (dir.getAxis() == Direction.Axis.Y) ? Direction.NORTH : Direction.UP;
         int[] zv = VEC[zWorld.ordinal()];
         int[] yv = VEC[yWorld.ordinal()];
         int[] xv = cross(yv, zv);
-        Direction xWorld = dirOf(xv);
 
-        // ---- 几何 ----
-        // 基准：from=[8-h, 8-h, lo], to=[8+h, 8+h, hi]
         int h = half;
         int[] fromW = mapPoint(8 - h, 8 - h, lo, xv, yv, zv);
         int[] toW = mapPoint(8 + h, 8 + h, hi, xv, yv, zv);
-        // 归一化：MC 要求 from <= to（标架映射可能翻转某个轴的坐标顺序）
         for (int i = 0; i < 3; i++) {
             if (fromW[i] > toW[i]) {
                 int t = fromW[i];
@@ -166,88 +205,120 @@ public final class BranchModelFactory {
         el.add("from", arr(fromW));
         el.add("to", arr(toW));
 
-        // ---- 六面数据 ----
-        int w = 2 * h;
-        // 沿轴长度（用于子枝侧面的 v 范围）
-        int len = hi - lo;
+        // ---- 六面：uv 尺寸从面的几何算，rotation 从生长方向算 ----
+        // 生长方向 g：母枝取 FACING；子枝只取「轴」——
+        // 作者手作件验证 下生==上生、西生==东生、北生==南生，面数据与正负无关。
+        Direction g = isSub ? positiveOf(dir.getAxis()) : dir;
 
         JsonObject faces = new JsonObject();
-
-        // 沿轴方向的两个面（子枝的这两个面在下方的分支里一并写入）
-        if (!isSub) {
-            // 母枝/主干：两端都是截断面
-            faces.add(zWorld.asString(), face(sq(h), null, TEX_CAP));
-            faces.add(zWorld.getOpposite().asString(), face(sq(h), 180, TEX_CAP));
-        }
-
-        // 垂直子枝轴的四个侧面
-        if (!isSub) {
-            // 母枝：按「基准系」的固定槽位（宽 w，v 满 0..16）
-            int s = Math.min(8, 16 - w);
-            faces.add(xWorld.asString(), face(new int[]{16 - w, 0, 16, 16}, 90, TEX_SIDE));
-            faces.add(xWorld.getOpposite().asString(), face(new int[]{0, 0, w, 16}, 270, TEX_SIDE));
-            faces.add(yWorld.asString(), face(new int[]{s, 0, s + w, 16}, null, TEX_SIDE));
-            faces.add(yWorld.getOpposite().asString(), face(new int[]{16 - (s + w), 0, 16 - s, 16}, 180, TEX_SIDE));
-        } else {
-            // 子枝四侧面：按固定 4px 槽位起步（0 / 4 / 8 / 16-w），v 范围 = 长度
-            // c >= 5 时槽位互相重叠，改统一居中（对齐作者在 g6/g7 的处理）
-            int[] uvEast, uvNorth, uvSouth, uvWest;
-            if (w >= 10) {
-                int[] cc = new int[]{8 - h, 0, 8 + h, len};
-                uvEast = uvNorth = uvSouth = uvWest = cc;
-            } else {
-                uvEast = new int[]{0, 0, w, len};
-                uvSouth = new int[]{4, 0, 4 + w, len};
-                uvNorth = new int[]{8, 0, 8 + w, len};
-                uvWest = new int[]{16 - w, 0, 16, len};
-            }
-            // 轴向（dir 所在轴）
-            if (dir.getAxis() == Direction.Axis.Y) {
-                // 上生/下生：面名映射与上生完全一致，作者手作件已验证逐字节相同
-                // up 面 = 朝外端面（cap），down 面 = 贴母枝（missing）
-                faces.add(Direction.UP.asString(), face(sq(h), null, TEX_CAP));
-                faces.add(Direction.DOWN.asString(), missing());
-                faces.add(Direction.EAST.asString(), face(uvEast, null, TEX_SIDE));
-                faces.add(Direction.WEST.asString(), face(uvWest, null, TEX_SIDE));
-                faces.add(Direction.NORTH.asString(), face(uvNorth, null, TEX_SIDE));
-                faces.add(Direction.SOUTH.asString(), face(uvSouth, null, TEX_SIDE));
-            } else {
-                // 东生/西生：面名按 Y 轴顺 90° 置换，rotation 统一 +270（轴端面 +90）。
-                // 置换表（已用作者手作件逐个核对）：
-                //   up(cap) -> north, down(missing) -> east, east -> up, west -> down,
-                //   north -> west, south -> south
-                int r = 270;
-                faces.add(Direction.NORTH.asString(), face(sq(h), 90, TEX_CAP));
-                faces.add(Direction.EAST.asString(), missing(r));
-                faces.add(Direction.UP.asString(), face(uvEast, r, TEX_SIDE));
-                faces.add(Direction.DOWN.asString(), face(uvWest, r, TEX_SIDE));
-                faces.add(Direction.WEST.asString(), face(uvNorth, r, TEX_SIDE));
-                faces.add(Direction.SOUTH.asString(), face(uvSouth, r, TEX_SIDE));
-            }
+        for (Direction f : DIRS) {
+            int[] fd = faceDims(f, fromW, toW);
+            boolean end = f.getAxis() == g.getAxis();
+            // 贴图归属：**正方形的面**贴截断面，长条面贴树皮。
+            // 手作件全样本符合：母枝两端（正方形）是截断面、四个侧面（长条）是树皮；
+            // 子枝的三个轴同理，平方的那个面才是截断面（不是「朝外」的那个）。
+            boolean isCap = fd[0] == fd[1];
+            int rot = isSub ? subRot(dir.getAxis(), f) : (end ? (f == g ? 180 : 0) : sideRot(g, f));
+            faces.add(f.asString(), face(uvFor(fd, rot), rot, isCap));
         }
 
         el.add("faces", faces);
         return el;
     }
 
-    /** 居中正方形 uv（母枝/子枝的端面） */
-    private static int[] sq(int h) {
-        return new int[]{8 - h, 8 - h, 8 + h, 8 + h};
+    // ---------- uv：尺寸一律等于面的几何尺寸 ----------
+
+    /** 面在 MC 的 u/v 方向上的尺寸 {宽, 高}。u/v 轴约定：法向 X→(u=Z,v=Y)，Y→(X,Z)，Z→(X,Y) */
+    private static int[] faceDims(Direction f, int[] from, int[] to) {
+        int dx = to[0] - from[0], dy = to[1] - from[1], dz = to[2] - from[2];
+        return switch (f.getAxis()) {
+            case X -> new int[]{dz, dy};
+            case Y -> new int[]{dx, dz};
+            case Z -> new int[]{dx, dy};
+        };
     }
 
-    /** #missing 占位面（子枝贴母枝那一端，正常看不见） */
-    private static JsonObject missing() {
-        return missing(null);
+    /**
+     * 按面的真实尺寸取 uv 矩形。rotation 为 90/270 时宽高先对调，
+     * 保证「uv 占用的尺寸 == 面的尺寸」，不会拉伸。正方形面居中取，长方形面从 v=0 起。
+     */
+    private static int[] uvFor(int[] fd, int rot) {
+        int fw = fd[0], fh = fd[1];
+        boolean swap = (rot == 90 || rot == 270);
+        int rw = swap ? fh : fw;
+        int rh = swap ? fw : fh;
+        int u0 = 8 - rw / 2;
+        int v0 = (fw == fh) ? 8 - rh / 2 : 0;
+        return new int[]{u0, v0, u0 + rw, v0 + rh};
     }
 
-    private static JsonObject missing(Integer rotation) {
-        JsonObject f = new JsonObject();
-        f.add("uv", arr(new int[]{0, 0, 7, 2}));
-        if (rotation != null && rotation != 0) {
-            f.addProperty("rotation", rotation);
+    // ---------- rotation：全部由「生长方向 + 面法向」算，不查表 ----------
+
+    /** 某轴的正方向 */
+    private static Direction positiveOf(Direction.Axis a) {
+        return switch (a) {
+            case X -> Direction.EAST;
+            case Y -> Direction.UP;
+            case Z -> Direction.SOUTH;
+        };
+    }
+
+    /**
+     * 侧面 rotation（母枝）。已用手作件 4 方位 × 3 档位全量核对，逐面命中。
+     *
+     * <p>规则：MC 各面的 u/v 轴随法向而变（法向 X→u∥Z,v∥Y；Y→u∥X,v∥Z；Z→u∥X,v∥Y）。
+     * 哪条 uv 轴与生长方向平行，就决定了 rotation 落在 {0,180} 还是 {90,270}；
+     * 具体值由「面相对分支朝向的左右上下」决定。
+     */
+    private static int sideRot(Direction g, Direction f) {
+        int[] n = VEC[f.ordinal()], gv = VEC[g.ordinal()];
+        Direction upRef = (g.getAxis() == Direction.Axis.Y) ? Direction.NORTH : Direction.UP;
+        int[] uv = VEC[upRef.ordinal()];
+        int[] r = cross(gv, uv);
+        boolean uAlong = uvAxes(f)[0] == g.getAxis().ordinal();
+        boolean gPositive = gv[g.getAxis().ordinal()] > 0;
+        if (!uAlong) {                       // 长度落在 v 轴上
+            int base = dot(n, uv) > 0 ? 0 : 180;
+            return (base + (gPositive ? 180 : 0)) % 360;
         }
-        f.addProperty("texture", "#missing");
-        return f;
+        if (same(n, r)) return 90;           // 长度落在 u 轴上
+        if (same(n, neg(r))) return 270;
+        return gPositive ? 90 : 270;
+    }
+
+    /** 子枝的 rotation：只跟轴有关（手作件验证 东生==西生、下生==上生），值取自样本 */
+    private static int subRot(Direction.Axis a, Direction f) {
+        return switch (a) {
+            case Y -> 0;                                     // 上/下生：六个面一律不转
+            case X -> f == Direction.NORTH ? 90 : 270;       // 东/西生：只有 north 是 90
+            case Z -> switch (f) {                           // 北/南生
+                case EAST -> 90;
+                case WEST, SOUTH -> 270;
+                case DOWN -> 180;
+                default -> 0;                                // north = 截断面
+            };
+        };
+    }
+
+    /** MC 某面法向对应的 (u 轴序号, v 轴序号) */
+    private static int[] uvAxes(Direction f) {
+        return switch (f.getAxis()) {
+            case X -> new int[]{2, 1};
+            case Y -> new int[]{0, 2};
+            case Z -> new int[]{0, 1};
+        };
+    }
+
+    private static boolean same(int[] a, int[] b) {
+        return a[0] == b[0] && a[1] == b[1] && a[2] == b[2];
+    }
+
+    private static int[] neg(int[] a) {
+        return new int[]{-a[0], -a[1], -a[2]};
+    }
+
+    private static int dot(int[] a, int[] b) {
+        return a[0] * b[0] + a[1] * b[1] + a[2] * b[2];
     }
 
     /**
@@ -268,13 +339,21 @@ public final class BranchModelFactory {
         };
     }
 
-    private static JsonObject face(int[] uv, Integer rotation, String texture) {
+    /**
+     * 一个面。贴图槽位只有两个：
+     * <ul>
+     *   <li>{@code #0} 树皮 —— 长条侧面（宽 ≠ 高）</li>
+     *   <li>{@code #2} 截断面 —— 正方形面（宽 == 高）</li>
+     * </ul>
+     * 具体指向哪张贴图由模型头部的 textures 段决定（树种提交）。
+     */
+    private static JsonObject face(int[] uv, Integer rotation, boolean isCap) {
         JsonObject f = new JsonObject();
         f.add("uv", arr(uv));
         if (rotation != null && rotation != 0) {
             f.addProperty("rotation", rotation);
         }
-        f.addProperty("texture", TEX_CAP.equals(texture) ? "#2" : "#0");
+        f.addProperty("texture", isCap ? "#2" : "#0");
         return f;
     }
 
@@ -294,16 +373,6 @@ public final class BranchModelFactory {
                 a[2] * b[0] - a[0] * b[2],
                 a[0] * b[1] - a[1] * b[0],
         };
-    }
-
-    private static Direction dirOf(int[] v) {
-        for (Direction d : DIRS) {
-            int[] u = VEC[d.ordinal()];
-            if (u[0] == v[0] && u[1] == v[1] && u[2] == v[2]) {
-                return d;
-            }
-        }
-        throw new IllegalArgumentException("not a unit axis vector");
     }
 
     private static JsonArray arr(int[] a) {

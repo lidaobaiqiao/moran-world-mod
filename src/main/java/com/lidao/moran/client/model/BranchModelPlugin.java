@@ -110,7 +110,9 @@ public final class BranchModelPlugin implements ModelLoadingPlugin {
                     subs.add(d);
                 }
             }
-            return BranchModelFactory.build(facing, growth, subs);
+            // 贴图由树种提交。目前只有桃树；多树种时让 id 带上树种前缀
+            // （branch/<species>/<facing>_g<n>__<subs>），在这里按名字查 TreeSpecies 的贴图即可。
+            return BranchModelFactory.build(facing, growth, subs, BranchModelFactory.PEACH);
         } catch (NumberFormatException e) {
             return null;
         }

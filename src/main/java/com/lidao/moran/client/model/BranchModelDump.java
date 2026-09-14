@@ -80,7 +80,7 @@ public final class BranchModelDump {
                 subs.add(d);
             }
         }
-        return BranchModelFactory.build(facing, growth, subs);
+        return BranchModelFactory.build(facing, growth, subs, BranchModelFactory.PEACH);
     }
 
     private static Direction byName(String n) {
