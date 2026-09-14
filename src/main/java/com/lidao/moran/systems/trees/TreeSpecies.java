@@ -80,6 +80,8 @@ public class TreeSpecies {
     private final int forkSpacing;
     /** 概率衰减：本节每多一根子枝，概率乘这个数 */
     private final float forkDecay;
+    /** 分叉的最低收益：候选方向光照收益低于它就干脆不长（大多数方向不长叉的原因） */
+    private final int forkMinGain;
     // —— 环境参数 ——
     private final float growChance;
     private final int minLight;
@@ -116,6 +118,7 @@ public class TreeSpecies {
         this.forkMinChainPos = b.forkMinChainPos;
         this.forkSpacing = b.forkSpacing;
         this.forkDecay = b.forkDecay;
+        this.forkMinGain = b.forkMinGain;
         this.growChance = b.growChance;
         this.minLight = b.minLight;
         this.minTemperature = b.minTemperature;
@@ -191,6 +194,10 @@ public class TreeSpecies {
         return forkDecay;
     }
 
+    public int forkMinGain() {
+        return forkMinGain;
+    }
+
     /** 分叉额度上限 —— SUBMASK 是 4 位掩码，最多 4 根 */
     public static final int MAX_FORKS = 4;
 
@@ -202,10 +209,9 @@ public class TreeSpecies {
      * 树种可覆写（比如垂柳更爱分叉、劲松轮生枝）。
      */
     public int forkCapacity(int nutrition) {
-        if (nutrition >= 7) return 4;
-        if (nutrition == 6) return 3;
-        if (nutrition == 5) return 2;
-        if (nutrition == 4) return 1;
+        if (nutrition >= 8) return 3;
+        if (nutrition >= 6) return 2;
+        if (nutrition >= 5) return 1;
         return 0;
     }
 
@@ -429,6 +435,7 @@ public class TreeSpecies {
         private int forkMinChainPos = 2;
         private int forkSpacing = 2;
         private float forkDecay = 0.5F;
+        private int forkMinGain = 4;
         private float growChance = 0.5F;
         private int minLight = 9;
         private float minTemperature = 0.3F;
@@ -463,6 +470,8 @@ public class TreeSpecies {
         public Builder forkSpacing(int v) { this.forkSpacing = v; return this; }
         /** 概率衰减：本节每多一根子枝，概率乘这个数 */
         public Builder forkDecay(float v) { this.forkDecay = v; return this; }
+        /** 分叉最低光照收益：调高 = 只在光很好的地方分叉（树更稀疏通透） */
+        public Builder forkMinGain(int v) { this.forkMinGain = v; return this; }
         public Builder growChance(float v) { this.growChance = v; return this; }
         public Builder minLight(int v) { this.minLight = v; return this; }
         public Builder temperature(float min, float max) { this.minTemperature = min; this.maxTemperature = max; return this; }

@@ -361,19 +361,43 @@ public class MoranBranchBlock extends Block implements Fertilizable {
             if (have < cap && !forkedWithin(world, pos, facing, species.forkSpacing())) {
                 float p = species.subBranchChance() * (float) Math.pow(species.forkDecay(), have);
                 if (random.nextFloat() < p) {
-                    // 从「掩码没占 且 目标格为空气」的槽位里随机挑一个，避免总长同一侧
+                    // 往哪长？—— 不是「随机挑个空位」，是「往光更好的地方去」。
+                    // 收益用开口度度量（与侧芽萌发同一个启发式），向上额外加分、向下扣分；
+                    // 收益低于阈值的候选直接排除：光不好就不长，这才是大多数方向不长叉的原因。
                     List<Direction> free = new ArrayList<>(4);
+                    int[] gains = new int[4];
+                    int totalGain = 0;
+                    int bestGain = Integer.MIN_VALUE;
                     for (Direction side : perpendiculars(facing)) {
                         int slot = slotOf(facing, side);
                         if (slot < 0 || (mask & (1 << slot)) != 0) {
                             continue;
                         }
-                        if (world.getBlockState(pos.offset(side)).isAir()) {
+                        if (!world.getBlockState(pos.offset(side)).isAir()) {
+                            continue;
+                        }
+                        int g = forkGain(world, pos, side);
+                        if (g > bestGain) {
+                            bestGain = g;
+                        }
+                        if (g > 0) {
+                            gains[slot] = g;
                             free.add(side);
+                            totalGain += g;
                         }
                     }
-                    if (!free.isEmpty()) {
-                        Direction side = free.get(random.nextInt(free.size()));
+                    // 一个值得长的方向都没有 —— 本拍就不分叉
+                    if (bestGain >= species.forkMinGain() && !free.isEmpty()) {
+                        // 按收益加权随机：偏向光好的那边，但不总是同一个方向
+                        int roll = random.nextInt(totalGain);
+                        Direction side = free.get(free.size() - 1);
+                        for (Direction candidate : free) {
+                            roll -= gains[slotOf(facing, candidate)];
+                            if (roll < 0) {
+                                side = candidate;
+                                break;
+                            }
+                        }
                         // 子枝档位：母枝 n 只长出 n-1 档（g1 特殊，没有更细的档，只能长 g1）。
                         // 与视觉模型共用同一档位表——北侧上生N 的子枝粗细就是 N-1 档的截面。
                         world.setBlockState(pos.offset(side), getDefaultState()
@@ -575,6 +599,36 @@ public class MoranBranchBlock extends Block implements Fertilizable {
             }
         }
         return TreeSpecies.HORIZONTALS[0];
+    }
+
+    /**
+     * 子枝方向的「光照收益」评分。
+     *
+     * 植物长枝不是随机挑空位，是往光更好的地方去 —— 与侧芽萌发共用同一个启发式
+     * （{@link #phototropicDirection}）：候选方向 2 格内空气越多、上方越开阔，
+     * 说明光越进得来。向上是光照最优解，额外加分；向下背离光，扣分。
+     *
+     * 「离根的代价」不在这里 —— 它由 {@code nutritionAt} 承担：沿链回溯到主干、
+     * 同链每节 -1、换向分叉 -2，天然表达了「越远越弱」。两者分工：
+     *   收益（这里）决定「往哪长」，代价（营养）决定「能长几根」。
+     */
+    private static int forkGain(ServerWorld world, BlockPos pos, Direction dir) {
+        int open = 0;
+        for (int step = 1; step <= 2; step++) {
+            if (world.getBlockState(pos.offset(dir, step)).isAir()) {
+                open++;
+            }
+        }
+        if (world.getBlockState(pos.offset(dir).up()).isAir()) {
+            open++;
+        }
+        int gain = open * 2;
+        if (dir == Direction.UP) {
+            gain += 3;
+        } else if (dir == Direction.DOWN) {
+            gain -= 4;
+        }
+        return gain;
     }
 
     /** 空间竞争：目标位置周围实心邻居达到阈值即压抑萌芽（密林瘦高、孤树开张的涌现来源） */
