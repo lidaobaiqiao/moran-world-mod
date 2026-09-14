@@ -39,6 +39,10 @@ public class MoranModClient implements ClientModInitializer {
      */
     @Override
     public void onInitializeClient() {
+        // === 树枝模型运行时生成：磁盘零模型文件，按 走向+档位+分叉方向 现场算 ===
+        net.fabricmc.fabric.api.client.model.loading.v1.ModelLoadingPlugin.register(
+                new com.lidao.moran.client.model.BranchModelPlugin());
+
         // 通过标识符获取我们的自定义方块对应的物品实例
         Item myGrassBlock = Registries.ITEM.get(new Identifier(MoranMod.MOD_ID, "peach_blossom_grass_block"));
         LOGGER.info("🔍 找到目标物品: {}", Registries.ITEM.getId(myGrassBlock));

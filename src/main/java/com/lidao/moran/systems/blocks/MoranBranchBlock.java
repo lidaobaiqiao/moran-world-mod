@@ -63,6 +63,32 @@ public class MoranBranchBlock extends Block implements Fertilizable {
     /** 主干封顶标记：到顶决策持久化，唤醒侧芽与顶花苞由此驱动 */
     public static final BooleanProperty TOPPED = BooleanProperty.of("topped");
 
+    /**
+     * 本节是否分叉出了子枝。
+     *
+     * 为什么需要它：枝是「一格一块」的，而分叉点那格在模型上要同时画出
+     * 「穿过本格的母枝」和「从母枝侧面伸出的子枝」两根元素（如 北侧东生N）。
+     * 单元素模型画不出 T 字形，分叉点就会缺一根——视觉上就是「侧枝只有一半」。
+     * 故母枝方块需要知道自己这格分出了什么，才能挑对面叉模型。
+     *
+     * 用布尔而非「子枝档位」：分叉模型是「母枝 + 子枝」两根元素的组合，
+     * 而母枝多粗、子枝多粗是绑定的（模型经实测：母枝 14 粗时子枝截面 12，
+     * 即「母枝 n 只长出 n-1 档的子枝」），所以只要知道母枝自己第几档
+     * （就是本方块已有的 {@link #GROWTH}）+ 分叉方向，就能唯一确定模型。
+     * 额外存子枝档位是冗余，且会把状态数放大数倍。
+     */
+    public static final BooleanProperty BRANCH = BooleanProperty.of("branch");
+
+    /**
+     * 分叉方向——子枝伸出的方向。仅在 {@link #BRANCH} 为 true 时有意义。
+     *
+     * 不能从 FACING 推出：同为 facing=north 的母枝（沿 Z 贯穿），
+     * 分叉可能是东/西/上/下四种之一，必须单独记。
+     * BRANCH=false 时本属性取任意值都不影响模型选择（blockstate 里
+     * branch=false 的条目不列 sub，全部落到单元素侧枝模型）。
+     */
+    public static final EnumProperty<Direction> SUB = EnumProperty.of("sub", Direction.class);
+
     private final TreeSpecies species;
 
     /** 各生长度的枝干横截面半宽：直径 2/4/6/8/10/12/14/16（用户定稿），1-2 是可穿行的细枝，8 为满格 */
@@ -110,7 +136,9 @@ public class MoranBranchBlock extends Block implements Fertilizable {
                 .with(DORMANT, false)
                 .with(TOPPED, false)
                 .with(NATURAL, false)
-                .with(TARGET, 8));
+                .with(TARGET, 8)
+                .with(BRANCH, false)
+                .with(SUB, Direction.UP));
     }
 
     public TreeSpecies species() {
@@ -119,7 +147,7 @@ public class MoranBranchBlock extends Block implements Fertilizable {
 
     @Override
     protected void appendProperties(StateManager.Builder<Block, BlockState> builder) {
-        builder.add(GROWTH, FACING, TRUNK, FAILS, DORMANT, TOPPED, NATURAL, TARGET);
+        builder.add(GROWTH, FACING, TRUNK, FAILS, DORMANT, TOPPED, NATURAL, TARGET, BRANCH, SUB);
     }
 
     @Override
@@ -307,9 +335,22 @@ public class MoranBranchBlock extends Block implements Fertilizable {
             for (Direction side : candidates) {
                 BlockPos sp = pos.offset(side);
                 if (world.getBlockState(sp).isAir() && random.nextFloat() < species.subBranchChance()) {
+                    // 子枝档位：母枝 n 只长出 n-1 档（g1 特殊，没有更细的档，只能长 g1）。
+                    // 与视觉模型共用同一档位表——北侧上生N 的子枝粗细就是 N-1 档的截面。
+                    int subGrowth = growth > 1 ? growth - 1 : 1;
                     world.setBlockState(sp, getDefaultState()
+                            .with(GROWTH, subGrowth)
                             .with(FACING, side).with(TRUNK, false).with(NATURAL, state.get(NATURAL))
                             .with(TARGET, state.get(TARGET)), Block.NOTIFY_ALL);
+                    // 母枝那格记下「本格分出了子枝、朝哪个方向」，好挑对应的双元素分叉模型。
+                    // 不记的话分叉点只能画出一根母枝——视觉上就是「侧枝只有一半」。
+                    // 档位不必存：分叉模型由母枝自己的 GROWTH + 分叉方向唯一确定。
+                    // 注意：必须从世界重读本格状态——传进来的 state 是生长前的快照，
+                    // 而上面可能刚用 state.with(GROWTH, growth) 提升过成熟度，直接复用会把
+                    // GROWTH 写回旧值。
+                    world.setBlockState(pos, world.getBlockState(pos)
+                            .with(BRANCH, true)
+                            .with(SUB, side), Block.NOTIFY_ALL);
                     return;
                 }
             }
@@ -326,11 +367,18 @@ public class MoranBranchBlock extends Block implements Fertilizable {
     /**
      * 本节是否已抽出过子枝。
      *
-     * 判定：某方向上存在同族方块，且它「朝外」（FACING 指向该方向）、非主干。
+     * 主判据是本节自己的 {@link #BRANCH} 标记——它就是「本节分过叉」的持久记录，
+     * 不受子枝后来长走、被剪、开花消失的影响。
+     *
+     * 兜底再扫一遍邻居：旧存档里的枝没有 BRANCH 属性（自动落 false），
+     * 但确实已经长出了子枝，靠邻居扫描能把它们认出来，避免老树二次分叉。
      * 同类朝向（d == selfFacing）的邻居是链上的延伸节，不是子枝，必须排除——
      * 否则每根枝都会被自己的下一节误判成「已有子枝」，永远分不出叉。
      */
     private static boolean hasChildBranch(ServerWorld world, BlockPos pos, Direction selfFacing) {
+        if (world.getBlockState(pos).get(BRANCH)) {
+            return true;
+        }
         for (Direction d : Direction.values()) {
             if (d == selfFacing) {
                 continue;
@@ -350,9 +398,26 @@ public class MoranBranchBlock extends Block implements Fertilizable {
     @Override
     public void onStateReplaced(BlockState state, World world, BlockPos pos, BlockState newState, boolean moved) {
         super.onStateReplaced(state, world, pos, newState, moved);
-        if (world.isClient
-                || newState.getBlock() instanceof MoranBranchBlock
-                || world.getRandom().nextFloat() >= species.pruneResponseChance()) {
+        if (world.isClient || newState.getBlock() instanceof MoranBranchBlock) {
+            return;
+        }
+
+        // 被移除的是子枝 -> 通知母枝清掉分叉标记，否则那格会一直挂着
+        // 「我这里有根子枝」的双元素模型，画出一根已经不存在的枝。
+        // 判定：自己不是分叉点（BRANCH=false）且非主干，母枝在反方向、
+        // 且它记录的 SUB 正是自己、BRANCH 为 true。
+        if (!state.get(BRANCH) && !state.get(TRUNK)) {
+            Direction back = state.get(FACING).getOpposite();
+            BlockState parent = world.getBlockState(pos.offset(back));
+            if (parent.getBlock() instanceof MoranBranchBlock
+                    && parent.get(BRANCH)
+                    && parent.get(SUB) == state.get(FACING)) {
+                world.setBlockState(pos.offset(back), parent
+                        .with(BRANCH, false), Block.NOTIFY_ALL);
+            }
+        }
+
+        if (world.getRandom().nextFloat() >= species.pruneResponseChance()) {
             return;
         }
         // FACING 现已含 DOWN，断口在上方或下方都能生成朝向断口的新芽，不必再跳过 UP
@@ -363,12 +428,15 @@ public class MoranBranchBlock extends Block implements Fertilizable {
                 // 断口处生成朝向母体的新芽（growth=1），立即登记生长请求。
                 // 用 neighbor.with(...) 从邻居复制状态：TRUNK 未在下方显式列出，故自动继承——
                 // 主干断了长出来的仍是主干（继续抽高），侧枝断了长出来的仍是侧枝。
+                // BRANCH/SUB 必须显式清零：新芽自己没分叉，继承下来会画出不存在的分叉。
                 world.setBlockState(pos, neighbor
                         .with(FACING, d.getOpposite())
                         .with(GROWTH, 1)
                         .with(DORMANT, false)
                         .with(TOPPED, false)
                         .with(FAILS, 0)
+                        .with(BRANCH, false)
+                        .with(SUB, d.getOpposite())
                         .with(TARGET, neighbor.contains(TARGET) ? neighbor.get(TARGET) : 8), Block.NOTIFY_ALL);
                 world.scheduleBlockTick(pos, neighbor.getBlock(),
                         neighbor.contains(NATURAL) && neighbor.get(NATURAL)

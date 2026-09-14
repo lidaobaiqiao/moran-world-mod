@@ -113,3 +113,11 @@ jar {
         rename { "${it}_${project.base.archivesName.get()}"}
      }
 }
+
+// === 临时：导出 BranchModelFactory 生成的模型，供逐字段校验（验证完可删） ===
+tasks.register('dumpBranchModels', JavaExec) {
+    group = 'verification'
+    classpath = sourceSets.main.runtimeClasspath
+    mainClass = 'com.lidao.moran.client.model.BranchModelDump'
+    args = ['.workbuddy/dynamic_ids.txt', '.workbuddy/gen_java']
+}
