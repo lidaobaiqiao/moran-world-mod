@@ -71,6 +71,15 @@ public class TreeSpecies {
     private final int branchStopGrowth;
     private final float branchStopChance;
     private final float subBranchChance;
+    // —— 分叉参数（多侧枝） ——
+    /** 分叉最低成熟度：够粗才分 */
+    private final int forkMinGrowth;
+    /** 距主干至少几节才分叉（贴干首节不分） */
+    private final int forkMinChainPos;
+    /** 空间冷却：分叉后隔几节才允许再分（密度主旋钮） */
+    private final int forkSpacing;
+    /** 概率衰减：本节每多一根子枝，概率乘这个数 */
+    private final float forkDecay;
     // —— 环境参数 ——
     private final float growChance;
     private final int minLight;
@@ -103,6 +112,10 @@ public class TreeSpecies {
         this.branchStopGrowth = b.branchStopGrowth;
         this.branchStopChance = b.branchStopChance;
         this.subBranchChance = b.subBranchChance;
+        this.forkMinGrowth = b.forkMinGrowth;
+        this.forkMinChainPos = b.forkMinChainPos;
+        this.forkSpacing = b.forkSpacing;
+        this.forkDecay = b.forkDecay;
         this.growChance = b.growChance;
         this.minLight = b.minLight;
         this.minTemperature = b.minTemperature;
@@ -160,6 +173,40 @@ public class TreeSpecies {
 
     public float subBranchChance() {
         return subBranchChance;
+    }
+
+    public int forkMinGrowth() {
+        return forkMinGrowth;
+    }
+
+    public int forkMinChainPos() {
+        return forkMinChainPos;
+    }
+
+    public int forkSpacing() {
+        return forkSpacing;
+    }
+
+    public float forkDecay() {
+        return forkDecay;
+    }
+
+    /** 分叉额度上限 —— SUBMASK 是 4 位掩码，最多 4 根 */
+    public static final int MAX_FORKS = 4;
+
+    /**
+     * 这一节最多能养出几根子枝，由营养决定。
+     *
+     * 营养从根部发起、沿结构递减（同链每节 -1，换向分叉 -2），所以越靠梢越细弱、
+     * 能养的侧枝越少——这条规律不需要额外参数，营养本身就是它。
+     * 树种可覆写（比如垂柳更爱分叉、劲松轮生枝）。
+     */
+    public int forkCapacity(int nutrition) {
+        if (nutrition >= 7) return 4;
+        if (nutrition == 6) return 3;
+        if (nutrition == 5) return 2;
+        if (nutrition == 4) return 1;
+        return 0;
     }
 
     public float growChance() {
@@ -378,6 +425,10 @@ public class TreeSpecies {
         private int branchStopGrowth = 4;
         private float branchStopChance = 0.25F;
         private float subBranchChance = 0.25F;
+        private int forkMinGrowth = 6;
+        private int forkMinChainPos = 2;
+        private int forkSpacing = 2;
+        private float forkDecay = 0.5F;
         private float growChance = 0.5F;
         private int minLight = 9;
         private float minTemperature = 0.3F;
@@ -406,6 +457,12 @@ public class TreeSpecies {
         public Builder branchStopGrowth(int v) { this.branchStopGrowth = v; return this; }
         public Builder branchStopChance(float v) { this.branchStopChance = v; return this; }
         public Builder subBranchChance(float v) { this.subBranchChance = v; return this; }
+        public Builder forkMinGrowth(int v) { this.forkMinGrowth = v; return this; }
+        public Builder forkMinChainPos(int v) { this.forkMinChainPos = v; return this; }
+        /** 空间冷却：分叉后隔几节才能再分。1 = 允许相邻节都分（最密），2 = 隔一节 */
+        public Builder forkSpacing(int v) { this.forkSpacing = v; return this; }
+        /** 概率衰减：本节每多一根子枝，概率乘这个数 */
+        public Builder forkDecay(float v) { this.forkDecay = v; return this; }
         public Builder growChance(float v) { this.growChance = v; return this; }
         public Builder minLight(int v) { this.minLight = v; return this; }
         public Builder temperature(float min, float max) { this.minTemperature = min; this.maxTemperature = max; return this; }
