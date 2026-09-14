@@ -13,6 +13,7 @@ import net.minecraft.state.property.BooleanProperty;
 import net.minecraft.state.property.EnumProperty;
 import net.minecraft.state.property.IntProperty;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.StringIdentifiable;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.random.Random;
 import net.minecraft.util.shape.VoxelShape;
@@ -65,17 +66,78 @@ public class MoranBranchBlock extends Block implements Fertilizable {
     public static final BooleanProperty TOPPED = BooleanProperty.of("topped");
 
     /**
-     * 本节分出的子枝集合，位掩码（0 = 没分叉）。取代了原先的 BRANCH(布尔) + SUB(单方向)。
+     * 本节分出的子枝集合。取代了原先的 BRANCH(布尔) + SUB(单方向)。
      *
      * 为什么需要它：枝是「一格一块」的，分叉点那格在模型上要同时画出
      * 「穿过本格的母枝」和「从母枝侧面伸出的子枝」；单元素模型画不出 T 字形，
      * 分叉点就会缺一根——视觉上就是「侧枝只有一半」。
-     * 多侧枝要求「一节能同时分出好几根」，单方向装不下，所以改成掩码。
+     * 多侧枝要求「一节能同时分出好几根」，单方向装不下，所以要记一整组。
+     *
+     * <h2>为什么是枚举而不是 IntProperty 位掩码</h2>
+     * MC 的状态哈希是「Σ(属性哈希 XOR 值哈希)」，而 XOR 一个小整数只翻低位。
+     * {@code IntProperty} 的值哈希就是那个整数本身（0~15），于是 24.6 万个状态的
+     * 哈希全挤成一团——实测哈希种类从 4752 掉到 624，桶里塞几百个状态、退化成
+     * 红黑树，方块注册从 28 秒涨到 383 秒。换成枚举后，枚举常量的身份哈希是
+     * 大随机数，多样性反而超过原设计（8256 种）。
      *
      * 位序由 {@link #perpendiculars(Direction)} 定义，必须与 blockstate 生成器
      * （.workbuddy/build_bs_final.py 的 perp_for）严格一致，否则模型 id 会对不上。
      */
-    public static final IntProperty SUBMASK = IntProperty.of("submask", 0, (1 << TreeSpecies.MAX_FORKS) - 1);
+    public static final EnumProperty<ForkSet> FORK_SET = EnumProperty.of("forkset", ForkSet.class);
+
+    /**
+     * 本节分出的子枝集合，枚举。名字里的 F0~F3 是
+     * {@link #perpendiculars(Direction)} 里的槽位序号，例如 F013 = 第 0、1、3 槽有子枝。
+     *
+     * 用枚举而非整数位掩码是<b>为了哈希熵</b>（见 {@link #FORK_SET} 的说明）：
+     * MC 的状态哈希取值的身份哈希，枚举常量天然是良分布的大随机数，小整数不是。
+     */
+    public enum ForkSet implements StringIdentifiable {
+        NONE(0),
+        F0(1), F1(2), F2(4), F3(8),
+        F01(3), F02(5), F03(9), F12(6), F13(10), F23(12),
+        F012(7), F013(11), F023(13), F123(14), F0123(15);
+
+        private final int mask;
+
+        ForkSet(int mask) {
+            this.mask = mask;
+        }
+
+        /** 位掩码：第 i 位 = 第 i 个槽位（{@link #perpendiculars} 的顺序）有子枝 */
+        public int mask() {
+            return mask;
+        }
+
+        private static final ForkSet[] BY_MASK = new ForkSet[(1 << TreeSpecies.MAX_FORKS)];
+
+        static {
+            for (ForkSet v : values()) {
+                BY_MASK[v.mask] = v;
+            }
+        }
+
+        /** 掩码 -> 枚举；越界或未定义时落到 NONE */
+        public static ForkSet of(int mask) {
+            int m = mask & (BY_MASK.length - 1);
+            ForkSet v = BY_MASK[m];
+            return v == null ? NONE : v;
+        }
+
+        public boolean isEmpty() {
+            return mask == 0;
+        }
+
+        public int count() {
+            return Integer.bitCount(mask);
+        }
+
+        /** blockstate 里的属性值就是这个名字（MC 的 EnumProperty 要求实现 StringIdentifiable） */
+        @Override
+        public String asString() {
+            return this.name().toLowerCase(java.util.Locale.ROOT);
+        }
+    }
 
     /**
      * 分叉槽位的规范顺序 —— 必须与 blockstate 生成器逐位一致。
@@ -161,7 +223,7 @@ public class MoranBranchBlock extends Block implements Fertilizable {
                 .with(TOPPED, false)
                 .with(NATURAL, false)
                 .with(TARGET, 8)
-                .with(SUBMASK, 0));
+                .with(FORK_SET, ForkSet.NONE));
     }
 
     public TreeSpecies species() {
@@ -170,7 +232,7 @@ public class MoranBranchBlock extends Block implements Fertilizable {
 
     @Override
     protected void appendProperties(StateManager.Builder<Block, BlockState> builder) {
-        builder.add(GROWTH, FACING, TRUNK, FAILS, DORMANT, TOPPED, NATURAL, TARGET, SUBMASK);
+        builder.add(GROWTH, FACING, TRUNK, FAILS, DORMANT, TOPPED, NATURAL, TARGET, FORK_SET);
     }
 
     @Override
@@ -354,8 +416,8 @@ public class MoranBranchBlock extends Block implements Fertilizable {
         //   额度由营养决定（越靠梢越细弱、能养的侧枝越少），概率随已分数衰减。
         //   每拍最多落一根 —— 四叉要四拍各自命中，天然稀有，也不会四根同时蹦出来。
         if (growth >= species.forkMinGrowth() && chainPos >= species.forkMinChainPos()) {
-            int mask = state.get(SUBMASK);
-            int have = Math.max(Integer.bitCount(mask), neighborForkCount(world, pos, facing));
+            int mask = state.get(FORK_SET).mask();
+            int have = Math.max(state.get(FORK_SET).count(), neighborForkCount(world, pos, facing));
             int cap = Math.min(TreeSpecies.MAX_FORKS,
                     species.forkCapacity(nutritionAt(world, pos, facing)));
             if (have < cap && !forkedWithin(world, pos, facing, species.forkSpacing())) {
@@ -410,7 +472,7 @@ public class MoranBranchBlock extends Block implements Fertilizable {
                         // 必须从世界重读本格状态——传进来的 state 是生长前的快照，
                         // 上面可能刚提过 GROWTH，直接复用会把它写回旧值。
                         world.setBlockState(pos, world.getBlockState(pos)
-                                .with(SUBMASK, mask | (1 << slotOf(facing, side))), Block.NOTIFY_ALL);
+                                .with(FORK_SET, ForkSet.of(mask | (1 << slotOf(facing, side)))), Block.NOTIFY_ALL);
                         return;
                     }
                 }
@@ -437,7 +499,7 @@ public class MoranBranchBlock extends Block implements Fertilizable {
      * 否则每根枝都会被自己的下一节误判成「已有子枝」，永远分不出叉。
      */
     private static int neighborForkCount(ServerWorld world, BlockPos pos, Direction selfFacing) {
-        int mask = world.getBlockState(pos).get(SUBMASK);
+        int mask = world.getBlockState(pos).get(FORK_SET).mask();
         if (mask != 0) {
             return Integer.bitCount(mask);
         }
@@ -466,7 +528,7 @@ public class MoranBranchBlock extends Block implements Fertilizable {
             if (!(s.getBlock() instanceof MoranBranchBlock) || s.get(FACING) != facing) {
                 return false;
             }
-            if (s.get(SUBMASK) != 0) {
+            if (!s.get(FORK_SET).isEmpty()) {
                 return true;
             }
         }
@@ -486,15 +548,16 @@ public class MoranBranchBlock extends Block implements Fertilizable {
 
         // 被移除的是子枝 -> 通知母枝清掉对应的那一位，否则母枝会一直挂着
         // 「我这里有根子枝」的分叉模型，画出一根已经不存在的枝。
-        if (!state.get(TRUNK) && state.get(SUBMASK) == 0) {
+        if (!state.get(TRUNK) && state.get(FORK_SET).isEmpty()) {
             Direction back = state.get(FACING).getOpposite();
             BlockPos ppos = pos.offset(back);
             BlockState parent = world.getBlockState(ppos);
-            if (parent.getBlock() instanceof MoranBranchBlock && parent.get(SUBMASK) != 0) {
+            if (parent.getBlock() instanceof MoranBranchBlock && !parent.get(FORK_SET).isEmpty()) {
                 int slot = slotOf(parent.get(FACING), state.get(FACING));
-                if (slot >= 0 && (parent.get(SUBMASK) & (1 << slot)) != 0) {
+                if (slot >= 0 && (parent.get(FORK_SET).mask() & (1 << slot)) != 0) {
                     world.setBlockState(ppos,
-                            parent.with(SUBMASK, parent.get(SUBMASK) & ~(1 << slot)), Block.NOTIFY_ALL);
+                            parent.with(FORK_SET, ForkSet.of(parent.get(FORK_SET).mask() & ~(1 << slot))),
+                            Block.NOTIFY_ALL);
                 }
             }
         }
@@ -517,7 +580,7 @@ public class MoranBranchBlock extends Block implements Fertilizable {
                         .with(DORMANT, false)
                         .with(TOPPED, false)
                         .with(FAILS, 0)
-                        .with(SUBMASK, 0)
+                        .with(FORK_SET, ForkSet.NONE)
                         .with(TARGET, neighbor.contains(TARGET) ? neighbor.get(TARGET) : 8), Block.NOTIFY_ALL);
                 world.scheduleBlockTick(pos, neighbor.getBlock(),
                         neighbor.contains(NATURAL) && neighbor.get(NATURAL)
