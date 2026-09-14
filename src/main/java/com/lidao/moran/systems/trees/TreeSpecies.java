@@ -31,9 +31,14 @@ import java.util.Map;
  * 现实物候由各档案的钩子表达：
  * - 桃（默认范式）：上半部萌芽、先营养后生殖、先花后叶、耐旱怕涝；
  * - 垂柳：覆写 {@link #branchChildDirection} 枝条渐下垂、{@link #checkEnvironment} 要求水度；
- * - 劲松：覆写 {@link #isBudPosition} 轮生枝、放宽温度下限；
+ * - 劲松：覆写 {@link #isBudPosition} 轮生枝、{@link #branchForkGain} 只认水平向、放宽温度下限；
  * - 寒梅：覆写 {@link #onBranchStop} 贴枝开花、耐寒；
  * - 银杏：调低 growChance、稀疏侧芽。
+ *
+ * <b>分叉的两个维度分属两处，别搞混</b>：
+ * 「往哪长」是物种偏好，走 {@link #branchForkGain}（可覆写）；
+ * 「能长几根」是离根的代价，走 {@link #forkCapacity}（营养的函数）。
+ * 引擎只负责把两者拼起来，不含任何树种偏好。
  */
 public class TreeSpecies {
 
@@ -381,6 +386,46 @@ public class TreeSpecies {
     /** 侧枝延伸时子枝的方向。默认：直线延伸（垂柳覆写为渐下垂） */
     public Direction branchChildDirection(ServerWorld world, BlockPos pos, Direction facing) {
         return facing;
+    }
+
+    /**
+     * 开口度：候选方向 2 格内空气数 + 该方向斜上方是否开阔（0~3）。
+     *
+     * 这是「光照进不进得来」的廉价近似 —— 比起真实光照值，它不依赖光照更新，
+     * 在树自己还在长、上方尚未定型时也成立。
+     * 向光萌发与分叉收益共用这一个度量，避免同一个概念在两处各写一遍。
+     */
+    public static int opennessAround(ServerWorld world, BlockPos pos, Direction dir) {
+        int open = 0;
+        for (int step = 1; step <= 2; step++) {
+            if (world.getBlockState(pos.offset(dir, step)).isAir()) {
+                open++;
+            }
+        }
+        if (world.getBlockState(pos.offset(dir).up()).isAir()) {
+            open++;
+        }
+        return open;
+    }
+
+    /**
+     * 分叉候选方向的「收益」—— <b>物种偏好，不是引擎机制</b>。
+     *
+     * 引擎拿它决定「往哪长」：收益越高越容易被选中，低于 {@link #forkMinGain()} 的干脆不长。
+     * 与「能长几根」分工不同 —— 那个由营养承担（离根的代价：同链 -1、换向 -2）。
+     *
+     * 默认实现 = 桃的范式：往光更好的地方长，向上加分、向下减分。
+     * 覆写示例：垂柳偏向斜下（枝条渐下垂）、劲松只认水平四向（轮生枝）、
+     * 阴性树种把 {@code opennessAround} 的权重调低甚至取负。
+     */
+    public int branchForkGain(ServerWorld world, BlockPos pos, Direction facing, Direction candidate) {
+        int gain = opennessAround(world, pos, candidate) * 2;
+        if (candidate == Direction.UP) {
+            gain += 3;
+        } else if (candidate == Direction.DOWN) {
+            gain -= 4;
+        }
+        return gain;
     }
 
     /**

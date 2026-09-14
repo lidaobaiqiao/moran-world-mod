@@ -376,7 +376,7 @@ public class MoranBranchBlock extends Block implements Fertilizable {
                         if (!world.getBlockState(pos.offset(side)).isAir()) {
                             continue;
                         }
-                        int g = forkGain(world, pos, side);
+                        int g = species.branchForkGain(world, pos, facing, side);
                         if (g > bestGain) {
                             bestGain = g;
                         }
@@ -578,17 +578,8 @@ public class MoranBranchBlock extends Block implements Fertilizable {
         int totalWeight = 0;
         int[] weights = new int[TreeSpecies.HORIZONTALS.length];
         for (int i = 0; i < TreeSpecies.HORIZONTALS.length; i++) {
-            Direction d = TreeSpecies.HORIZONTALS[i];
-            int open = 0;
-            for (int step = 1; step <= 2; step++) {
-                if (world.getBlockState(pos.offset(d, step)).isAir()) {
-                    open++;
-                }
-            }
-            if (world.getBlockState(pos.offset(d).up()).isAir()) {
-                open++;
-            }
-            weights[i] = 1 + open;
+            // 开口度与分叉收益共用同一个度量（TreeSpecies.opennessAround），不再各写一遍
+            weights[i] = 1 + TreeSpecies.opennessAround(world, pos, TreeSpecies.HORIZONTALS[i]);
             totalWeight += weights[i];
         }
         int roll = random.nextInt(totalWeight);
@@ -599,36 +590,6 @@ public class MoranBranchBlock extends Block implements Fertilizable {
             }
         }
         return TreeSpecies.HORIZONTALS[0];
-    }
-
-    /**
-     * 子枝方向的「光照收益」评分。
-     *
-     * 植物长枝不是随机挑空位，是往光更好的地方去 —— 与侧芽萌发共用同一个启发式
-     * （{@link #phototropicDirection}）：候选方向 2 格内空气越多、上方越开阔，
-     * 说明光越进得来。向上是光照最优解，额外加分；向下背离光，扣分。
-     *
-     * 「离根的代价」不在这里 —— 它由 {@code nutritionAt} 承担：沿链回溯到主干、
-     * 同链每节 -1、换向分叉 -2，天然表达了「越远越弱」。两者分工：
-     *   收益（这里）决定「往哪长」，代价（营养）决定「能长几根」。
-     */
-    private static int forkGain(ServerWorld world, BlockPos pos, Direction dir) {
-        int open = 0;
-        for (int step = 1; step <= 2; step++) {
-            if (world.getBlockState(pos.offset(dir, step)).isAir()) {
-                open++;
-            }
-        }
-        if (world.getBlockState(pos.offset(dir).up()).isAir()) {
-            open++;
-        }
-        int gain = open * 2;
-        if (dir == Direction.UP) {
-            gain += 3;
-        } else if (dir == Direction.DOWN) {
-            gain -= 4;
-        }
-        return gain;
     }
 
     /** 空间竞争：目标位置周围实心邻居达到阈值即压抑萌芽（密林瘦高、孤树开张的涌现来源） */
