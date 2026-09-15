@@ -11,6 +11,8 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Arrays;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -52,6 +54,8 @@ public final class TreeSimulator {
         String out = ".workbuddy/sim_out";
         String webOut = null;
         int envScore = 4;
+        boolean best = false;
+        int bestCount = 300;
         for (int i = 0; i < args.length; i++) {
             switch (args[i]) {
                 case "--seeds" -> seeds = Integer.parseInt(args[++i]);
@@ -63,6 +67,8 @@ public final class TreeSimulator {
                     case "average" -> 3;
                     default -> 4;
                 };
+                case "--best" -> best = true;
+                case "--count" -> bestCount = Integer.parseInt(args[++i]);
                 default -> { }
             }
         }
@@ -78,6 +84,11 @@ public final class TreeSimulator {
                     w.hormones.gibberellin(), w.max);
             TreeRenderer.renderTreePng(w, Path.of(out, "tree_" + pick + ".png"), label);
             printBaseline(species, pick, w);
+            return;
+        }
+
+        if (best) {
+            runBest(species, bestCount, envScore, out);
             return;
         }
 
@@ -497,6 +508,7 @@ public final class TreeSimulator {
             return;   // 静默，防 tick 风暴
         }
         // 生命周期终止：连续 IDLE_LIMIT 次请求无产出 → terminate
+        // （侧枝够开花年龄则开花收场——树冠的花叶全靠这条退出路径，同步引擎）
         if (progressed) {
             w.clearIdle(pos);
         } else if (w.bumpIdle(pos) >= IDLE_LIMIT) {
@@ -504,6 +516,9 @@ public final class TreeSimulator {
                 s.topped = true;
             } else {
                 s.dormant = true;
+                if (s.growth >= (w.max + 1) / 2) {
+                    onBranchStop(w, pos, s.facing);
+                }
             }
             w.clearIdle(pos);
         }
@@ -649,11 +664,13 @@ public final class TreeSimulator {
             }
         }
 
-        // 停止开花：到门槛概率停（随链位置递增，先端易成花 → 冠层圆拱）/ 到上限强制停
-        if (growth >= (w.max + 1) / 2
-                && (growth >= w.max - 1
-                    || w.random.nextFloat() < w.species.branchStopChance() * chainPos / (float) chainLimit)) {
+        // 主动停止开花（养分封顶前的提前成花）：与引擎同步——只对未到自身 cap 的节生效，
+        // 到 cap 的节走分叉窗口 + 终止开花（见 tickBranch）；开花即休眠（停止即终末）
+        int cap = Math.min(w.max - 1, nutritionAt(w, pos, facing));
+        if (growth < cap && growth >= (w.max + 1) / 2
+                && w.random.nextFloat() < w.species.branchStopChance() * chainPos / (float) chainLimit) {
             onBranchStop(w, pos, facing);
+            s.dormant = true;
             return true;
         }
         return false;
@@ -921,7 +938,9 @@ public final class TreeSimulator {
             }
             return treeTopped(w, pos);
         }
-        return s.growth >= max - 1;
+        // 侧枝没有「结构长满即静默」出口（同步引擎）：终局是开花写入的 dormant，
+        // 到 cap 未开花的节留在循环里走分叉窗口，由终止逻辑开花收场
+        return false;
     }
 
     // ===== 分叉槽位（复刻 MoranBranchBlock.perpendiculars/slotOf，与 blockstate 生成器一致） =====
@@ -942,5 +961,118 @@ public final class TreeSimulator {
             }
         }
         return -1;
+    }
+
+    // ============================================================
+    //  完美基因自动搜索：扫大批量种子，多维度 Top-K 合并成候选池，
+    //  批量渲染 + 打印每棵的激素档案，交人工眼挑定稿。
+    // ============================================================
+
+    /**
+     * 候选池筛选：每个维度各取 Top-K，合并去重 —— 覆盖「最茂密/最高/最宽/最对称/分叉最多」等各型好树，
+     * 避免单一指标筛出的候选高度雷同，给眼挑留足多样性。
+     */
+    private static void runBest(TreeSpecies species, int count, int envScore, String outBase) throws Exception {
+        Path dir = Path.of(outBase, "best");
+        Files.createDirectories(dir);
+
+        List<SimWorld> all = new ArrayList<>();
+        for (int i = 0; i < count; i++) {
+            all.add(growTree(species, 1000L + i, envScore));
+        }
+
+        int n = all.size();
+        double[] dLeaves = new double[n], dBranch = new double[n], dFork = new double[n],
+                dHeight = new double[n], dWidth = new double[n], dBud = new double[n],
+                dLush = new double[n], dSym = new double[n];
+        for (int i = 0; i < n; i++) {
+            SimStats s = stats(all.get(i));
+            dLeaves[i] = s.leaves; dBranch[i] = s.branches; dFork[i] = s.forks;
+            dHeight[i] = s.height; dWidth[i] = s.width; dBud[i] = s.buds;
+            dLush[i] = s.branches + s.leaves + s.buds;
+            dSym[i] = symmetry(all.get(i));
+        }
+
+        int topK = 3;
+        LinkedHashSet<Long> candSeeds = new LinkedHashSet<>();
+        topN(dLeaves, topK, candSeeds, all);
+        topN(dBranch, topK, candSeeds, all);
+        topN(dFork, topK, candSeeds, all);
+        topN(dHeight, topK, candSeeds, all);
+        topN(dWidth, topK, candSeeds, all);
+        topN(dBud, topK, candSeeds, all);
+        topN(dLush, topK, candSeeds, all);
+        topN(dSym, topK, candSeeds, all);
+
+        Map<Long, SimWorld> bySeed = new HashMap<>();
+        for (SimWorld w : all) bySeed.put(w.seed, w);
+
+        List<SimWorld> cands = new ArrayList<>();
+        for (Long sd : candSeeds) cands.add(bySeed.get(sd));
+
+        // 单棵大图（细节）
+        for (SimWorld w : cands) {
+            HormoneProfile h = w.hormones;
+            String label = String.format(Locale.ROOT,
+                    "seed=%d %s aux=%.2f cyt=%.2f gib=%.2f tgt=%d",
+                    w.seed, w.phenotype.id(), h.auxin(), h.cytokinin(), h.gibberellin(), w.max);
+            TreeRenderer.renderTreePng(w, dir.resolve("tree_" + w.seed + ".png"), label);
+        }
+        // 总览拼图（一眼扫候选）
+        List<String> labels = new ArrayList<>();
+        for (SimWorld w : cands) labels.add(String.format(Locale.ROOT, "#%d %s", w.seed, w.phenotype.id()));
+        TreeRenderer.renderSheetPng(cands, labels, 6, dir.resolve("sheet.png"),
+                "moran perfect-gene candidates  (scanned " + count + ", pool " + cands.size() + ")");
+
+        // 控制台：候选档案表
+        System.out.println("===== 完美基因候选池（扫描 " + count + " 棵，各维度 Top" + topK
+                + " 合并，共 " + cands.size() + " 棵）=====");
+        for (SimWorld w : cands) {
+            SimStats s = stats(w);
+            HormoneProfile h = w.hormones;
+            System.out.printf(Locale.ROOT,
+                    "#%d %-5s aux=%.3f cyt=%.3f gib=%.3f tgt=%d | 高%d 宽%d 枝%d 叶%d 叉%d 苞%d 对称%.2f%n",
+                    w.seed, w.phenotype.id(), h.auxin(), h.cytokinin(), h.gibberellin(), w.max,
+                    s.height, s.width, s.branches, s.leaves, s.forks, s.buds, symmetry(w));
+        }
+        System.out.println("粘进 PeachSpecies.peach()（取你挑中的一棵，作为基准原型；残差取整到两位小数）：");
+        for (SimWorld w : cands) {
+            HormoneProfile h = w.hormones;
+            System.out.printf(Locale.ROOT, "  .phenotype(\"golden\", 1F, %.2fF, %.2fF, %.2fF)  // #%d %s%n",
+                    h.auxin(), h.cytokinin(), h.gibberellin(), w.seed, w.phenotype.id());
+        }
+        System.out.println("总览图: " + dir.resolve("sheet.png").toAbsolutePath());
+
+        // 纯 ASCII 候选档案（避开终端中文编码乱码，供画廊脚本稳健解析）
+        StringBuilder tsv = new StringBuilder("seed\tpheno\taux\tcyt\tgib\ttgt\th\tw\tb\tl\tf\tsym\n");
+        for (SimWorld w : cands) {
+            SimStats s = stats(w);
+            HormoneProfile h = w.hormones;
+            tsv.append(String.format(Locale.ROOT, "%d\t%s\t%.3f\t%.3f\t%.3f\t%d\t%d\t%d\t%d\t%d\t%d\t%.2f\n",
+                    w.seed, w.phenotype.id(), h.auxin(), h.cytokinin(), h.gibberellin(),
+                    w.max, s.height, s.width, s.branches, s.leaves, s.forks, symmetry(w)));
+        }
+        Files.writeString(dir.resolve("candidates.tsv"), tsv.toString());
+        System.out.println("候选档案(TSV): " + dir.resolve("candidates.tsv").toAbsolutePath());
+    }
+
+    /** 树冠重心偏离主干轴(0,0)的程度：越居中越对称（1/(1+偏移)） */
+    private static double symmetry(SimWorld w) {
+        int sx = 0, sz = 0, n = 0;
+        for (Map.Entry<BlockPos, SimBlock> e : w.blocks.entrySet()) {
+            if (e.getValue().trunk) continue;
+            BlockPos p = e.getKey();
+            sx += p.getX(); sz += p.getZ(); n++;
+        }
+        if (n == 0) return 0;
+        return 1.0 / (1.0 + Math.hypot((double) sx / n, (double) sz / n));
+    }
+
+    /** 按分数降序取 Top-K 的 seed 并入候选集（LinkedHashSet 保序去重） */
+    private static void topN(double[] score, int k, LinkedHashSet<Long> out, List<SimWorld> all) {
+        Integer[] idx = new Integer[score.length];
+        for (int i = 0; i < score.length; i++) idx[i] = i;
+        Arrays.sort(idx, (a, b) -> Double.compare(score[b], score[a]));
+        for (int i = 0; i < Math.min(k, idx.length); i++) out.add(all.get(idx[i]).seed);
     }
 }

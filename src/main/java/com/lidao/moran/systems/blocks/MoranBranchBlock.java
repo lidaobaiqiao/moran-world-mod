@@ -287,8 +287,12 @@ public class MoranBranchBlock extends Block implements Fertilizable {
         // 条件满足：野生树立即生长；种植树掷骰（有效概率 = 基础 × 水度 × 土壤 × 赤霉素）
         // 激素档案：这棵树自己的内分泌（由树基坐标确定性推出，同树同档、零存储）
         HormoneProfile hormones = species.hormones(world, pos, state.get(FACING));
-        // 本树成熟档位 max：同样由树基种子推出（ hormones 与 max 各自独立随机流）
-        int max = species.treeMaxGrowth(root.asLong());
+        // 本树成熟档位 max：由树基种子推出（与激素同一树基，独立随机流）。
+        // 必须走 treeOrigin 沿链回溯——不能复用上面的 root（rootPos 是土壤取样的
+        // 垂直下探，侧枝用它落到自己脚下的地面，每个枝算出各自的 max，
+        // 整树档位体系就散了：分叉门槛/开花年龄/成熟上限全部失准，
+        // 且与离线模拟器的单树 max 系统性漂移）。
+        int max = species.treeMaxGrowth(treeOrigin(world, pos, state.get(FACING)).asLong());
         boolean progressed = false;
         if (natural || random.nextFloat()
                 < species.effectiveGrowChance(world, pos, hydration, soil) * hormones.gibberellin()) {
@@ -319,7 +323,7 @@ public class MoranBranchBlock extends Block implements Fertilizable {
         if (progressed) {
             clearIdle(world, pos);
         } else if (bumpIdle(world, pos) >= IDLE_LIMIT) {
-            terminate(world, pos);
+            terminate(world, pos, random);
             clearIdle(world, pos);
             return;   // 不再登记 tick，这棵树这一节的生命周期到此为止
         }
@@ -365,14 +369,25 @@ public class MoranBranchBlock extends Block implements Fertilizable {
      *       —— 这正是治「树挖一节长一节」的地方</li>
      *   <li>侧枝 → {@link #DORMANT}：不参与请求循环，且修剪时不再萌蘖</li>
      * </ul>
+     *
+     * <p>侧枝若已够开花年龄（growth ≥ (max+1)/2），终止 = <b>开花收场</b>：
+     * 养分封顶的冠层枝（上生子枝）到不了旧的 max-1 强制停止线，分叉窗口期满
+     * 走到这里是它们唯一的花叶出口——终止绝不能让它们光秃秃地睡去。
      */
-    private static void terminate(ServerWorld world, BlockPos pos) {
+    private void terminate(ServerWorld world, BlockPos pos, Random random) {
         BlockState s = world.getBlockState(pos);
         if (!(s.getBlock() instanceof MoranBranchBlock)) {
             return;
         }
-        world.setBlockState(pos, s.get(TRUNK) ? s.with(TOPPED, true) : s.with(DORMANT, true),
-                Block.NOTIFY_ALL);
+        if (s.get(TRUNK)) {
+            world.setBlockState(pos, s.with(TOPPED, true), Block.NOTIFY_ALL);
+            return;
+        }
+        world.setBlockState(pos, s.with(DORMANT, true), Block.NOTIFY_ALL);
+        int max = species.treeMaxGrowth(treeOrigin(world, pos, s.get(FACING)).asLong());
+        if (s.get(GROWTH) >= (max + 1) / 2) {
+            species.onBranchStop(world, pos, s.get(FACING), random, s.get(NATURAL));
+        }
     }
 
     /**
@@ -600,15 +615,20 @@ public class MoranBranchBlock extends Block implements Fertilizable {
             }
         }
 
-        // 停止进入开花：链到上限或末端被占后，成熟度过门槛概率停止，上限强制
-        // （一旦开始生成花苞就不再延伸/分叉——停止即终末）。
-        // 开花门槛相对本树 max（branchStopGrowth = (max+1)/2；max=8 时即旧的 4），
-        // 上限 max-1 与 growPart 的侧枝 cap 一致。
-        // 主动停的概率随链位置递增（先端易成花、中段持续生长）—— 冠层自然收成圆拱。
-        if (growth >= (max + 1) / 2
-                && (growth >= max - 1
-                    || random.nextFloat() < species.branchStopChance() * chainPos / (float) chainLimit)) {
+        // 主动停止进入开花（养分封顶前的提前成花）：成熟度过门槛后按概率停，
+        // 概率随链位置递增（先端易成花、中段持续生长）—— 冠层自然收成圆拱。
+        // 只对还没到自身 cap 的节生效：到 cap 的节留在请求循环里走完分叉窗口，
+        // 由生命周期终止（terminate）以开花收场。旧的「到 max-1 强制停」是
+        // 树冠光秃的根因：强制线与分叉门槛同在一拍开启，分叉只获得一次掷骰；
+        // 而养分封顶的冠层枝（上生子枝 cap = max-2 以下）根本够不到强制线，
+        // 只剩低概率彩票对跑 10 拍终止计数，多数没开花就休眠了。
+        int cap = Math.min(max - 1, nutritionAt(world, pos, facing));
+        if (growth < cap && growth >= (max + 1) / 2
+                && random.nextFloat() < species.branchStopChance() * chainPos / (float) chainLimit) {
             species.onBranchStop(world, pos, facing, random, state.get(NATURAL));
+            // 停止即终末：开花后本节休眠——不再延伸/分叉/复花（scheduledTick 开头挡下，
+            // 修剪响应也按终止处理，防「砍一节长一节」）。重读本格状态：state 是生长前快照。
+            world.setBlockState(pos, world.getBlockState(pos).with(DORMANT, true), Block.NOTIFY_ALL);
             return true;   // 开花也算产出（放了花苞）
         }
         return false;
@@ -742,7 +762,7 @@ public class MoranBranchBlock extends Block implements Fertilizable {
     /** 野生树是否已完成全部生长使命（可永久静默） */
     private boolean isFullyGrown(BlockState state, ServerWorld world, BlockPos pos) {
         int growth = state.get(GROWTH);
-        int max = species.treeMaxGrowth(rootPos(world, pos, species.biologicalTopMax()).asLong());
+        int max = species.treeMaxGrowth(treeOrigin(world, pos, state.get(FACING)).asLong());
         if (state.get(TRUNK)) {
             if (growth < max) {
                 return false;
@@ -761,7 +781,11 @@ public class MoranBranchBlock extends Block implements Fertilizable {
             }
             return treeTopped(world, pos);
         }
-        return growth >= max - 1;
+        // 侧枝没有「结构长满即静默」的出口：养分封顶的节（cap < max-1）若在此静默，
+        // 会跳过开花直接沉默——整层树冠的花和叶就没了。侧枝的终局只有一个：
+        // 开花时写入的 DORMANT，由 scheduledTick 开头挡下；到 cap 未开花的节
+        // 要留在请求循环里走完分叉窗口，再由 terminate 以开花收场。
+        return false;
     }
 
     /** 根部位置：沿同柱向下找第一个非枝干方块（土壤在其下方） */
@@ -982,7 +1006,7 @@ public class MoranBranchBlock extends Block implements Fertilizable {
     @Override
     public boolean isFertilizable(WorldView world, BlockPos pos, BlockState state, boolean isClient) {
         int growth = state.get(GROWTH);
-        int max = species.treeMaxGrowth(rootPos(world, pos, species.biologicalTopMax()).asLong());
+        int max = species.treeMaxGrowth(treeOrigin(world, pos, state.get(FACING)).asLong());
         return state.get(TRUNK)
                 ? growth < max
                 : growth < max - 1;
@@ -996,7 +1020,7 @@ public class MoranBranchBlock extends Block implements Fertilizable {
     @Override
     public void grow(ServerWorld world, Random random, BlockPos pos, BlockState state) {
         int growth = state.get(GROWTH);
-        int max = species.treeMaxGrowth(rootPos(world, pos, species.biologicalTopMax()).asLong());
+        int max = species.treeMaxGrowth(treeOrigin(world, pos, state.get(FACING)).asLong());
         int cap = state.get(TRUNK) ? max
                 : Math.min(max - 1, nutritionAt(world, pos, state.get(FACING)));
         if (growth < cap) {
