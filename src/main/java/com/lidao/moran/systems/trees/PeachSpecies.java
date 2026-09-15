@@ -40,7 +40,10 @@ public class PeachSpecies extends TreeSpecies {
                 .minHydration(0)
                 .minHumidity(0.0F)
                 .soilPreference(4, 8, 3, 8, 2, 6)
-                .pruneResponseChance(0.5F));
+                .pruneResponseChance(0.5F)
+                // 树种提交的贴图（模型头部 textures 段）
+                .textures("moran_mod:block/peach_log",
+                          "moran_mod:item/thick_peach_trunk_side"));
     }
 
     /** 链上侧腋开花概率：未长枝的侧位以花填充（现实桃树花芽满布一年生枝侧腋） */

@@ -1,15 +1,12 @@
 package com.lidao.moran.client.model;
 
 import com.google.gson.JsonObject;
-import net.minecraft.util.math.Direction;
 
 import java.io.BufferedWriter;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.LinkedHashSet;
-import java.util.Set;
 
 /**
  * 开发期校验工具：把 {@link BranchModelFactory} 为 blockstate 引用的全部动态 id
@@ -47,48 +44,11 @@ public final class BranchModelDump {
         System.out.println("dumped " + n + " models -> " + outDir.toAbsolutePath());
     }
 
-    /** 与 BranchModelPlugin.parse 同构 */
+    /**
+     * 直接复用 {@link BranchModelPlugin#parse} —— 解析规则只写一份，
+     * 改一处不会漏一处（包括新的 {@code <species>/} 前缀）。
+     */
     static JsonObject parseAndBuild(String spec) {
-        String facingPart = spec;
-        String subPart = null;
-        int sep = spec.indexOf("__");
-        if (sep >= 0) {
-            facingPart = spec.substring(0, sep);
-            subPart = spec.substring(sep + 2);
-        }
-        int gi = facingPart.lastIndexOf("_g");
-        if (gi < 0) {
-            return null;
-        }
-        Direction facing = byName(facingPart.substring(0, gi));
-        if (facing == null) {
-            return null;
-        }
-        int growth;
-        try {
-            growth = Integer.parseInt(facingPart.substring(gi + 2));
-        } catch (NumberFormatException e) {
-            return null;
-        }
-        Set<Direction> subs = new LinkedHashSet<>();
-        if (subPart != null && !subPart.isEmpty()) {
-            for (String s : subPart.split("_")) {
-                Direction d = byName(s);
-                if (d == null) {
-                    return null;
-                }
-                subs.add(d);
-            }
-        }
-        return BranchModelFactory.build(facing, growth, subs, BranchModelFactory.PEACH);
-    }
-
-    private static Direction byName(String n) {
-        for (Direction d : Direction.values()) {
-            if (d.asString().equals(n)) {
-                return d;
-            }
-        }
-        return null;
+        return BranchModelPlugin.parse(spec);
     }
 }

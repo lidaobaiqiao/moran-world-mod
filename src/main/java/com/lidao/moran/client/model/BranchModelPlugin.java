@@ -7,6 +7,8 @@ import net.fabricmc.fabric.api.client.model.loading.v1.ModelLoadingPlugin;
 import net.fabricmc.fabric.api.client.model.loading.v1.ModelResolver;
 import net.minecraft.client.render.model.UnbakedModel;
 import net.minecraft.client.render.model.json.JsonUnbakedModel;
+import com.lidao.moran.systems.trees.TreeSpecies;
+import com.lidao.moran.systems.trees.Trees;
 import net.minecraft.util.Identifier;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
@@ -30,11 +32,15 @@ import java.util.Set;
  *
  * <h2>模型 id 命名</h2>
  * <pre>
- *   moran_mod:branch/&lt;facing&gt;_g&lt;growth&gt;                    单枝（无分叉）
- *   moran_mod:branch/&lt;facing&gt;_g&lt;growth&gt;__&lt;sub1&gt;[_&lt;sub2&gt;...]  分叉
+ *   moran_mod:branch/&lt;species&gt;/&lt;facing&gt;_g&lt;growth&gt;                    单枝（无分叉）
+ *   moran_mod:branch/&lt;species&gt;/&lt;facing&gt;_g&lt;growth&gt;__&lt;sub1&gt;[_&lt;sub2&gt;...]  分叉
  * </pre>
- * 例：{@code moran_mod:branch/north_g5__east_up} = 朝北的 g5 母枝，向东、向上各伸出一根子枝。
+ * 例：{@code moran_mod:branch/peach/north_g5__east_up}
+ * = 桃树、朝北的 g5 母枝，向东、向上各伸出一根子枝。
  * blockstate 里只要拼出这个 id 就能引用，无需任何文件。
+ *
+ * <p>id 里的 {@code <species>} 就是树种档案 id：解析出来查 {@link Trees#byId}，
+ * 取该树种提交的贴图。所以贴图跟着档案走，加树种不用碰这个生成器。
  */
 @Environment(EnvType.CLIENT)
 public final class BranchModelPlugin implements ModelLoadingPlugin {
@@ -70,21 +76,37 @@ public final class BranchModelPlugin implements ModelLoadingPlugin {
     }
 
     /**
-     * 解析 {@code <facing>_g<growth>[__<sub>...]} 形式的 id。
+     * 解析 {@code <species>/<facing>_g<growth>[__<sub>...]} 形式的 id。
+     *
+     * <p>包内可见，供开发期的 {@link BranchModelDump} 复用同一套解析，
+     * 避免两处各写一份、改一处漏一处。
      *
      * @return 模型 JSON；id 非法时返回 null
      */
     @Nullable
-    private static JsonObject parse(String spec) {
+    static JsonObject parse(String spec) {
         try {
+            // 第一段是树种档案 id
+            int slash = spec.indexOf('/');
+            if (slash < 0) {
+                LOGGER.warn("树枝模型 id 缺少树种前缀: {}", spec);
+                return null;
+            }
+            TreeSpecies species = Trees.byId(spec.substring(0, slash));
+            if (species == null) {
+                LOGGER.warn("树枝模型 id 里的树种未登记: {}", spec);
+                return null;
+            }
+
             String facingPart;
             String subPart = null;
-            int sep = spec.indexOf("__");
+            String rest = spec.substring(slash + 1);
+            int sep = rest.indexOf("__");
             if (sep >= 0) {
-                facingPart = spec.substring(0, sep);
-                subPart = spec.substring(sep + 2);
+                facingPart = rest.substring(0, sep);
+                subPart = rest.substring(sep + 2);
             } else {
-                facingPart = spec;
+                facingPart = rest;
             }
 
             // facingPart = "<facing>_g<growth>"
@@ -110,9 +132,8 @@ public final class BranchModelPlugin implements ModelLoadingPlugin {
                     subs.add(d);
                 }
             }
-            // 贴图由树种提交。目前只有桃树；多树种时让 id 带上树种前缀
-            // （branch/<species>/<facing>_g<n>__<subs>），在这里按名字查 TreeSpecies 的贴图即可。
-            return BranchModelFactory.build(facing, growth, subs, BranchModelFactory.PEACH);
+            // 贴图由树种提交 —— 解析出的 species 直接交给生成器
+            return BranchModelFactory.build(facing, growth, subs, species);
         } catch (NumberFormatException e) {
             return null;
         }

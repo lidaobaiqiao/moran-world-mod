@@ -102,6 +102,11 @@ public class TreeSpecies {
     private final int minSpacing;
     private final int branchNutritionDecay;
     private final int chainNutritionDecay;
+    // —— 外观（模型头部 textures 段；由模型生成器读取，树种自己提交） ——
+    /** 树皮：贴在长条侧面 */
+    private final String barkTexture;
+    /** 截断面：贴在正方形的端面 */
+    private final String capTexture;
     // —— 方块引用（注册后绑定） ——
     private Block branchBlock;
     private Block budBlock;
@@ -137,6 +142,11 @@ public class TreeSpecies {
         this.minSpacing = b.minSpacing;
         this.branchNutritionDecay = b.branchNutritionDecay;
         this.chainNutritionDecay = b.chainNutritionDecay;
+        this.barkTexture = b.barkTexture;
+        this.capTexture = b.capTexture;
+        if (this.barkTexture == null || this.capTexture == null) {
+            throw new IllegalStateException("树种 " + this.id + " 没有提交贴图：Builder.textures(bark, cap)");
+        }
     }
 
     public String id() {
@@ -241,6 +251,16 @@ public class TreeSpecies {
     /** 养分距离损耗：同链每延伸一节，养分减损 */
     public int chainNutritionDecay() {
         return chainNutritionDecay;
+    }
+
+    /** 树皮贴图 id（贴长条侧面）。模型生成器把它写进模型头部的 textures 段 */
+    public String barkTexture() {
+        return barkTexture;
+    }
+
+    /** 截断面贴图 id（贴正方形端面） */
+    public String capTexture() {
+        return capTexture;
     }
 
     /** 注册完成后绑定本树种的三类方块实例 */
@@ -494,6 +514,9 @@ public class TreeSpecies {
         private int minSpacing = 4;
         private int branchNutritionDecay = 2;
         private int chainNutritionDecay = 1;
+        // 外观：没有默认值 —— 必须显式提交，否则模型会引用空贴图（渲染成紫黑格）
+        private String barkTexture;
+        private String capTexture;
 
         private Builder(String id) {
             this.id = id;
@@ -539,6 +562,18 @@ public class TreeSpecies {
         public Builder branchNutritionDecay(int v) { this.branchNutritionDecay = v; return this; }
         /** 养分距离损耗（同链每节） */
         public Builder chainNutritionDecay(int v) { this.chainNutritionDecay = v; return this; }
+
+        /**
+         * 树种提交的贴图对（对应模型头部的 textures 段）。新增树种必须填。
+         *
+         * @param bark 树皮，贴长条侧面
+         * @param cap  截断面，贴正方形端面
+         */
+        public Builder textures(String bark, String cap) {
+            this.barkTexture = bark;
+            this.capTexture = cap;
+            return this;
+        }
 
         public TreeSpecies build() {
             return new TreeSpecies(this);

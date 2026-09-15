@@ -2,6 +2,7 @@ package com.lidao.moran.client.model;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
+import com.lidao.moran.systems.trees.TreeSpecies;
 import net.minecraft.util.math.Direction;
 
 import java.util.Map;
@@ -69,20 +70,9 @@ public final class BranchModelFactory {
     }
 
     /**
-     * 一个树种提交的贴图对（对应模型头部的 textures 段）。
-     *
-     * @param bark 树皮，贴子枝与母枝的长条侧面
-     * @param cap  截断面，贴正方形的端面
+     * 生成结果缓存：同一个 (树种, 方向, 档位, 子枝集合) 只算一次。
+     * 键里用树种 id 而不是贴图串 —— 一个树种一套贴图，id 更短且语义更准。
      */
-    public record Textures(String bark, String cap) {
-    }
-
-    /** 桃花心木（当前唯一树种）提交的贴图 */
-    public static final Textures PEACH = new Textures(
-            "moran_mod:block/peach_log",
-            "moran_mod:item/thick_peach_trunk_side");
-
-    /** 生成结果缓存：同一个 (方向, 档位, 子枝集合, 贴图) 只算一次 */
     private static final Map<String, JsonObject> CACHE = new ConcurrentHashMap<>();
 
     /**
@@ -101,11 +91,11 @@ public final class BranchModelFactory {
      * @param facing 母枝走向（方块 FACING）
      * @param growth 母枝档位 1~8（方块 GROWTH）
      * @param subs   本节分出的子枝方向集合（方块 submask）
-     * @param tex    树种提交的贴图
+     * @param species 树种档案（贴图由它提交）
      */
-    public static JsonObject build(Direction facing, int growth, Set<Direction> subs, Textures tex) {
-        String key = facing.asString() + "|" + growth + "|" + canonicalSubs(subs) + "|" + tex.bark();
-        return CACHE.computeIfAbsent(key, k -> generate(facing, growth, subs, tex));
+    public static JsonObject build(Direction facing, int growth, Set<Direction> subs, TreeSpecies species) {
+        String key = species.id() + "|" + facing.asString() + "|" + growth + "|" + canonicalSubs(subs);
+        return CACHE.computeIfAbsent(key, k -> generate(facing, growth, subs, species));
     }
 
     /** 子枝集合转成稳定字符串（顺序无关，保证同一状态永远同一个缓存键） */
@@ -119,28 +109,29 @@ public final class BranchModelFactory {
         return sb.toString();
     }
 
-    private static JsonObject generate(Direction facing, int growth, Set<Direction> subs, Textures tex) {
+    private static JsonObject generate(Direction facing, int growth, Set<Direction> subs, TreeSpecies species) {
         JsonObject model = new JsonObject();
         // 继承原版 block/block：它只提供标准 display 与 gui_light=side，不含 textures/elements，
         // 故不会覆盖下面的纹理与几何。不要自己写 display，否则物品栏显示会变形。
         model.addProperty("parent", "minecraft:block/block");
         model.addProperty("render_type", "minecraft:cutout");
 
+        // 贴图由树种提交，生成器只是搬运工 —— 引擎里不含任何树种外观
         JsonObject textures = new JsonObject();
-        textures.addProperty("0", tex.bark());
-        textures.addProperty("2", tex.cap());
-        textures.addProperty("particle", tex.bark());
+        textures.addProperty("0", species.barkTexture());
+        textures.addProperty("2", species.capTexture());
+        textures.addProperty("particle", species.barkTexture());
         model.add("textures", textures);
 
         JsonArray elements = new JsonArray();
 
         // ① 四侧生成器 —— 母枝，沿 facing 轴贯穿 0..16，半宽 = 档位
-        Footprint trunk = sideGenerator(facing, growth, tex);
+        Footprint trunk = sideGenerator(facing, growth);
         elements.add(trunk.element);
 
         // ② 子枝生成器 —— 以母枝的返回值为输入，逐个相加
         for (Direction sub : subs) {
-            elements.add(subGenerator(trunk, sub, tex));
+            elements.add(subGenerator(trunk, sub));
         }
 
         model.add("elements", elements);
@@ -152,7 +143,7 @@ public final class BranchModelFactory {
     }
 
     /** 四侧生成器：母枝/主干。占满整格，把占位交给下一层 */
-    private static Footprint sideGenerator(Direction facing, int growth, Textures tex) {
+    private static Footprint sideGenerator(Direction facing, int growth) {
         return new Footprint(facing, growth, 0, 16, column(facing, growth, 0, 16, false));
     }
 
@@ -163,7 +154,7 @@ public final class BranchModelFactory {
      * 母枝占 [8-h, 8+h]，于是正方向那半格 [8+h, 16]、负方向那半格 [0, 8-h] 就是
      * 留出来的空间，全部填满——子枝长度因此不需要单独指定，由空间反推。
      */
-    private static JsonObject subGenerator(Footprint parent, Direction sub, Textures tex) {
+    private static JsonObject subGenerator(Footprint parent, Direction sub) {
         int c = Math.max(1, parent.half() - 1);
         boolean positive = VEC[sub.ordinal()][sub.getAxis().ordinal()] > 0;
         int lo = positive ? 8 + parent.half() : 0;
