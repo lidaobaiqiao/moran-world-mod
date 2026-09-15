@@ -1,7 +1,7 @@
 {
   "parent": "minecraft:block/block",
   "render_type": "minecraft:cutout",
-  "credit": "Made with Blockbench (\u624b\u7ed8\u7248)",
+  "credit": "Made with Blockbench",
   "textures": {
     "0": "moran_mod:block/peach_log",
     "1": "moran_mod:item/thick_peach_trunk",
