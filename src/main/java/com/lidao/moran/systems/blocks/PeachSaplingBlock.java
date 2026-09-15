@@ -38,9 +38,7 @@ public class PeachSaplingBlock extends SaplingBlock {
     @Override
     public void generate(ServerWorld world, BlockPos pos, BlockState state, Random random) {
         // 树苗成熟后不再生成原版树结构：变成生长度 1 的桃源树枝，由 MoranBranchBlock 接管生长。
-        // 生长前一次性环境评估 → 目标高度（光照/水分/温度/土壤各一分，8+n 格）
-        int target = com.lidao.moran.systems.trees.Trees.PEACH.evaluateTargetHeight(world, pos);
-        world.setBlockState(pos, BlockSystem.PEACH_BRANCH.getDefaultState()
-                .with(MoranBranchBlock.TARGET, target), Block.NOTIFY_ALL);
+        // 树的成熟档位（max）与激素档案一样，由树基坐标确定性推导，无需在种植时评估存储。
+        world.setBlockState(pos, BlockSystem.PEACH_BRANCH.getDefaultState(), Block.NOTIFY_ALL);
     }
 }

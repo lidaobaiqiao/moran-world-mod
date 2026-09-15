@@ -9,7 +9,9 @@ import net.minecraft.world.LightType;
 import net.minecraft.util.math.random.Random;
 import net.minecraft.world.WorldView;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -27,6 +29,13 @@ import java.util.Map;
  *   1.20.1 API 已移除 downfall 数值读取）；
  * - 土壤：SoilProfile 三轴（排水/气密/保水），树种声明偏好区间，出区扣生长倍率；
  * - 高度：biologicalTopMin~Max 区间内掷封顶骰，同林树木天然高矮不一。
+ *
+ * 激素模型：物种偏好的生理学载体是激素（生长素/细胞分裂素/赤霉素）。
+ * 相似性的单位是<b>表型原型</b>（{@link Phenotype}）：原型 = 一套把拮抗关系
+ * 配好的激素档案，同原型的树趋向一致、树形相似；原型间的配比差异就是
+ * 文献里测到的激素趋向（直立/垂枝是离散遗传性状，不是连续散点）。
+ * 个体只在原型内做小幅残差抖动（推导式状态，零存储）。
+ * 见 {@link HormoneProfile} 与 {@link #hormones(WorldView, BlockPos, Direction)}。
  *
  * 现实物候由各档案的钩子表达：
  * - 桃（默认范式）：上半部萌芽、先营养后生殖、先花后叶、耐旱怕涝；
@@ -69,16 +78,11 @@ public class TreeSpecies {
     private final int biologicalTopMin;
     private final int biologicalTopMax;
     private final int trunkMaxGrowth;
-    private final int topBudGrowth;
     private final int maxBuds;
     private final int budChanceDenom;
-    private final int branchMaxGrowth;
-    private final int branchStopGrowth;
     private final float branchStopChance;
     private final float subBranchChance;
-    // —— 分叉参数（多侧枝） ——
-    /** 分叉最低成熟度：够粗才分 */
-    private final int forkMinGrowth;
+    // —— 分叉参数（多侧枝；成熟度门槛相对本树 max，见 treeMaxGrowth） ——
     /** 距主干至少几节才分叉（贴干首节不分） */
     private final int forkMinChainPos;
     /** 空间冷却：分叉后隔几节才允许再分（密度主旋钮） */
@@ -87,6 +91,15 @@ public class TreeSpecies {
     private final float forkDecay;
     /** 分叉的最低收益：候选方向光照收益低于它就干脆不长（大多数方向不长叉的原因） */
     private final int forkMinGain;
+    // —— 激素：常态原型（Builder 未声明任何原型时的唯一档案；1.0 = 中性） ——
+    private final float auxinNorm;
+    private final float cytokininNorm;
+    private final float gibberellinNorm;
+    /** 表型原型（至少一条）：相似性的单位，见 {@link Phenotype} */
+    private final List<Phenotype> phenotypes;
+    private final double phenotypeWeightTotal;
+    /** 原型内个体残差幅度：默认 0.05（±5%）—— 大差异归原型，残差只管个体微调 */
+    private final float hormoneVariation;
     // —— 环境参数 ——
     private final float growChance;
     private final int minLight;
@@ -117,18 +130,29 @@ public class TreeSpecies {
         this.biologicalTopMin = b.biologicalTopMin;
         this.biologicalTopMax = b.biologicalTopMax;
         this.trunkMaxGrowth = b.trunkMaxGrowth;
-        this.topBudGrowth = b.topBudGrowth;
         this.maxBuds = b.maxBuds;
         this.budChanceDenom = b.budChanceDenom;
-        this.branchMaxGrowth = b.branchMaxGrowth;
-        this.branchStopGrowth = b.branchStopGrowth;
         this.branchStopChance = b.branchStopChance;
         this.subBranchChance = b.subBranchChance;
-        this.forkMinGrowth = b.forkMinGrowth;
         this.forkMinChainPos = b.forkMinChainPos;
         this.forkSpacing = b.forkSpacing;
         this.forkDecay = b.forkDecay;
         this.forkMinGain = b.forkMinGain;
+        this.auxinNorm = b.auxinNorm;
+        this.cytokininNorm = b.cytokininNorm;
+        this.gibberellinNorm = b.gibberellinNorm;
+        List<Phenotype> ph = new ArrayList<>(b.phenotypes);
+        if (ph.isEmpty()) {
+            ph.add(new Phenotype("default", 1F, new HormoneProfile(
+                    clampHormone(auxinNorm), clampHormone(cytokininNorm), clampHormone(gibberellinNorm))));
+        }
+        this.phenotypes = List.copyOf(ph);
+        double weightTotal = 0;
+        for (Phenotype p : ph) {
+            weightTotal += p.weight();
+        }
+        this.phenotypeWeightTotal = weightTotal;
+        this.hormoneVariation = b.hormoneVariation;
         this.growChance = b.growChance;
         this.minLight = b.minLight;
         this.minTemperature = b.minTemperature;
@@ -165,8 +189,38 @@ public class TreeSpecies {
         return trunkMaxGrowth;
     }
 
-    public int topBudGrowth() {
-        return topBudGrowth;
+    /**
+     * 本树成熟档位（「成熟标志成熟度」max）—— <b>档位体系全部相对它展开（max-i），
+     * 不是每棵树都要长满 8 档</b>。
+     *
+     * <p>由树基坐标确定性推出（与激素档案同一套路数：位置=基因，零存储零状态）：
+     * 在 biologicalTop 区间内掷出 —— 桃 6-8 → max ∈ [6,8]，即主干成熟度 6-8 档。
+     * trunkMaxGrowth 退为物种天花板。
+     *
+     * <p><b>档位（粗细）与格数（高度）是两回事，别再混用</b>：max 只定粗细与档位门槛，
+     * 高度由 {@link #trunkHalfHeight(int)}（max/2）决定 —— 桃 = 主干 3-4 格的矮壮树形
+     * （整树 6-8 格 = 干 max/2 + 冠层）。早先拿 max 当格数用，得到的是
+     * 「3-4 档的细杆 + 撑不起来的冠层」，与参照图的粗壮矮干不符。
+     *
+     * <p>语义变化（相对旧 TARGET 评估）：环境不再直接决定最终高度/档位，
+     * 改为通过生长速度（水度/土壤因子）与存亡（硬门槛）起作用；
+     * 个体高低差异由树基种子承担，与激素抖动同一哲学。
+     *
+     * <p>种子混入第二常数，与激素档案的随机流分离 —— 两份档案互不相关。
+     */
+    public int treeMaxGrowth(long treeSeed) {
+        long seed = treeSeed * 0x9E3779B97F4A7C15L;
+        seed ^= seed >>> 32;
+        seed ^= 0x6A09E667F3BCC909L;
+        Random r = Random.create(seed);
+        int lo = Math.max(3, biologicalTopMin);
+        int hi = Math.max(lo, Math.min(trunkMaxGrowth, biologicalTopMax));
+        return lo + r.nextInt(hi - lo + 1);
+    }
+
+    /** 主干格数（半高封顶）：整树高 = 2 × 干高，桃 = 3-4 格干 + 冠层 = 6-8 格 */
+    public int trunkHalfHeight(int max) {
+        return Math.max(2, max / 2);
     }
 
     public int maxBuds() {
@@ -177,14 +231,6 @@ public class TreeSpecies {
         return budChanceDenom;
     }
 
-    public int branchMaxGrowth() {
-        return branchMaxGrowth;
-    }
-
-    public int branchStopGrowth() {
-        return branchStopGrowth;
-    }
-
     public float branchStopChance() {
         return branchStopChance;
     }
@@ -193,8 +239,9 @@ public class TreeSpecies {
         return subBranchChance;
     }
 
-    public int forkMinGrowth() {
-        return forkMinGrowth;
+    /** 分叉概率衰减：本节每多一根子枝，概率乘这个数（密度副旋钮） */
+    public float forkDecay() {
+        return forkDecay;
     }
 
     public int forkMinChainPos() {
@@ -205,28 +252,103 @@ public class TreeSpecies {
         return forkSpacing;
     }
 
-    public float forkDecay() {
-        return forkDecay;
-    }
-
     public int forkMinGain() {
         return forkMinGain;
+    }
+
+    // ===== 激素模型 =====
+
+    /**
+     * 本树的激素档案：先按权重抽定<b>表型原型</b>（同原型的树趋向一致、树形相似），
+     * 再在原型内掷小幅个体残差。
+     *
+     * <p>全部由树基坐标（{@code MoranBranchBlock.treeOrigin}）确定性推出——
+     * 同一棵树的每个节算出同一份档案，跨重启不变，不占任何存储。
+     * 「相似性有共同原因、趋向随原型走」由此落地。
+     */
+    public HormoneProfile hormones(WorldView world, BlockPos pos, Direction facing) {
+        if (hormoneVariation <= 0F && phenotypes.size() == 1) {
+            return phenotypes.get(0).hormones();   // 快路径：单原型无残差，不必走树基
+        }
+        BlockPos origin = com.lidao.moran.systems.blocks.MoranBranchBlock.treeOrigin(world, pos, facing);
+        return hormoneProfileForSeed(origin.asLong());
+    }
+
+    /**
+     * 由树种子直接推导激素档案（纯函数，不碰世界）—— 游戏内种子 = 树基坐标 asLong。
+     *
+     * <p>抽出来成纯函数是给<b>离线树形模拟器</b>（tools.TreeSimulator）用的：
+     * 游戏与模拟器共用这同一条代码路径，保证「游戏里某位置的树」与
+     * 「模拟器同 seed 的树」激素配比完全一致，模拟结果可以反向指导调参。
+     */
+    public HormoneProfile hormoneProfileForSeed(long treeSeed) {
+        return seededHormones(treeSeed).hormones();
+    }
+
+    /** 同 {@link #hormoneProfileForSeed}，但连同抽中的<b>原型</b>一起返回（id 供标注） */
+    public Phenotype phenotypeForSeed(long treeSeed) {
+        return seededHormones(treeSeed).phenotype();
+    }
+
+    public SeededHormones seededHormones(long treeSeed) {
+        long seed = treeSeed * 0x9E3779B97F4A7C15L;   // 黄金比例常数搅散，相邻树不相关
+        seed ^= seed >>> 32;
+        Random r = Random.create(seed);
+        Phenotype p = pickPhenotype(r);
+        if (hormoneVariation <= 0F) {
+            return new SeededHormones(p, p.hormones());
+        }
+        return new SeededHormones(p, new HormoneProfile(
+                rollHormone(r, p.hormones().auxin()),
+                rollHormone(r, p.hormones().cytokinin()),
+                rollHormone(r, p.hormones().gibberellin())));
+    }
+
+    /** 种子 → (原型, 最终档案) 的配对载体，供模拟器标注用 */
+    public record SeededHormones(Phenotype phenotype, HormoneProfile hormones) {
+    }
+
+    /** 按权重从原型中确定性抽取（权重和已在建档时算好） */
+    private Phenotype pickPhenotype(Random r) {
+        if (phenotypes.size() == 1) {
+            return phenotypes.get(0);
+        }
+        double roll = r.nextDouble() * phenotypeWeightTotal;
+        for (Phenotype p : phenotypes) {
+            roll -= p.weight();
+            if (roll < 0) {
+                return p;
+            }
+        }
+        return phenotypes.get(phenotypes.size() - 1);
+    }
+
+    /** 原型内个体残差：原型配比 × (1 ± 残差)，夹在 [0.4, 2.5] 内防极端档案 */
+    private float rollHormone(Random r, float norm) {
+        float v = norm * (1F + hormoneVariation * (2F * r.nextFloat() - 1F));
+        return Math.max(0.4F, Math.min(2.5F, v));
+    }
+
+    private static float clampHormone(float v) {
+        return Math.max(0.4F, Math.min(2.5F, v));
     }
 
     /** 分叉额度上限 —— SUBMASK 是 4 位掩码，最多 4 根 */
     public static final int MAX_FORKS = 4;
 
     /**
-     * 这一节最多能养出几根子枝，由营养决定。
+     * 这一节最多能养出几根子枝，由营养决定（<b>相对本树 max 的 max-i 制</b>）。
      *
      * 营养从根部发起、沿结构递减（同链每节 -1，换向分叉 -2），所以越靠梢越细弱、
      * 能养的侧枝越少——这条规律不需要额外参数，营养本身就是它。
+     * 阈值相对本树成熟档位 max：满营养 3 根、亏 2 档 2 根、亏 3 档 1 根——
+     * max=8 时即旧的 8/6/5 绝对阈值，矮小的树（max 小）额度整体收缩。
      * 树种可覆写（比如垂柳更爱分叉、劲松轮生枝）。
      */
-    public int forkCapacity(int nutrition) {
-        if (nutrition >= 8) return 3;
-        if (nutrition >= 6) return 2;
-        if (nutrition >= 5) return 1;
+    public int forkCapacity(int nutrition, int max) {
+        if (nutrition >= max) return 3;
+        if (nutrition >= max - 2) return 2;
+        if (nutrition >= max - 3) return 1;
         return 0;
     }
 
@@ -315,39 +437,6 @@ public class TreeSpecies {
         return world.getBiome(pos).value().hasPrecipitation() ? 0.6F : 0.15F;
     }
 
-    // —— 环境评分阈值（每项达标记 1 分，目标高度 = min + 分数） ——
-    /** 天空光存储值达标线（露天 15，浓荫 <11） */
-    private static final int SCORE_SKY_LIGHT = 11;
-    /** 水度达标线（4/8 = 2 格内有水） */
-    private static final int SCORE_HYDRATION = 4;
-    /** 温度适宜区间 */
-    private static final float SCORE_TEMP_MIN = 0.5F;
-    private static final float SCORE_TEMP_MAX = 0.95F;
-
-    /**
-     * 生长前一次性环境评估 → 目标高度 = biologicalTopMin + 得分数（0-4）。
-     * 光照（露天）/ 水分（近水）/ 温度（适宜）/ 土壤（三轴全落偏好区间）各占一分。
-     * 评估在根部进行，结果持久化为方块 target 属性并随生长继承——
-     * 随机生长模式下每棵树的最终高度在生长期始即已确定。
-     */
-    public int evaluateTargetHeight(net.minecraft.world.WorldView world, BlockPos root) {
-        int score = 0;
-        if (world.getLightLevel(LightType.SKY, root.up()) >= SCORE_SKY_LIGHT) {
-            score++;
-        }
-        if (hydration(world, root) >= SCORE_HYDRATION) {
-            score++;
-        }
-        float temp = world.getBiome(root).value().getTemperature();
-        if (temp >= SCORE_TEMP_MIN && temp <= SCORE_TEMP_MAX) {
-            score++;
-        }
-        if (soilFactor(Soils.of(world, root.down())) >= 1.0F) {
-            score++;
-        }
-        return Math.min(biologicalTopMax, biologicalTopMin + score);
-    }
-
     /** 水度生长因子：干土 0.6 倍速 → 饱和 1.0 倍速 */
     public float hydrationFactor(int hydration) {
         return 0.6F + hydration * 0.05F;
@@ -398,9 +487,16 @@ public class TreeSpecies {
         return biomeHumidity(world, pos) >= minHumidity;
     }
 
-    /** 该主干方块是否处于可萌发侧芽的位置。默认：预定目标高度的上半部分（现实：主枝自上部萌发） */
+    /**
+     * 该主干方块是否处于可萌发侧芽的位置。
+     *
+     * 桃范式（参照现实照片定标）：侧枝<b>只在主干尽头定干</b>——主干半高封顶后
+     * 顶端四向抽主枝（见 MoranBranchBlock 的定干分叉），中下部一律不萌。
+     * 故默认实现恒 false：抽高期侧芽机制整体关闭，侧枝完全由定干承担。
+     * 需要逐节侧芽的树形（灌丛状）覆写本钩子，例如 {@code height * 4 > targetHeight}。
+     */
     public boolean isBudPosition(ServerWorld world, BlockPos pos, int height, int targetHeight) {
-        return height > targetHeight / 2;
+        return false;
     }
 
     /** 侧枝延伸时子枝的方向。默认：直线延伸（垂柳覆写为渐下垂） */
@@ -431,19 +527,23 @@ public class TreeSpecies {
     /**
      * 分叉候选方向的「收益」—— <b>物种偏好，不是引擎机制</b>。
      *
-     * 引擎拿它决定「往哪长」：收益越高越容易被选中，低于 {@link #forkMinGain()} 的干脆不长。
+     * 引擎拿它决定「往哪长」：收益越高越容易被选中，低于
+     * {@code forkMinGain × auxin} 的干脆不长（顶端优势抬门槛）。
      * 与「能长几根」分工不同 —— 那个由营养承担（离根的代价：同链 -1、换向 -2）。
      *
-     * 默认实现 = 桃的范式：往光更好的地方长，向上加分、向下减分。
+     * 默认实现 = 桃的范式：往光更好的地方长，向顶性强度跟着生长素走，
+     * 向上发散权重高（auxin = 1.0 时向上 +5 / 向下 -6）——
+     * 冠层靠主枝上的上生子枝层层抬起，构成向上发散的伞面（参照现实桃树照片定标）。
      * 覆写示例：垂柳偏向斜下（枝条渐下垂）、劲松只认水平四向（轮生枝）、
      * 阴性树种把 {@code opennessAround} 的权重调低甚至取负。
      */
-    public int branchForkGain(ServerWorld world, BlockPos pos, Direction facing, Direction candidate) {
+    public int branchForkGain(ServerWorld world, BlockPos pos, Direction facing, Direction candidate, HormoneProfile hormones) {
         int gain = opennessAround(world, pos, candidate) * 2;
+        int upBias = Math.round(5F * hormones.auxin());
         if (candidate == Direction.UP) {
-            gain += 3;
+            gain += upBias;
         } else if (candidate == Direction.DOWN) {
-            gain -= 4;
+            gain -= upBias + 1;
         }
         return gain;
     }
@@ -489,14 +589,10 @@ public class TreeSpecies {
         private int biologicalTopMin = 8;
         private int biologicalTopMax = 12;
         private int trunkMaxGrowth = 8;
-        private int topBudGrowth = 5;
         private int maxBuds = 4;
         private int budChanceDenom = 8;
-        private int branchMaxGrowth = 7;
-        private int branchStopGrowth = 4;
         private float branchStopChance = 0.25F;
         private float subBranchChance = 0.25F;
-        private int forkMinGrowth = 6;
         private int forkMinChainPos = 2;
         private int forkSpacing = 2;
         private float forkDecay = 0.5F;
@@ -514,6 +610,13 @@ public class TreeSpecies {
         private int minSpacing = 4;
         private int branchNutritionDecay = 2;
         private int chainNutritionDecay = 1;
+        // 激素：默认单一常态原型（1.0 = 中性）—— 桃树范式即中性基调；
+        // 树种用 phenotype(...) 声明离散亚型后，差异由原型承担，残差只做微调
+        private float auxinNorm = 1F;
+        private float cytokininNorm = 1F;
+        private float gibberellinNorm = 1F;
+        private final List<Phenotype> phenotypes = new ArrayList<>();
+        private float hormoneVariation = 0.05F;
         // 外观：没有默认值 —— 必须显式提交，否则模型会引用空贴图（渲染成紫黑格）
         private String barkTexture;
         private String capTexture;
@@ -525,14 +628,10 @@ public class TreeSpecies {
         /** 生物顶端高度区间：主干在 min~max 之间掷封顶骰，同一片林子天然高矮不一 */
         public Builder biologicalTop(int min, int max) { this.biologicalTopMin = min; this.biologicalTopMax = max; return this; }
         public Builder trunkMaxGrowth(int v) { this.trunkMaxGrowth = v; return this; }
-        public Builder topBudGrowth(int v) { this.topBudGrowth = v; return this; }
         public Builder maxBuds(int v) { this.maxBuds = v; return this; }
         public Builder budChanceDenom(int v) { this.budChanceDenom = v; return this; }
-        public Builder branchMaxGrowth(int v) { this.branchMaxGrowth = v; return this; }
-        public Builder branchStopGrowth(int v) { this.branchStopGrowth = v; return this; }
         public Builder branchStopChance(float v) { this.branchStopChance = v; return this; }
         public Builder subBranchChance(float v) { this.subBranchChance = v; return this; }
-        public Builder forkMinGrowth(int v) { this.forkMinGrowth = v; return this; }
         public Builder forkMinChainPos(int v) { this.forkMinChainPos = v; return this; }
         /** 空间冷却：分叉后隔几节才能再分。1 = 允许相邻节都分（最密），2 = 隔一节 */
         public Builder forkSpacing(int v) { this.forkSpacing = v; return this; }
@@ -562,6 +661,35 @@ public class TreeSpecies {
         public Builder branchNutritionDecay(int v) { this.branchNutritionDecay = v; return this; }
         /** 养分距离损耗（同链每节） */
         public Builder chainNutritionDecay(int v) { this.chainNutritionDecay = v; return this; }
+
+        /**
+         * 默认原型的激素常态：生长素（顶端优势）/ 细胞分裂素（促分支）/ 赤霉素（伸长）。
+         * 1.0 = 中性。声明了 {@link #phenotype} 后它退为兜底档案，可不再调。
+         */
+        public Builder hormones(float auxin, float cytokinin, float gibberellin) {
+            this.auxinNorm = auxin;
+            this.cytokininNorm = cytokinin;
+            this.gibberellinNorm = gibberellin;
+            return this;
+        }
+
+        /**
+         * 声明一个<b>表型原型</b>（同种树的离散亚型，相似性的单位，见 {@link Phenotype}）。
+         *
+         * @param id          原型名（调试与未来的形状覆写用）
+         * @param weight      选中权重（如垂枝桃论文 F2 的 3:1 分离比就写成 3 和 1）
+         * @param auxin       生长素（顶端优势强度）
+         * @param cytokinin   细胞分裂素（促分支）
+         * @param gibberellin 赤霉素（伸长）
+         */
+        public Builder phenotype(String id, float weight, float auxin, float cytokinin, float gibberellin) {
+            this.phenotypes.add(new Phenotype(id, weight,
+                    new HormoneProfile(clampHormone(auxin), clampHormone(cytokinin), clampHormone(gibberellin))));
+            return this;
+        }
+
+        /** 原型内个体残差幅度：0 = 原型内完全一致；默认 0.05（±5%，只管个体微调） */
+        public Builder hormoneVariation(float v) { this.hormoneVariation = v; return this; }
 
         /**
          * 树种提交的贴图对（对应模型头部的 textures 段）。新增树种必须填。

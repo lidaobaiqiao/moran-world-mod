@@ -121,3 +121,16 @@ tasks.register('dumpBranchModels', JavaExec) {
     mainClass = 'com.lidao.moran.client.model.BranchModelDump'
     args = ['.workbuddy/dynamic_ids.txt', '.workbuddy/gen_java']
 }
+
+// === 离线树形模拟渲染器：不进游戏批量验证树形，找完美树基准 ===
+// 用法：gradlew simTrees
+//       gradlew simTrees -PsimArgs="--seeds 96"
+//       gradlew simTrees -PsimArgs="--pick 1234"          （单棵放大 + 打印基准参数）
+//       gradlew simTrees -PsimArgs="--env average"        （环境评分降档）
+tasks.register('simTrees', JavaExec) {
+    group = 'verification'
+    classpath = sourceSets.main.runtimeClasspath
+    mainClass = 'com.lidao.moran.tools.TreeSimulator'
+    args = (project.findProperty('simArgs') ?: '--seeds 48 --out .workbuddy/sim_out')
+            .toString().trim().split('\\s+').toList()
+}

@@ -41,9 +41,7 @@ public class MoranTreeSeedFeature extends Feature<SimpleBlockFeatureConfig> {
         if (hasNearbyTrunk(context.getWorld(), pos, Trees.PEACH.minSpacing())) {
             return false; // 安全距离内已有树干，放弃该点
         }
-        // 生长前一次性环境评估 → 目标高度（持久化于方块，随生长继承）
-        int target = Trees.PEACH.evaluateTargetHeight(context.getWorld(), pos);
-        state = state.with(MoranBranchBlock.TARGET, target);
+        // 树的成熟档位（max）与激素档案一样由树基坐标确定性推导，无需评估存储。
         context.getWorld().setBlockState(pos, state, 2);
         // 登记第一次野生生长请求（0.1 秒），此后由引擎链式自续
         context.getWorld().scheduleBlockTick(pos, state.getBlock(), MoranBranchBlock.NATURAL_INTERVAL);

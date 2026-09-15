@@ -1,5 +1,6 @@
 package com.lidao.moran.systems.blocks;
 
+import com.lidao.moran.systems.trees.HormoneProfile;
 import com.lidao.moran.systems.trees.SoilProfile;
 import com.lidao.moran.systems.trees.Soils;
 import com.lidao.moran.systems.trees.TreeSpecies;
@@ -34,6 +35,8 @@ import java.util.concurrent.ConcurrentHashMap;
  * 通用活树枝干方块——生长引擎的树干/侧枝部分，所有树种共用。
  * 行为由 {@link TreeSpecies} 档案驱动，环境参数系统接入：
  * 水度（生长速度软增益 + 硬门槛）、土壤三轴偏好、空间竞争、向光性、修剪响应。
+ * 激素模型：每棵树按树基坐标推出自己的激素档案（生长素/细胞分裂素/赤霉素），
+ * 调制生长速率、侧芽萌出、枝条延伸与分叉偏好 —— 同种不同形。
  *
  * 掉落按生长度分档（见各树种枝干方块的战利品表）：
  * 1-2 桃源树枝，3-6 粗壮桃源树枝，7-8 粗壮桃源树干。
@@ -63,9 +66,7 @@ public class MoranBranchBlock extends Block implements Fertilizable {
     public static final int NATURAL_INTERVAL = 2;
     /** 野生模式（世界生成）：0.1s 一次请求、条件过即立即生长、条件失败直接冻结 */
     public static final BooleanProperty NATURAL = BooleanProperty.of("natural");
-    /** 目标高度（8-12）：生长前环境评估一次确定（8 + 光照/水分/温度/土壤各一分），生长全程继承 */
-    public static final IntProperty TARGET = IntProperty.of("target", 8, 12);
-    /** 主干封顶标记：到顶决策持久化，唤醒侧芽与顶花苞由此驱动 */
+    /** 主干封顶标记：到顶决策持久化，唤醒侧芽与定干分叉由此驱动 */
     public static final BooleanProperty TOPPED = BooleanProperty.of("topped");
 
     /**
@@ -225,7 +226,6 @@ public class MoranBranchBlock extends Block implements Fertilizable {
                 .with(DORMANT, false)
                 .with(TOPPED, false)
                 .with(NATURAL, false)
-                .with(TARGET, 8)
                 .with(FORK_SET, ForkSet.NONE));
     }
 
@@ -235,7 +235,7 @@ public class MoranBranchBlock extends Block implements Fertilizable {
 
     @Override
     protected void appendProperties(StateManager.Builder<Block, BlockState> builder) {
-        builder.add(GROWTH, FACING, TRUNK, FAILS, DORMANT, TOPPED, NATURAL, TARGET, FORK_SET);
+        builder.add(GROWTH, FACING, TRUNK, FAILS, DORMANT, TOPPED, NATURAL, FORK_SET);
     }
 
     @Override
@@ -284,10 +284,15 @@ public class MoranBranchBlock extends Block implements Fertilizable {
             return;
         }
 
-        // 条件满足：野生树立即生长；种植树掷骰（有效概率 = 基础 × 水度 × 土壤）
+        // 条件满足：野生树立即生长；种植树掷骰（有效概率 = 基础 × 水度 × 土壤 × 赤霉素）
+        // 激素档案：这棵树自己的内分泌（由树基坐标确定性推出，同树同档、零存储）
+        HormoneProfile hormones = species.hormones(world, pos, state.get(FACING));
+        // 本树成熟档位 max：同样由树基种子推出（ hormones 与 max 各自独立随机流）
+        int max = species.treeMaxGrowth(root.asLong());
         boolean progressed = false;
-        if (natural || random.nextFloat() < species.effectiveGrowChance(world, pos, hydration, soil)) {
-            progressed = growPart(state, world, pos, random);
+        if (natural || random.nextFloat()
+                < species.effectiveGrowChance(world, pos, hydration, soil) * hormones.gibberellin()) {
+            progressed = growPart(state, world, pos, random, hormones, max);
             if (!(world.getBlockState(pos).getBlock() instanceof MoranBranchBlock)) {
                 return;
             }
@@ -376,16 +381,17 @@ public class MoranBranchBlock extends Block implements Fertilizable {
      * @return 本拍是否真的产出了什么（成熟度提升 / 放了新方块 / 分叉 / 开花）。
      *         生命周期终止判定靠它：连续若干次请求全都没产出，就认为这棵树长完了。
      */
-    private boolean growPart(BlockState state, ServerWorld world, BlockPos pos, Random random) {
+    private boolean growPart(BlockState state, ServerWorld world, BlockPos pos, Random random, HormoneProfile hormones, int max) {
         Direction facing = state.get(FACING);
         int growth = state.get(GROWTH);
         boolean trunk = state.get(TRUNK);   // 身份看 TRUNK，不看 FACING（上生子枝 FACING 也是 UP）
 
-        // 自身成熟：主干至 trunkMaxGrowth；侧枝至 min(档案上限, 养分值)——
+        // 自身成熟：档位体系相对本树 max（树基种子推出，成熟标志）——
+        // 主干至 max；侧枝至 min(max-1, 养分值)——侧枝恒细于母干一档。
         // 养分从根部发起（主干=当前 growth），沿结构传递递减：
-        // 同链每节距离损耗、换向分叉分流损耗，末梢天然细小（侧枝恒细于母干）
-        int cap = trunk ? species.trunkMaxGrowth()
-                : Math.min(species.branchMaxGrowth(), nutritionAt(world, pos, facing));
+        // 同链每节距离损耗、换向分叉分流损耗，末梢天然细小
+        int cap = trunk ? max
+                : Math.min(max - 1, nutritionAt(world, pos, facing));
         boolean progressed = false;
         if (growth < cap) {
             growth += 1;
@@ -394,25 +400,26 @@ public class MoranBranchBlock extends Block implements Fertilizable {
         }
 
         if (trunk) {
-            progressed |= growTrunk(state, world, pos, random, growth);
+            progressed |= growTrunk(state, world, pos, random, growth, hormones, max);
         } else {
-            progressed |= growBranch(state, world, pos, random, growth, facing);
+            progressed |= growBranch(state, world, pos, random, growth, facing, hormones, max);
         }
         return progressed;
     }
 
-    /** 主干生长：抽高与封顶决策 → 到顶唤醒侧芽并长顶花苞 */
-    private boolean growTrunk(BlockState state, ServerWorld world, BlockPos pos, Random random, int growth) {
+    /** 主干生长：抽高与封顶决策 → 到顶唤醒侧芽并定干分叉 */
+    private boolean growTrunk(BlockState state, ServerWorld world, BlockPos pos, Random random, int growth, HormoneProfile hormones, int max) {
         boolean progressed = false;
         BlockPos above = pos.up();
         boolean top = !(world.getBlockState(above).getBlock() instanceof MoranBranchBlock);
         int height = heightBelow(world, pos, species.biologicalTopMax()) + 1;
 
         // 封顶决策（只在顶端做一次，结果持久化为 TOPPED）：
-        // 高度达目标（生长前环境评估确定）即封顶；上方被遮挡视为到顶
+        // 桃树范式（开心形）：主干只长 max/2 格（桃 3-4 格），上半部分完全交给侧枝
+        // 展开成冠层，整树 6-8 格。上方被遮挡同样视为到顶。
         if (top && !state.get(TOPPED)) {
             boolean canExtend = world.getBlockState(above).isAir();
-            if (height >= state.get(TARGET) || !canExtend) {
+            if (height >= species.trunkHalfHeight(max) || !canExtend) {
                 state = state.with(TOPPED, true);
                 world.setBlockState(pos, state, Block.NOTIFY_ALL);
                 progressed = true;
@@ -422,39 +429,53 @@ public class MoranBranchBlock extends Block implements Fertilizable {
         if (state.get(TOPPED)) {
             // 到顶：唤醒全部休眠侧芽（幂等），侧枝期开始
             wakeDormantBuds(world, pos);
-            if (top && growth >= species.topBudGrowth() && world.getBlockState(above).isAir()
-                    && !(world.getBlockState(above).getBlock() instanceof MoranFlowerBudBlock)) {
-                // 顶端方块成熟度达标：长出顶花苞
-                world.setBlockState(above, species.budBlock().getDefaultState()
-                        .with(MoranFlowerBudBlock.NATURAL, state.get(NATURAL)), Block.NOTIFY_ALL);
-                progressed = true;
+            // 定干分叉（开心形核心）：主干尽头不再长顶花苞（无直立中央头），
+            // 而是四水平向逐拍抽出主枝（几乎与干等粗），向上发散构成冠层。
+            // 幂等判据 = 邻居本身（已是主枝的方向跳过），无需新增状态；
+            // 每拍最多落一根 —— 四根主枝四拍完成，符合「每拍最多一落」的节奏。
+            // 等干长满（growth 到 max）再定干。主枝出生档位 = max-2：
+            // 既有一定粗度（现实主枝与干近乎等粗），又留出长到 max-1 的空间——
+            // 出生即满档会被 isFullyGrown 判静默，冠层就长不出来。
+            if (top && growth >= max) {
+                for (Direction d : TreeSpecies.HORIZONTALS) {
+                    BlockPos p = pos.offset(d);
+                    if (world.getBlockState(p).isAir() && !isCrowded(world, p)) {
+                        world.setBlockState(p, getDefaultState()
+                                .with(GROWTH, Math.max(1, max - 2))
+                                .with(FACING, d).with(TRUNK, false)
+                                .with(NATURAL, state.get(NATURAL)), Block.NOTIFY_ALL);
+                        progressed = true;
+                        break;   // 每拍一根
+                    }
+                }
             }
         } else if (top && world.getBlockState(above).isAir()) {
             // 抽高期：自身 >= 2 才能向上生新节（新节恒为 1，「新块最大为自身减一」）
             if (growth >= 2) {
                 world.setBlockState(above, getDefaultState()
-                        .with(NATURAL, state.get(NATURAL))
-                        .with(TARGET, state.get(TARGET)), Block.NOTIFY_ALL);
+                        .with(NATURAL, state.get(NATURAL)), Block.NOTIFY_ALL);
                 progressed = true;
             }
         }
 
-        // 侧芽萌发：位置 = 预定目标高度的上半部分（树种判定，矮树期天然不触发），
-        // 数量上限内概率递减，向光 + 空间竞争。
+        // 侧芽萌发：位置由树种判定（桃范式恒 false —— 侧枝完全由定干承担），
+        // 机制保留给需要逐节侧芽的树形。数量上限内概率递减，向光 + 空间竞争；
+        // 激素：细胞分裂素促萌出 × 生长素压萌出（顶端优势的生理本义）。
         // 抽高期萌发的为休眠态（到顶统一唤醒）；封顶后补芽直接苏醒态（密度受 maxBuds 硬上限约束）
         if (growth >= 2) {
             int buds = countBudsAroundTrunk(world, pos);
+            float budChance = (float) (species.maxBuds() - buds)
+                    * hormones.cytokinin() * (2F - hormones.auxin()) / species.budChanceDenom();
             if (buds < species.maxBuds()
-                    && species.isBudPosition(world, pos, height, state.get(TARGET))
-                    && random.nextInt(species.budChanceDenom()) < (species.maxBuds() - buds)) {
+                    && species.isBudPosition(world, pos, height, max)
+                    && random.nextFloat() < budChance) {
                 Direction d = phototropicDirection(world, pos, random);
                 BlockPos p = pos.offset(d);
                 if (world.getBlockState(p).isAir() && !isCrowded(world, p)) {
                     boolean dormant = !treeTopped(world, pos);
                     world.setBlockState(p, getDefaultState()
                             .with(FACING, d).with(TRUNK, false).with(DORMANT, dormant)
-                            .with(NATURAL, state.get(NATURAL))
-                            .with(TARGET, state.get(TARGET)), Block.NOTIFY_ALL);
+                            .with(NATURAL, state.get(NATURAL)), Block.NOTIFY_ALL);
                     progressed = true;
                 }
             }
@@ -472,19 +493,20 @@ public class MoranBranchBlock extends Block implements Fertilizable {
      * 此前版本缺失延伸逻辑且子侧枝距离判定写反（量父枝位置，贴干芽恒为1），
      * 导致侧枝永远单节、直接开花，树形光秃。
      */
-    private boolean growBranch(BlockState state, ServerWorld world, BlockPos pos, Random random, int growth, Direction facing) {
+    private boolean growBranch(BlockState state, ServerWorld world, BlockPos pos, Random random, int growth, Direction facing, HormoneProfile hormones, int max) {
         int chainPos = chainPosition(world, pos, facing); // 1 = 贴干首节
         BlockPos tip = pos.offset(facing);
         boolean tipAir = world.getBlockState(tip).isAir();
 
-        // 末端延伸：链上限按养分递减（营养分配规律——末级枝短）：
-        // 一级枝（养分6）3 节，链尾/二级枝（养分4-5）1-2 节
-        int chainLimit = Math.max(1, Math.min(MAX_BRANCH_CHAIN, nutritionAt(world, pos, facing) - 3));
+        // 末端延伸：链上限 = 养分 - 链长预算（预算随本树 max 缩放，max/4；
+        // max=8 时营养 8 → 3 节，与旧公式 -3 一致）。下限 2 节 —— 上生子枝
+        // （营养 max-2）也至少能抬 2 格，冠层高度才撑得起整树 6-8 格。
+        // 激素：赤霉素促节间伸长 —— 高的树把枝拉得更长。
+        int chainLimit = Math.min(MAX_BRANCH_CHAIN, Math.max(2, nutritionAt(world, pos, facing) - max / 4));
         if (growth >= 2 && chainPos < chainLimit && tipAir
-                && random.nextFloat() < BRANCH_EXTEND_CHANCE) {
+                && random.nextFloat() < BRANCH_EXTEND_CHANCE * hormones.gibberellin()) {
             world.setBlockState(tip, getDefaultState()
-                    .with(FACING, facing).with(TRUNK, false).with(NATURAL, state.get(NATURAL))
-                    .with(TARGET, state.get(TARGET)), Block.NOTIFY_ALL);
+                    .with(FACING, facing).with(TRUNK, false).with(NATURAL, state.get(NATURAL)), Block.NOTIFY_ALL);
             return true;
         }
 
@@ -500,17 +522,29 @@ public class MoranBranchBlock extends Block implements Fertilizable {
         // 分叉：够成熟、离干够远、还有额度、且不在冷却里。
         //   额度由营养决定（越靠梢越细弱、能养的侧枝越少），概率随已分数衰减。
         //   每拍最多落一根 —— 四叉要四拍各自命中，天然稀有，也不会四根同时蹦出来。
-        if (growth >= species.forkMinGrowth() && chainPos >= species.forkMinChainPos()) {
+        // 分叉门槛相对本树 max（forkMinGrowth = max-1）。两个约束同时卡住这个值：
+        // ① 必须严格高于子枝出生档位 1 —— 否则新子枝落地即能再分叉，
+        //    树指数爆炸填满空间（实测跑满 3000 轮不收敛）；max-2 在 max=3 时等于 1，会炸。
+        // ② 不能高于主枝上限 max-1 —— 那样永远够不到；等于它正好：
+        //    主枝长满即可分叉，中途开花早停的那部分主枝不分叉（自然变异）。
+        // 分叉：够成熟、离干够远、还有额度、且不在冷却里。
+        //   额度由营养决定（越靠梢越细弱、能养的侧枝越少），概率随已分数衰减。
+        //   每拍最多落一根 —— 四叉要四拍各自命中，天然稀有，也不会四根同时蹦出来。
+        if (growth >= max - 1 && chainPos >= species.forkMinChainPos()) {
             int mask = state.get(FORK_SET).mask();
             int have = Math.max(state.get(FORK_SET).count(), neighborForkCount(world, pos, facing));
             int cap = Math.min(TreeSpecies.MAX_FORKS,
-                    species.forkCapacity(nutritionAt(world, pos, facing)));
+                    species.forkCapacity(nutritionAt(world, pos, facing), max));
             if (have < cap && !forkedWithin(world, pos, facing, species.forkSpacing())) {
-                float p = species.subBranchChance() * (float) Math.pow(species.forkDecay(), have);
+                // 激素调制分叉倾向：细胞分裂素促分叉，生长素压分叉（顶端优势，2-auxin 当 auxin=1 时为 1）。
+                // 两者都围绕 1.0 抖动，常态下与无激素时完全一致。
+                float p = species.subBranchChance() * (float) Math.pow(species.forkDecay(), have)
+                        * hormones.cytokinin() * (2F - hormones.auxin());
                 if (random.nextFloat() < p) {
                     // 往哪长？—— 不是「随机挑个空位」，是「往光更好的地方去」。
-                    // 收益用开口度度量（与侧芽萌发同一个启发式），向上额外加分、向下扣分；
+                    // 收益用开口度度量（与侧芽萌发同一个启发式），向顶性强度跟着生长素走；
                     // 收益低于阈值的候选直接排除：光不好就不长，这才是大多数方向不长叉的原因。
+                    // 门槛本身也随生长素抬升（顶端优势：激素旺的树只在光特别好的地方才分叉）。
                     List<Direction> free = new ArrayList<>(4);
                     int[] gains = new int[4];
                     int totalGain = 0;
@@ -523,7 +557,7 @@ public class MoranBranchBlock extends Block implements Fertilizable {
                         if (!world.getBlockState(pos.offset(side)).isAir()) {
                             continue;
                         }
-                        int g = species.branchForkGain(world, pos, facing, side);
+                        int g = species.branchForkGain(world, pos, facing, side, hormones);
                         if (g > bestGain) {
                             bestGain = g;
                         }
@@ -534,7 +568,8 @@ public class MoranBranchBlock extends Block implements Fertilizable {
                         }
                     }
                     // 一个值得长的方向都没有 —— 本拍就不分叉
-                    if (bestGain >= species.forkMinGain() && !free.isEmpty()) {
+                    int minGain = Math.round(species.forkMinGain() * hormones.auxin());
+                    if (bestGain >= minGain && !free.isEmpty()) {
                         // 按收益加权随机：偏向光好的那边，但不总是同一个方向
                         int roll = random.nextInt(totalGain);
                         Direction side = free.get(free.size() - 1);
@@ -545,13 +580,14 @@ public class MoranBranchBlock extends Block implements Fertilizable {
                                 break;
                             }
                         }
-                        // 子枝档位：母枝 n 只长出 n-1 档（g1 特殊，没有更细的档，只能长 g1）。
-                        // 与视觉模型共用同一档位表——北侧上生N 的子枝粗细就是 N-1 档的截面。
+                        // 子枝档位：新枝一律从 1 档长起（先细后粗，由营养定上限）。
+                        // 不能按「母枝档位-1」给出生值 —— 那样二级/up 子枝出生档位
+                        // 就等于它的营养上限，永远长不到可延伸的 2 档，冠层抬不起来。
+                        // 视觉上子枝的粗细由「母枝档位 + 槽位」在模型工厂里算，
+                        // 与本节自身的 GROWTH 无关，两者不冲突。
                         world.setBlockState(pos.offset(side), getDefaultState()
-                                .with(GROWTH, Math.max(1, growth - 1))
                                 .with(FACING, side).with(TRUNK, false)
-                                .with(NATURAL, state.get(NATURAL))
-                                .with(TARGET, state.get(TARGET)), Block.NOTIFY_ALL);
+                                .with(NATURAL, state.get(NATURAL)), Block.NOTIFY_ALL);
                         // 母枝那格记下这一位，好挑对应的分叉模型；不记就只画得出一根母枝。
                         // 档位不必存：模型由母枝 GROWTH + 这一组方向唯一确定。
                         // 必须从世界重读本格状态——传进来的 state 是生长前的快照，
@@ -565,9 +601,13 @@ public class MoranBranchBlock extends Block implements Fertilizable {
         }
 
         // 停止进入开花：链到上限或末端被占后，成熟度过门槛概率停止，上限强制
-        // （一旦开始生成花苞就不再延伸/分叉——停止即终末）
-        if (growth >= species.branchStopGrowth()
-                && (growth >= species.branchMaxGrowth() || random.nextFloat() < species.branchStopChance())) {
+        // （一旦开始生成花苞就不再延伸/分叉——停止即终末）。
+        // 开花门槛相对本树 max（branchStopGrowth = (max+1)/2；max=8 时即旧的 4），
+        // 上限 max-1 与 growPart 的侧枝 cap 一致。
+        // 主动停的概率随链位置递增（先端易成花、中段持续生长）—— 冠层自然收成圆拱。
+        if (growth >= (max + 1) / 2
+                && (growth >= max - 1
+                    || random.nextFloat() < species.branchStopChance() * chainPos / (float) chainLimit)) {
             species.onBranchStop(world, pos, facing, random, state.get(NATURAL));
             return true;   // 开花也算产出（放了花苞）
         }
@@ -669,15 +709,14 @@ public class MoranBranchBlock extends Block implements Fertilizable {
                 // 断口处生成朝向母体的新芽（growth=1），立即登记生长请求。
                 // 用 neighbor.with(...) 从邻居复制状态：TRUNK 未在下方显式列出，故自动继承——
                 // 主干断了长出来的仍是主干（继续抽高），侧枝断了长出来的仍是侧枝。
-                // SUBMASK 必须显式清零：新芽自己没分叉，继承下来会画出不存在的分叉。
+                // FORK_SET 必须显式清零：新芽自己没分叉，继承下来会画出不存在的分叉。
                 world.setBlockState(pos, neighbor
                         .with(FACING, d.getOpposite())
                         .with(GROWTH, 1)
                         .with(DORMANT, false)
                         .with(TOPPED, false)
                         .with(FAILS, 0)
-                        .with(FORK_SET, ForkSet.NONE)
-                        .with(TARGET, neighbor.contains(TARGET) ? neighbor.get(TARGET) : 8), Block.NOTIFY_ALL);
+                        .with(FORK_SET, ForkSet.NONE), Block.NOTIFY_ALL);
                 world.scheduleBlockTick(pos, neighbor.getBlock(),
                         neighbor.contains(NATURAL) && neighbor.get(NATURAL)
                                 ? NATURAL_INTERVAL : TreeSpecies.REQUEST_INTERVAL);
@@ -703,19 +742,26 @@ public class MoranBranchBlock extends Block implements Fertilizable {
     /** 野生树是否已完成全部生长使命（可永久静默） */
     private boolean isFullyGrown(BlockState state, ServerWorld world, BlockPos pos) {
         int growth = state.get(GROWTH);
+        int max = species.treeMaxGrowth(rootPos(world, pos, species.biologicalTopMax()).asLong());
         if (state.get(TRUNK)) {
-            if (growth < species.trunkMaxGrowth()) {
+            if (growth < max) {
                 return false;
             }
-            // 顶端且上方是空气：顶花苞还没放下，还需 tick
             BlockPos above = pos.up();
             boolean top = !(world.getBlockState(above).getBlock() instanceof MoranBranchBlock);
-            if (top && world.getBlockState(above).isAir()) {
-                return false;
+            if (top) {
+                // 定干分叉未完成（四向还有能落主枝的空位）→ 还需 tick。
+                // 全部占满或拥挤（放不出去）即视为完成；极端拥挤的死锁由 IDLE 兜底。
+                for (Direction d : TreeSpecies.HORIZONTALS) {
+                    BlockPos p = pos.offset(d);
+                    if (world.getBlockState(p).isAir() && !isCrowded(world, p)) {
+                        return false;
+                    }
+                }
             }
             return treeTopped(world, pos);
         }
-        return growth >= species.branchMaxGrowth();
+        return growth >= max - 1;
     }
 
     /** 根部位置：沿同柱向下找第一个非枝干方块（土壤在其下方） */
@@ -728,6 +774,41 @@ public class MoranBranchBlock extends Block implements Fertilizable {
                 continue;
             }
             break;
+        }
+        return p;
+    }
+
+    /**
+     * 树的「身份证」：树基（主干最底下那格）。
+     *
+     * 侧枝先沿链向回走（与 {@link #nutritionAt} 同一条路）到主干，再沿主干向下走到基座。
+     * 激素档案以此为种子（见 {@link TreeSpecies#hormones}）—— 同一棵树的所有节
+     * 都推出同一份档案，零存储、跨重启不变。链被打断后的孤儿枝走不到基座，
+     * 按自己位置另起一份，后果只是偏好略变，可接受。
+     */
+    public static BlockPos treeOrigin(WorldView world, BlockPos pos, Direction facing) {
+        BlockPos p = pos;
+        Direction d = facing;
+        for (int i = 0; i < 16; i++) {
+            BlockState s = world.getBlockState(p);
+            if (!(s.getBlock() instanceof MoranBranchBlock) || s.get(TRUNK)) {
+                break;
+            }
+            BlockPos back = p.offset(d.getOpposite());
+            BlockState bs = world.getBlockState(back);
+            if (!(bs.getBlock() instanceof MoranBranchBlock)) {
+                break;
+            }
+            p = back;
+            d = bs.get(FACING);
+        }
+        for (int i = 0; i < 32; i++) {
+            BlockState below = world.getBlockState(p.down());
+            if (below.getBlock() instanceof MoranBranchBlock && below.get(TRUNK)) {
+                p = p.down();
+            } else {
+                break;
+            }
         }
         return p;
     }
@@ -774,12 +855,6 @@ public class MoranBranchBlock extends Block implements Fertilizable {
             p = p.down();
         }
         return height;
-    }
-
-    /** 自身是否位于主干可萌发位置（由树种档案判定，默认上半部分） */
-    private boolean inBudPosition(ServerWorld world, BlockPos pos) {
-        int height = heightBelow(world, pos, species.biologicalTopMax()) + 1;
-        return species.isBudPosition(world, pos, height, world.getBlockState(pos).get(TARGET));
     }
 
     private int trunkSegmentsAbove(ServerWorld world, BlockPos pos) {
@@ -907,9 +982,10 @@ public class MoranBranchBlock extends Block implements Fertilizable {
     @Override
     public boolean isFertilizable(WorldView world, BlockPos pos, BlockState state, boolean isClient) {
         int growth = state.get(GROWTH);
+        int max = species.treeMaxGrowth(rootPos(world, pos, species.biologicalTopMax()).asLong());
         return state.get(TRUNK)
-                ? growth < species.trunkMaxGrowth()
-                : growth < species.branchMaxGrowth();
+                ? growth < max
+                : growth < max - 1;
     }
 
     @Override
@@ -920,8 +996,9 @@ public class MoranBranchBlock extends Block implements Fertilizable {
     @Override
     public void grow(ServerWorld world, Random random, BlockPos pos, BlockState state) {
         int growth = state.get(GROWTH);
-        int cap = state.get(TRUNK) ? species.trunkMaxGrowth()
-                : Math.min(species.branchMaxGrowth(), nutritionAt(world, pos, state.get(FACING)));
+        int max = species.treeMaxGrowth(rootPos(world, pos, species.biologicalTopMax()).asLong());
+        int cap = state.get(TRUNK) ? max
+                : Math.min(max - 1, nutritionAt(world, pos, state.get(FACING)));
         if (growth < cap) {
             world.setBlockState(pos, state.with(GROWTH, growth + 1), Block.NOTIFY_ALL);
         }

@@ -23,17 +23,14 @@ public class PeachSpecies extends TreeSpecies {
         super(builder);
     }
 
-    /** 桃树档案：8-12 米（环境评分定高），上部萌芽密集侧枝，侧枝 4-7 级 */
+    /** 桃树档案：整树 6-8 格（环境评分定高），主干半高 3-4 格、尽头四向定干，侧枝 2-3 级 */
     public static PeachSpecies peach() {
         return new PeachSpecies(TreeSpecies.builder("peach")
-                .biologicalTop(8, 12)
-                .topBudGrowth(5)
-                .maxBuds(6)
-                .budChanceDenom(4)
-                .branchMaxGrowth(7)
-                .branchStopGrowth(4)
-                .branchStopChance(0.25F)
-                .subBranchChance(0.12F)
+                .biologicalTop(6, 8)
+                .branchStopChance(0.06F)
+                .subBranchChance(0.3F)
+                .forkMinChainPos(1)
+                .forkSpacing(1)
                 .growChance(0.5F)
                 .minLight(9)
                 .temperature(0.3F, 1.2F)
@@ -41,6 +38,12 @@ public class PeachSpecies extends TreeSpecies {
                 .minHumidity(0.0F)
                 .soilPreference(4, 8, 3, 8, 2, 6)
                 .pruneResponseChance(0.5F)
+                // 表型原型：直立/开张两个离散亚型（树形是遗传性状，不是连续散点）。
+                // 直立 = 顶端优势强（向顶 bias 3、分叉概率 ×0.81、拔得快），权重 2:1 常见些；
+                // 开张 = 顶端优势弱（bias 2、分叉概率 ×1.44、爱出侧芽），呼应桃树开张冠层透光的栽培认知。
+                // 同原型的树彼此相似；个体只在原型内 ±5% 残差。
+                .phenotype("erect", 2F, 1.10F, 0.90F, 1.10F)
+                .phenotype("open",  1F, 0.80F, 1.20F, 0.90F)
                 // 树种提交的贴图（模型头部 textures 段）
                 .textures("moran_mod:block/peach_log",
                           "moran_mod:item/thick_peach_trunk_side"));
@@ -56,12 +59,14 @@ public class PeachSpecies extends TreeSpecies {
     public void onBranchStop(ServerWorld world, BlockPos pos, Direction facing, Random random, boolean natural) {
         // 末端花苞
         placeBudIfAir(world, pos.offset(facing), facing, natural);
-        // 四周花苞：水平母枝取「上 + 左 + 右」；垂直母枝（上生/下生）取四个水平向。
+        // 四周花苞：水平母枝取「左 + 右」—— 上方要让位给上生子枝（冠层靠它抬起来），
+        // 否则花苞占住上方，up 分叉候选判「非空气」被排除，冠层撑不出高度。
+        // 垂直母枝（上生/下生）仍是四个水平向，顶端方向留给链继续延伸。
         // 注意 rotateYCounterclockwise/Clockwise 对 UP/DOWN 会抛 IllegalStateException，
         // 不能无条件调用——垂直枝必须走另一条分支。
         Direction[] around = facing.getAxis() == Direction.Axis.Y
                 ? HORIZONTALS
-                : new Direction[]{Direction.UP, facing.rotateYCounterclockwise(), facing.rotateYClockwise()};
+                : new Direction[]{facing.rotateYCounterclockwise(), facing.rotateYClockwise()};
         for (Direction d : around) {
             placeBudIfAir(world, pos.offset(d), d, natural);
         }
