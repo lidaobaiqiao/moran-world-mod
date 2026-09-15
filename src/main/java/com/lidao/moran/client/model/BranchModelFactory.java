@@ -117,6 +117,8 @@ public final class BranchModelFactory {
         model.addProperty("render_type", "minecraft:cutout");
 
         // 贴图由树种提交，生成器只是搬运工 —— 引擎里不含任何树种外观
+        // #0 树皮（长条侧面）；#2 截断面（轴端面，水平/竖直枝通用）。
+        // 年轮贴图只属于主干（trunk=true 的手作美术件），工厂生成的都是侧枝。
         JsonObject textures = new JsonObject();
         textures.addProperty("0", species.barkTexture());
         textures.addProperty("2", species.capTexture());
@@ -205,12 +207,14 @@ public final class BranchModelFactory {
         for (Direction f : DIRS) {
             int[] fd = faceDims(f, fromW, toW);
             boolean end = f.getAxis() == g.getAxis();
-            // 贴图归属：**正方形的面**贴截断面，长条面贴树皮。
-            // 手作件全样本符合：母枝两端（正方形）是截断面、四个侧面（长条）是树皮；
-            // 子枝的三个轴同理，平方的那个面才是截断面（不是「朝外」的那个）。
-            boolean isCap = fd[0] == fd[1];
+            // 贴图归属：轴端面（⟺ 面法向与柱轴同轴）贴截断面 #2，长条侧面贴树皮 #0。
+            // 工厂生成的全部是侧枝（主干走 trunk=true 的手作美术件，年轮贴图属于那边）；
+            // 侧枝不分水平/竖直，端面一律 #2 —— 与手作 bud 件、手作上生子枝模板一致。
+            // 注意「端面」必须按轴向判定，不能用「正方形面」判定 —— g8 满格时
+            // 六个面全是 16×16 正方形，按正方形判定会把侧面也送进端面贴图。
+            int slot = end ? 2 : 0;
             int rot = isSub ? subRot(dir.getAxis(), f) : (end ? (f == g ? 180 : 0) : sideRot(g, f));
-            faces.add(f.asString(), face(uvFor(fd, rot), rot, isCap));
+            faces.add(f.asString(), face(uvFor(fd, rot), rot, slot));
         }
 
         el.add("faces", faces);
@@ -331,20 +335,21 @@ public final class BranchModelFactory {
     }
 
     /**
-     * 一个面。贴图槽位只有两个：
+     * 一个面。贴图槽位有两个：
      * <ul>
      *   <li>{@code #0} 树皮 —— 长条侧面（宽 ≠ 高）</li>
-     *   <li>{@code #2} 截断面 —— 正方形面（宽 == 高）</li>
+     *   <li>{@code #2} 截断面 —— 轴端面（水平/竖直枝通用；年轮贴图属于 trunk=true
+     *       的手作主干件，工厂生成的全部是侧枝）</li>
      * </ul>
      * 具体指向哪张贴图由模型头部的 textures 段决定（树种提交）。
      */
-    private static JsonObject face(int[] uv, Integer rotation, boolean isCap) {
+    private static JsonObject face(int[] uv, Integer rotation, int slot) {
         JsonObject f = new JsonObject();
         f.add("uv", arr(uv));
         if (rotation != null && rotation != 0) {
             f.addProperty("rotation", rotation);
         }
-        f.addProperty("texture", isCap ? "#2" : "#0");
+        f.addProperty("texture", "#" + slot);
         return f;
     }
 

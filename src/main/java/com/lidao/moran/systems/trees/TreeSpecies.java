@@ -118,7 +118,7 @@ public class TreeSpecies {
     // —— 外观（模型头部 textures 段；由模型生成器读取，树种自己提交） ——
     /** 树皮：贴在长条侧面 */
     private final String barkTexture;
-    /** 截断面：贴在正方形的端面 */
+    /** 截断面：贴轴端面（正方形面；水平/竖直枝通用——年轮贴图只属于 trunk=true 的手作主干件） */
     private final String capTexture;
     // —— 方块引用（注册后绑定） ——
     private Block branchBlock;
@@ -380,7 +380,7 @@ public class TreeSpecies {
         return barkTexture;
     }
 
-    /** 截断面贴图 id（贴正方形端面） */
+    /** 截断面贴图 id（贴轴端面；年轮贴图只属于 trunk=true 的手作主干件） */
     public String capTexture() {
         return capTexture;
     }
@@ -695,7 +695,7 @@ public class TreeSpecies {
          * 树种提交的贴图对（对应模型头部的 textures 段）。新增树种必须填。
          *
          * @param bark 树皮，贴长条侧面
-         * @param cap  截断面，贴正方形端面
+         * @param cap  截断面，贴轴端面（正方形面；水平/竖直枝通用）
          */
         public Builder textures(String bark, String cap) {
             this.barkTexture = bark;

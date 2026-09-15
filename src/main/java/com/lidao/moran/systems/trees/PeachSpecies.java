@@ -45,6 +45,9 @@ public class PeachSpecies extends TreeSpecies {
                 .phenotype("erect", 2F, 1.10F, 0.90F, 1.10F)
                 .phenotype("open",  1F, 0.80F, 1.20F, 0.90F)
                 // 树种提交的贴图（模型头部 textures 段）
+                // #0 树皮 = peach_log（长条侧面）
+                // #2 截断面 = thick_peach_trunk_side（轴端面，水平/竖直枝通用；
+                //   年轮贴图 thick_peach_trunk 只属于 trunk=true 的手作主干件）
                 .textures("moran_mod:block/peach_log",
                           "moran_mod:item/thick_peach_trunk_side"));
     }
