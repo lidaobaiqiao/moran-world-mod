@@ -22,10 +22,13 @@ import net.minecraft.world.BlockView;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldView;
 
+import net.minecraft.registry.RegistryKey;
+
 import java.util.ArrayList;
 import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * 通用活树枝干方块——生长引擎的树干/侧枝部分，所有树种共用。
@@ -282,8 +285,9 @@ public class MoranBranchBlock extends Block implements Fertilizable {
         }
 
         // 条件满足：野生树立即生长；种植树掷骰（有效概率 = 基础 × 水度 × 土壤）
+        boolean progressed = false;
         if (natural || random.nextFloat() < species.effectiveGrowChance(world, pos, hydration, soil)) {
-            growPart(state, world, pos, random);
+            progressed = growPart(state, world, pos, random);
             if (!(world.getBlockState(pos).getBlock() instanceof MoranBranchBlock)) {
                 return;
             }
@@ -291,16 +295,88 @@ public class MoranBranchBlock extends Block implements Fertilizable {
                 world.setBlockState(pos, world.getBlockState(pos).with(FAILS, 0), Block.NOTIFY_ALL);
             }
         }
-        // 野生树完成使命（长满且整树封顶 / 侧枝长满）后永久静默，防 tick 风暴；
-        // 种植树保持低频常驻（60s 一次，成本可忽略）
-        boolean done = natural && isFullyGrown(state, world, pos);
-        if (!done) {
+
+        if (!natural) {
+            // 种植树保持低频常驻（60s 一次，成本可忽略）——玩家会修剪、骨粉，得留着响应
             world.scheduleBlockTick(pos, this, interval);
+            return;
+        }
+
+        // 野生树完成使命（结构上判定长满）后永久静默，防 tick 风暴
+        if (isFullyGrown(world.getBlockState(pos), world, pos)) {
+            clearIdle(world, pos);
+            return;
+        }
+
+        // 生命周期终止：连续 IDLE_LIMIT 次请求一点产出都没有，就认为这一节长完了。
+        // 这是「结构完整性」判据兜不住的那些情况的统一出口 —— 养分封顶停在半路的枝、
+        // 环境长期凑不够的枝，靠它收场；否则它们会永远占着 tick 队列。
+        if (progressed) {
+            clearIdle(world, pos);
+        } else if (bumpIdle(world, pos) >= IDLE_LIMIT) {
+            terminate(world, pos);
+            clearIdle(world, pos);
+            return;   // 不再登记 tick，这棵树这一节的生命周期到此为止
+        }
+        world.scheduleBlockTick(pos, this, interval);
+    }
+
+    // ———————————————————— 生命周期终止 ————————————————————
+
+    /** 连续这么多次请求没有任何产出，就认为这一节长完了（野生树） */
+    private static final int IDLE_LIMIT = 10;
+
+    /**
+     * 运行期的「连续无产出」计数，按 (世界, 位置) 记。
+     *
+     * <p><b>为什么不放进 blockstate</b>：加一个 0~10 的属性会把方块状态数从 245,760
+     * 抬到 2,703,360（11 倍）。方块注册的代价是「状态数 × 属性取值数之和」次 Map 查找，
+     * 11 倍状态就意味着注册耗时涨一个量级（实测过：状态数 +33% 时耗时曾涨 13 倍）。
+     * 而丢表的代价仅仅是某棵树重新数 10 次请求 —— 不值得为它付状态空间的账。
+     *
+     * <p>计数本身不入档没关系：终止的<b>结果</b>会写回方块状态
+     * （主干 {@link #TOPPED} / 侧枝 {@link #DORMANT}），那个是持久的，重启后不会复活。
+     */
+    private static final Map<RegistryKey<World>, Map<BlockPos, Integer>> IDLE = new ConcurrentHashMap<>();
+
+    private static int bumpIdle(ServerWorld world, BlockPos pos) {
+        return IDLE.computeIfAbsent(world.getRegistryKey(), k -> new ConcurrentHashMap<>())
+                .merge(pos, 1, Integer::sum);
+    }
+
+    private static void clearIdle(ServerWorld world, BlockPos pos) {
+        Map<BlockPos, Integer> m = IDLE.get(world.getRegistryKey());
+        if (m != null) {
+            m.remove(pos);
         }
     }
 
-    /** 执行一次生长：自身成熟度 +1，再按身份推进结构（抽高/侧芽/侧枝/开花） */
-    private void growPart(BlockState state, ServerWorld world, BlockPos pos, Random random) {
+    /**
+     * 生命周期终止：把这节标记为「长完了」，此后不再生长。
+     *
+     * <p>用<b>已有属性</b>做持久标记，不新增属性（理由见 {@link #IDLE}）：
+     * <ul>
+     *   <li>主干 → {@link #TOPPED}：不再抽高；砍断上方也不会重新抽
+     *       —— 这正是治「树挖一节长一节」的地方</li>
+     *   <li>侧枝 → {@link #DORMANT}：不参与请求循环，且修剪时不再萌蘖</li>
+     * </ul>
+     */
+    private static void terminate(ServerWorld world, BlockPos pos) {
+        BlockState s = world.getBlockState(pos);
+        if (!(s.getBlock() instanceof MoranBranchBlock)) {
+            return;
+        }
+        world.setBlockState(pos, s.get(TRUNK) ? s.with(TOPPED, true) : s.with(DORMANT, true),
+                Block.NOTIFY_ALL);
+    }
+
+    /**
+     * 执行一次生长：自身成熟度 +1，再按身份推进结构（抽高/侧芽/侧枝/开花）。
+     *
+     * @return 本拍是否真的产出了什么（成熟度提升 / 放了新方块 / 分叉 / 开花）。
+     *         生命周期终止判定靠它：连续若干次请求全都没产出，就认为这棵树长完了。
+     */
+    private boolean growPart(BlockState state, ServerWorld world, BlockPos pos, Random random) {
         Direction facing = state.get(FACING);
         int growth = state.get(GROWTH);
         boolean trunk = state.get(TRUNK);   // 身份看 TRUNK，不看 FACING（上生子枝 FACING 也是 UP）
@@ -310,20 +386,24 @@ public class MoranBranchBlock extends Block implements Fertilizable {
         // 同链每节距离损耗、换向分叉分流损耗，末梢天然细小（侧枝恒细于母干）
         int cap = trunk ? species.trunkMaxGrowth()
                 : Math.min(species.branchMaxGrowth(), nutritionAt(world, pos, facing));
+        boolean progressed = false;
         if (growth < cap) {
             growth += 1;
             world.setBlockState(pos, state.with(GROWTH, growth), Block.NOTIFY_ALL);
+            progressed = true;
         }
 
         if (trunk) {
-            growTrunk(state, world, pos, random, growth);
+            progressed |= growTrunk(state, world, pos, random, growth);
         } else {
-            growBranch(state, world, pos, random, growth, facing);
+            progressed |= growBranch(state, world, pos, random, growth, facing);
         }
+        return progressed;
     }
 
     /** 主干生长：抽高与封顶决策 → 到顶唤醒侧芽并长顶花苞 */
-    private void growTrunk(BlockState state, ServerWorld world, BlockPos pos, Random random, int growth) {
+    private boolean growTrunk(BlockState state, ServerWorld world, BlockPos pos, Random random, int growth) {
+        boolean progressed = false;
         BlockPos above = pos.up();
         boolean top = !(world.getBlockState(above).getBlock() instanceof MoranBranchBlock);
         int height = heightBelow(world, pos, species.biologicalTopMax()) + 1;
@@ -335,6 +415,7 @@ public class MoranBranchBlock extends Block implements Fertilizable {
             if (height >= state.get(TARGET) || !canExtend) {
                 state = state.with(TOPPED, true);
                 world.setBlockState(pos, state, Block.NOTIFY_ALL);
+                progressed = true;
             }
         }
 
@@ -346,6 +427,7 @@ public class MoranBranchBlock extends Block implements Fertilizable {
                 // 顶端方块成熟度达标：长出顶花苞
                 world.setBlockState(above, species.budBlock().getDefaultState()
                         .with(MoranFlowerBudBlock.NATURAL, state.get(NATURAL)), Block.NOTIFY_ALL);
+                progressed = true;
             }
         } else if (top && world.getBlockState(above).isAir()) {
             // 抽高期：自身 >= 2 才能向上生新节（新节恒为 1，「新块最大为自身减一」）
@@ -353,6 +435,7 @@ public class MoranBranchBlock extends Block implements Fertilizable {
                 world.setBlockState(above, getDefaultState()
                         .with(NATURAL, state.get(NATURAL))
                         .with(TARGET, state.get(TARGET)), Block.NOTIFY_ALL);
+                progressed = true;
             }
         }
 
@@ -372,9 +455,11 @@ public class MoranBranchBlock extends Block implements Fertilizable {
                             .with(FACING, d).with(TRUNK, false).with(DORMANT, dormant)
                             .with(NATURAL, state.get(NATURAL))
                             .with(TARGET, state.get(TARGET)), Block.NOTIFY_ALL);
+                    progressed = true;
                 }
             }
         }
+        return progressed;
     }
 
     /** 侧枝链长上限绝对值（含贴干首节）：养分高的一级枝 3 节，末级枝按营养递减 */
@@ -387,7 +472,7 @@ public class MoranBranchBlock extends Block implements Fertilizable {
      * 此前版本缺失延伸逻辑且子侧枝距离判定写反（量父枝位置，贴干芽恒为1），
      * 导致侧枝永远单节、直接开花，树形光秃。
      */
-    private void growBranch(BlockState state, ServerWorld world, BlockPos pos, Random random, int growth, Direction facing) {
+    private boolean growBranch(BlockState state, ServerWorld world, BlockPos pos, Random random, int growth, Direction facing) {
         int chainPos = chainPosition(world, pos, facing); // 1 = 贴干首节
         BlockPos tip = pos.offset(facing);
         boolean tipAir = world.getBlockState(tip).isAir();
@@ -400,7 +485,7 @@ public class MoranBranchBlock extends Block implements Fertilizable {
             world.setBlockState(tip, getDefaultState()
                     .with(FACING, facing).with(TRUNK, false).with(NATURAL, state.get(NATURAL))
                     .with(TARGET, state.get(TARGET)), Block.NOTIFY_ALL);
-            return;
+            return true;
         }
 
         // 分叉：成熟 >5 且本节距主干 >1（链上第二节起），抽出一根子侧枝；
@@ -473,7 +558,7 @@ public class MoranBranchBlock extends Block implements Fertilizable {
                         // 上面可能刚提过 GROWTH，直接复用会把它写回旧值。
                         world.setBlockState(pos, world.getBlockState(pos)
                                 .with(FORK_SET, ForkSet.of(mask | (1 << slotOf(facing, side)))), Block.NOTIFY_ALL);
-                        return;
+                        return true;
                     }
                 }
             }
@@ -484,7 +569,9 @@ public class MoranBranchBlock extends Block implements Fertilizable {
         if (growth >= species.branchStopGrowth()
                 && (growth >= species.branchMaxGrowth() || random.nextFloat() < species.branchStopChance())) {
             species.onBranchStop(world, pos, facing, random, state.get(NATURAL));
+            return true;   // 开花也算产出（放了花苞）
         }
+        return false;
     }
 
     /**
@@ -543,6 +630,15 @@ public class MoranBranchBlock extends Block implements Fertilizable {
     public void onStateReplaced(BlockState state, World world, BlockPos pos, BlockState newState, boolean moved) {
         super.onStateReplaced(state, world, pos, newState, moved);
         if (world.isClient || newState.getBlock() instanceof MoranBranchBlock) {
+            return;
+        }
+        if (world instanceof ServerWorld serverWorld) {
+            clearIdle(serverWorld, pos);
+        }
+
+        // 生命周期已终止、或已经封顶的节，被砍掉不再萌蘖 —— 否则玩家砍一节，树又长一节。
+        // 只挡「封顶的那一节」和「终止标记」：没封顶的普通节照旧响应修剪（那是设计里的塑形玩法）。
+        if (state.get(DORMANT) || (state.get(TRUNK) && state.get(TOPPED))) {
             return;
         }
 
