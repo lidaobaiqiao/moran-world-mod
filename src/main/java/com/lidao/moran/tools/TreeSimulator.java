@@ -729,7 +729,10 @@ public final class TreeSimulator {
         }
     }
 
-    /** 复刻 PeachSpecies.onBudMature：先花后叶；顶花苞生成小树冠（四向必放 + 四角半数） */
+    /** 复刻 PeachSpecies.onBudMature：先花后叶；顶花苞生成小树冠（四向必放 + 四角半数）。
+     *  【盛花 prototype，待与引擎同步】侧向花苞成熟时不再只长单块叶——长成小花团
+     *  （水平 8 邻大半 + 上方强化 + 下方弱化），冠层连片成「盛花体量」，
+     *  对标目标图的中国风满树繁花；否则等轴测下只是架子挂点、冠层空心。 */
     private static void onBudMature(SimWorld w, BlockPos pos, Direction facing) {
         w.put(pos, new SimBlock(SimType.LEAF, 1, facing));
         if (facing == Direction.UP) {
@@ -740,6 +743,25 @@ public final class TreeSimulator {
                 if (w.random.nextBoolean()) {
                     placeLeaf(w, pos.offset(d).up());
                 }
+            }
+        } else {
+            for (int dx = -1; dx <= 1; dx++) {
+                for (int dz = -1; dz <= 1; dz++) {
+                    if (dx == 0 && dz == 0) continue;
+                    BlockPos p = pos.add(dx, 0, dz);
+                    if (w.random.nextFloat() < 0.75F) {
+                        placeLeaf(w, p);
+                    }
+                    if (w.random.nextFloat() < 0.40F) {
+                        placeLeaf(w, p.up());
+                    }
+                }
+            }
+            if (w.random.nextFloat() < 0.85F) {
+                placeLeaf(w, pos.up());
+            }
+            if (w.random.nextFloat() < 0.25F) {
+                placeLeaf(w, pos.down());
             }
         }
     }
