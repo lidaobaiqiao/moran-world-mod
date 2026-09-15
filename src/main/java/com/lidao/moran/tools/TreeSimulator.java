@@ -971,6 +971,11 @@ public final class TreeSimulator {
     /**
      * 候选池筛选：每个维度各取 Top-K，合并去重 —— 覆盖「最茂密/最高/最宽/最对称/分叉最多」等各型好树，
      * 避免单一指标筛出的候选高度雷同，给眼挑留足多样性。
+     *
+     * <p>维度向「中国风盛花桃树」目标图校准（2026-09-15）：伞形开张 = 冠幅宽于树高、
+     * 末梢深分叉、花簇挂外围。故废维「苞」（终态恒 0，排序退化随机）替换为
+     * <b>横展半径</b>（冠层到树基轴的最大水平距离，量全方位外扩含对角）与
+     * <b>宽高比</b>（伞形核心，矮桩不成型不计分）。
      */
     private static void runBest(TreeSpecies species, int count, int envScore, String outBase) throws Exception {
         Path dir = Path.of(outBase, "best");
@@ -983,14 +988,19 @@ public final class TreeSimulator {
 
         int n = all.size();
         double[] dLeaves = new double[n], dBranch = new double[n], dFork = new double[n],
-                dHeight = new double[n], dWidth = new double[n], dBud = new double[n],
-                dLush = new double[n], dSym = new double[n];
+                dHeight = new double[n], dWidth = new double[n],
+                dLush = new double[n], dSym = new double[n],
+                dSpread = new double[n], dRatio = new double[n];
         for (int i = 0; i < n; i++) {
-            SimStats s = stats(all.get(i));
+            SimWorld w = all.get(i);
+            SimStats s = stats(w);
+            double sp = spread(w);
             dLeaves[i] = s.leaves; dBranch[i] = s.branches; dFork[i] = s.forks;
-            dHeight[i] = s.height; dWidth[i] = s.width; dBud[i] = s.buds;
+            dHeight[i] = s.height; dWidth[i] = s.width;
             dLush[i] = s.branches + s.leaves + s.buds;
-            dSym[i] = symmetry(all.get(i));
+            dSym[i] = symmetry(w);
+            dSpread[i] = sp;
+            dRatio[i] = s.height >= 5 ? sp / s.height : 0;
         }
 
         int topK = 3;
@@ -1000,7 +1010,8 @@ public final class TreeSimulator {
         topN(dFork, topK, candSeeds, all);
         topN(dHeight, topK, candSeeds, all);
         topN(dWidth, topK, candSeeds, all);
-        topN(dBud, topK, candSeeds, all);
+        topN(dSpread, topK, candSeeds, all);
+        topN(dRatio, topK, candSeeds, all);
         topN(dLush, topK, candSeeds, all);
         topN(dSym, topK, candSeeds, all);
 
@@ -1031,9 +1042,10 @@ public final class TreeSimulator {
             SimStats s = stats(w);
             HormoneProfile h = w.hormones;
             System.out.printf(Locale.ROOT,
-                    "#%d %-5s aux=%.3f cyt=%.3f gib=%.3f tgt=%d | 高%d 宽%d 枝%d 叶%d 叉%d 苞%d 对称%.2f%n",
+                    "#%d %-5s aux=%.3f cyt=%.3f gib=%.3f tgt=%d | 高%d 宽%d 展%.1f 比%.2f 枝%d 叶%d 叉%d 对称%.2f%n",
                     w.seed, w.phenotype.id(), h.auxin(), h.cytokinin(), h.gibberellin(), w.max,
-                    s.height, s.width, s.branches, s.leaves, s.forks, s.buds, symmetry(w));
+                    s.height, s.width, spread(w), spread(w) / Math.max(1, s.height),
+                    s.branches, s.leaves, s.forks, symmetry(w));
         }
         System.out.println("粘进 PeachSpecies.peach()（取你挑中的一棵，作为基准原型；残差取整到两位小数）：");
         for (SimWorld w : cands) {
@@ -1044,16 +1056,22 @@ public final class TreeSimulator {
         System.out.println("总览图: " + dir.resolve("sheet.png").toAbsolutePath());
 
         // 纯 ASCII 候选档案（避开终端中文编码乱码，供画廊脚本稳健解析）
-        StringBuilder tsv = new StringBuilder("seed\tpheno\taux\tcyt\tgib\ttgt\th\tw\tb\tl\tf\tsym\n");
+        StringBuilder tsv = new StringBuilder("seed\tpheno\taux\tcyt\tgib\ttgt\th\tw\tsp\tratio\tb\tl\tf\tsym\n");
         for (SimWorld w : cands) {
             SimStats s = stats(w);
             HormoneProfile h = w.hormones;
-            tsv.append(String.format(Locale.ROOT, "%d\t%s\t%.3f\t%.3f\t%.3f\t%d\t%d\t%d\t%d\t%d\t%d\t%.2f\n",
+            tsv.append(String.format(Locale.ROOT, "%d\t%s\t%.3f\t%.3f\t%.3f\t%d\t%d\t%d\t%.2f\t%.2f\t%d\t%d\t%d\t%.2f\n",
                     w.seed, w.phenotype.id(), h.auxin(), h.cytokinin(), h.gibberellin(),
-                    w.max, s.height, s.width, s.branches, s.leaves, s.forks, symmetry(w)));
+                    w.max, s.height, s.width, spread(w), spread(w) / Math.max(1, s.height),
+                    s.branches, s.leaves, s.forks, symmetry(w)));
         }
         Files.writeString(dir.resolve("candidates.tsv"), tsv.toString());
         System.out.println("候选档案(TSV): " + dir.resolve("candidates.tsv").toAbsolutePath());
+
+        // 3D 体素查看器：眼挑应在三维里转着看（与 --seeds 路径同一条 writeWeb 出口）
+        writeWeb(dir, cands);
+        System.out.println("3D 查看器: " + dir.resolve("trees.html").toAbsolutePath()
+                + "（浏览器直接打开，左键旋转 / 滚轮缩放 / 右键平移）");
     }
 
     /** 树冠重心偏离主干轴(0,0)的程度：越居中越对称（1/(1+偏移)） */
@@ -1066,6 +1084,20 @@ public final class TreeSimulator {
         }
         if (n == 0) return 0;
         return 1.0 / (1.0 + Math.hypot((double) sx / n, (double) sz / n));
+    }
+
+    /**
+     * 冠层横展半径：非主干方块到树基竖轴的最大水平距离。
+     * 与 stats.width（单轴跨度）互补——伞形树四向斜伸时对角距离更大，此值才量得全。
+     */
+    private static double spread(SimWorld w) {
+        double r = 0;
+        for (Map.Entry<BlockPos, SimBlock> e : w.blocks.entrySet()) {
+            if (e.getValue().trunk) continue;
+            BlockPos p = e.getKey();
+            r = Math.max(r, Math.hypot(p.getX(), p.getZ()));
+        }
+        return r;
     }
 
     /** 按分数降序取 Top-K 的 seed 并入候选集（LinkedHashSet 保序去重） */
