@@ -459,6 +459,14 @@ public class MoranBranchBlock extends Block implements Fertilizable {
                                 .with(GROWTH, Math.max(1, max - 2))
                                 .with(FACING, d).with(TRUNK, false)
                                 .with(NATURAL, state.get(NATURAL)), Block.NOTIFY_ALL);
+                        // 主干记下这一位：主干侧向填充（trunk/ 动态模型按 FORK_SET 现场拼）
+                        // 由此生成；侧枝被砍时 onStateReplaced 的清位逻辑会同步摘掉填充。
+                        BlockState cur = world.getBlockState(pos);
+                        int slot = slotOf(cur.get(FACING), d);
+                        if (slot >= 0) {
+                            world.setBlockState(pos, cur.with(FORK_SET,
+                                    ForkSet.of(cur.get(FORK_SET).mask() | (1 << slot))), Block.NOTIFY_ALL);
+                        }
                         progressed = true;
                         break;   // 每拍一根
                     }
@@ -498,8 +506,10 @@ public class MoranBranchBlock extends Block implements Fertilizable {
         return progressed;
     }
 
-    /** 侧枝链长上限绝对值（含贴干首节）：养分高的一级枝 3 节，末级枝按营养递减 */
-    private static final int MAX_BRANCH_CHAIN = 3;
+    /** 侧枝链长上限绝对值（含贴干首节）：养分高的一级枝 6 节，末级枝按营养递减。
+     *  旧值 3 把冠缘横展锁死在 ~4 格（宽高比 ≤0.8），长不出伞形开张树冠 —— 放宽到 6，
+     *  一级枝 6 节 + 换向二级 4 节 + 末级 2 节，冠缘距轴可达 ~10-12 格（宽高比 ~1.5）。 */
+    private static final int MAX_BRANCH_CHAIN = 6;
     /** 侧枝末端延伸概率（主干同款的「抽高」，横向版） */
     private static final float BRANCH_EXTEND_CHANCE = 0.75F;
 
@@ -514,7 +524,7 @@ public class MoranBranchBlock extends Block implements Fertilizable {
         boolean tipAir = world.getBlockState(tip).isAir();
 
         // 末端延伸：链上限 = 养分 - 链长预算（预算随本树 max 缩放，max/4；
-        // max=8 时营养 8 → 3 节，与旧公式 -3 一致）。下限 2 节 —— 上生子枝
+        // max=8 时营养 8 → 6 节）。下限 2 节 —— 上生子枝
         // （营养 max-2）也至少能抬 2 格，冠层高度才撑得起整树 6-8 格。
         // 激素：赤霉素促节间伸长 —— 高的树把枝拉得更长。
         int chainLimit = Math.min(MAX_BRANCH_CHAIN, Math.max(2, nutritionAt(world, pos, facing) - max / 4));

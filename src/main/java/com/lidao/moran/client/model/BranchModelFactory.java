@@ -75,6 +75,9 @@ public final class BranchModelFactory {
      */
     private static final Map<String, JsonObject> CACHE = new ConcurrentHashMap<>();
 
+    /** {@link #buildTrunk} 的缓存，键格式同 {@link #CACHE} */
+    private static final Map<String, JsonObject> TRUNK_CACHE = new ConcurrentHashMap<>();
+
     /**
      * 造一个树枝模型——「生成器相加」的结果。
      *
@@ -107,6 +110,144 @@ public final class BranchModelFactory {
             }
         }
         return sb.toString();
+    }
+
+    // ———————————————————— 主干侧向模型（trunk/ 动态 id） ————————————————————
+
+    /**
+     * 造一个「手作主干 + 侧向填充」模型 —— 主干长出侧枝的节专用。
+     *
+     * <p>结构 = 作者手作主干件（{@link TreeSpecies#trunkModelBase()}，权威底模，
+     * 一字不动）+ 向每个有枝方向拼一条<b>侧向填充</b>（连接裙）：
+     * 从主干表面铺到方块边缘，竖向取 8±3（水平枝的竖向极限截面），
+     * 把主干方柱与水平侧枝之间裸露的凹角填平。没有侧枝的方向不填充，
+     * 主干保持手作原样 —— 旧的「每段四面全带裙」程序版由此作废。
+     *
+     * <p>填充随 FORK_SET 走：引擎定干分叉时在主干方块上记位（{@code trunk_gN__<subs>}），
+     * 侧枝被砍掉时既有清位逻辑同步摘除填充。g8 主干整格占满，无空隙，不填充。
+     *
+     * @param facing 主干朝向（正常恒为 UP；断口萌蘖的水平主干按其朝向的垂直向填充）
+     * @param growth 主干档位 1~8（选哪一档手作底模）
+     * @param subs   本节长出的侧枝方向集合（方块 FORK_SET）
+     * @param species 树种档案（决定手作底模文件）
+     */
+    public static JsonObject buildTrunk(Direction facing, int growth, Set<Direction> subs, TreeSpecies species) {
+        String key = species.id() + "|trunk|" + facing.asString() + "|" + growth + "|" + canonicalSubs(subs);
+        return TRUNK_CACHE.computeIfAbsent(key, k -> generateTrunk(facing, growth, subs, species));
+    }
+
+    private static JsonObject generateTrunk(Direction facing, int growth, Set<Direction> subs, TreeSpecies species) {
+        JsonObject model = loadTrunkBase(species, growth);
+        if (model == null) {
+            model = synthesizeTrunkBase(facing, growth, species);
+        }
+        // 手作件导出自 Blockbench，可能不带 render_type；cutout 是本模组渲染铁律
+        model.addProperty("render_type", "minecraft:cutout");
+
+        int h = growth;
+        JsonArray elements = model.getAsJsonArray("elements");
+        for (Direction d : subs) {
+            JsonObject sleeve = trunkSleeve(d, h);
+            if (sleeve != null) {
+                elements.add(sleeve);
+            }
+        }
+        return model;
+    }
+
+    /**
+     * 从模组资源里读手作主干底模（{@code assets/<ns>/models/<path>_g<档位>.json}）。
+     * 走 classpath：开发期在 build/resources，发布后在 jar 内，dump 任务（无客户端）同样可用。
+     * 底模缺失返回 null，由 {@link #synthesizeTrunkBase} 兜底，绝不让主干渲染成紫黑格。
+     */
+    private static JsonObject loadTrunkBase(TreeSpecies species, int growth) {
+        String base = species.trunkModelBase();
+        if (base == null) {
+            return null;
+        }
+        int colon = base.indexOf(':');
+        String resource = "assets/" + base.substring(0, colon) + "/models/"
+                + base.substring(colon + 1) + "_g" + growth + ".json";
+        try (java.io.InputStream in = BranchModelFactory.class.getClassLoader().getResourceAsStream(resource)) {
+            if (in == null) {
+                return null;
+            }
+            return com.google.gson.JsonParser.parseString(
+                    new String(in.readAllBytes(), java.nio.charset.StandardCharsets.UTF_8)).getAsJsonObject();
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
+    /** 无手作底模时的兜底：合成竖直方柱（半宽 = 档位，全高），#0 侧面 + #2 端面 */
+    private static JsonObject synthesizeTrunkBase(Direction facing, int growth, TreeSpecies species) {
+        JsonObject model = new JsonObject();
+        model.addProperty("parent", "minecraft:block/block");
+        JsonObject textures = new JsonObject();
+        textures.addProperty("0", species.barkTexture());
+        textures.addProperty("2", species.capTexture());
+        textures.addProperty("particle", species.barkTexture());
+        model.add("textures", textures);
+
+        int h = Math.max(1, Math.min(8, growth));
+        JsonObject el = new JsonObject();
+        JsonArray from = new JsonArray();
+        from.add(8 - h);
+        from.add(0);
+        from.add(8 - h);
+        JsonArray to = new JsonArray();
+        to.add(8 + h);
+        to.add(16);
+        to.add(8 + h);
+        el.add("from", from);
+        el.add("to", to);
+        JsonObject faces = new JsonObject();
+        for (Direction f : DIRS) {
+            JsonObject face = new JsonObject();
+            if (f.getAxis() == Direction.Axis.Y) {
+                face.addProperty("texture", "#2");
+            } else {
+                face.addProperty("texture", "#0");
+            }
+            faces.add(f.asString(), face);
+        }
+        el.add("faces", faces);
+        JsonArray elements = new JsonArray();
+        elements.add(el);
+        model.add("elements", elements);
+        return model;
+    }
+
+    /**
+     * 一条侧向填充（连接裙）：主干表面 → 方块边缘。
+     * 竖向 8±3 = 水平枝竖向截面的全域上限（水平枝形状竖向半高封顶 3），
+     * 另一横轴取主干全宽 —— 正好把枝根裹进主干。
+     * g8（满格）与 Y 向（竖直主干上下方向整格占满，无缝隙）返回 null。
+     */
+    private static JsonObject trunkSleeve(Direction d, int h) {
+        if (h >= 8 || d.getAxis() == Direction.Axis.Y) {
+            return null;
+        }
+        int lo = 8 - h, hi = 8 + h;
+        int[] from, to;
+        switch (d) {
+            case NORTH -> { from = new int[]{lo, 5, 0}; to = new int[]{hi, 11, lo}; }
+            case SOUTH -> { from = new int[]{lo, 5, hi}; to = new int[]{hi, 11, 16}; }
+            case WEST -> { from = new int[]{0, 5, lo}; to = new int[]{lo, 11, hi}; }
+            case EAST -> { from = new int[]{hi, 5, lo}; to = new int[]{16, 11, hi}; }
+            default -> { return null; }
+        }
+        JsonObject el = new JsonObject();
+        el.add("from", arr(from));
+        el.add("to", arr(to));
+        JsonObject faces = new JsonObject();
+        for (Direction f : DIRS) {
+            JsonObject face = new JsonObject();
+            face.addProperty("texture", "#0");
+            faces.add(f.asString(), face);
+        }
+        el.add("faces", faces);
+        return el;
     }
 
     private static JsonObject generate(Direction facing, int growth, Set<Direction> subs, TreeSpecies species) {

@@ -28,7 +28,15 @@ public final class BranchModelDump {
                 if (id.isEmpty()) {
                     continue;
                 }
-                String path = id.substring("moran_mod:branch/".length());
+                String path;
+                if (id.startsWith("moran_mod:branch/")) {
+                    path = id.substring("moran_mod:branch/".length());
+                } else if (id.startsWith("moran_mod:trunk/")) {
+                    path = id.substring("moran_mod:trunk/".length());
+                } else {
+                    System.err.println("SKIP(非动态前缀): " + id);
+                    continue;
+                }
                 JsonObject model = parseAndBuild(path);
                 if (model == null) {
                     System.err.println("FAILED: " + id);
@@ -45,8 +53,8 @@ public final class BranchModelDump {
     }
 
     /**
-     * 直接复用 {@link BranchModelPlugin#parse} —— 解析规则只写一份，
-     * 改一处不会漏一处（包括新的 {@code <species>/} 前缀）。
+     * 直接复用 {@link BranchModelPlugin#parse(String, boolean)} —— 解析规则只写一份，
+     * 改一处不会漏一处（包括新的 {@code <species>/} 前缀与 {@code trunk/} 主干动态模型）。
      */
     static JsonObject parseAndBuild(String spec) {
         return BranchModelPlugin.parse(spec);

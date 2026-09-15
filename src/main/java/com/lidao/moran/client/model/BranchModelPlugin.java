@@ -47,8 +47,9 @@ public final class BranchModelPlugin implements ModelLoadingPlugin {
 
     private static final Logger LOGGER = LoggerFactory.getLogger("moran-branch-model");
 
-    /** 动态生成模型的命名空间前缀（放在 models/branch/ 下） */
+    /** 动态生成模型的命名空间前缀（放在 models/branch/ 与 models/trunk/ 下） */
     private static final String PATH_PREFIX = "branch/";
+    private static final String TRUNK_PREFIX = "trunk/";
 
     @Override
     public void onInitializeModelLoader(Context pluginContext) {
@@ -56,16 +57,25 @@ public final class BranchModelPlugin implements ModelLoadingPlugin {
         LOGGER.info("🌿 树枝模型运行时生成器已注册");
     }
 
-    /** 识别 branch/ 前缀的模型 id，现场算出来 */
+    /** 识别 branch/ 与 trunk/ 前缀的模型 id，现场算出来 */
     private static final class Resolver implements ModelResolver {
         @Override
         @Nullable
         public UnbakedModel resolveModel(Context context) {
             Identifier id = context.id();
-            if (!id.getNamespace().equals("moran_mod") || !id.getPath().startsWith(PATH_PREFIX)) {
+            if (!id.getNamespace().equals("moran_mod")) {
                 return null;
             }
-            JsonObject json = parse(id.getPath().substring(PATH_PREFIX.length()));
+            String path = id.getPath();
+            final boolean trunk;
+            if (path.startsWith(PATH_PREFIX)) {
+                trunk = false;
+            } else if (path.startsWith(TRUNK_PREFIX)) {
+                trunk = true;
+            } else {
+                return null;
+            }
+            JsonObject json = parse(path.substring((trunk ? TRUNK_PREFIX : PATH_PREFIX).length()), trunk);
             if (json == null) {
                 LOGGER.warn("无法解析树枝模型 id: {}", id);
                 return null;
@@ -85,6 +95,15 @@ public final class BranchModelPlugin implements ModelLoadingPlugin {
      */
     @Nullable
     static JsonObject parse(String spec) {
+        return parse(spec, false);
+    }
+
+    /**
+     * @param trunk true = 主干动态模型（{@code trunk/} 前缀，手作底模 + 侧向填充）；
+     *              false = 侧枝模型（{@code branch/} 前缀，纯工厂几何）
+     */
+    @Nullable
+    static JsonObject parse(String spec, boolean trunk) {
         try {
             // 第一段是树种档案 id
             int slash = spec.indexOf('/');
@@ -133,7 +152,9 @@ public final class BranchModelPlugin implements ModelLoadingPlugin {
                 }
             }
             // 贴图由树种提交 —— 解析出的 species 直接交给生成器
-            return BranchModelFactory.build(facing, growth, subs, species);
+            return trunk
+                    ? BranchModelFactory.buildTrunk(facing, growth, subs, species)
+                    : BranchModelFactory.build(facing, growth, subs, species);
         } catch (NumberFormatException e) {
             return null;
         }

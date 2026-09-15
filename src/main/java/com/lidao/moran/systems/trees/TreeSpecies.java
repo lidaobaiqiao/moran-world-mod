@@ -120,6 +120,15 @@ public class TreeSpecies {
     private final String barkTexture;
     /** 截断面：贴轴端面（正方形面；水平/竖直枝通用——年轮贴图只属于 trunk=true 的手作主干件） */
     private final String capTexture;
+    /**
+     * 手作主干基础模型 id 前缀（每档后缀 {@code _g1.._g8}），可空。
+     *
+     * <p>声明后：{@code forkset=none} 的主干直接用该手作 JSON（作者权威版，
+     * 工厂一字不动）；主干长出侧枝（定干分叉记录 FORK_SET 位）时，由
+     * {@code BranchModelFactory.buildTrunk} 以手作件为底、向有枝的方向现场拼
+     * 侧向填充——{@code trunk/<species>/...} 动态 id。null = 无手作主干。
+     */
+    private final String trunkModelBase;
     // —— 方块引用（注册后绑定） ——
     private Block branchBlock;
     private Block budBlock;
@@ -168,6 +177,7 @@ public class TreeSpecies {
         this.chainNutritionDecay = b.chainNutritionDecay;
         this.barkTexture = b.barkTexture;
         this.capTexture = b.capTexture;
+        this.trunkModelBase = b.trunkModelBase;
         if (this.barkTexture == null || this.capTexture == null) {
             throw new IllegalStateException("树种 " + this.id + " 没有提交贴图：Builder.textures(bark, cap)");
         }
@@ -383,6 +393,11 @@ public class TreeSpecies {
     /** 截断面贴图 id（贴轴端面；年轮贴图只属于 trunk=true 的手作主干件） */
     public String capTexture() {
         return capTexture;
+    }
+
+    /** 手作主干基础模型 id 前缀（每档后缀 _g1.._g8）；null = 无手作主干 */
+    public String trunkModelBase() {
+        return trunkModelBase;
     }
 
     /** 注册完成后绑定本树种的三类方块实例 */
@@ -620,6 +635,8 @@ public class TreeSpecies {
         // 外观：没有默认值 —— 必须显式提交，否则模型会引用空贴图（渲染成紫黑格）
         private String barkTexture;
         private String capTexture;
+        /** 手作主干基础模型 id 前缀，可空（见 {@link TreeSpecies#trunkModelBase()}） */
+        private String trunkModelBase;
 
         private Builder(String id) {
             this.id = id;
@@ -700,6 +717,18 @@ public class TreeSpecies {
         public Builder textures(String bark, String cap) {
             this.barkTexture = bark;
             this.capTexture = cap;
+            return this;
+        }
+
+        /**
+         * 手作主干基础模型 id 前缀（每档后缀 {@code _g1.._g8}）。
+         *
+         * <p>作者的 Blockbench 主干件是权威版：{@code forkset=none} 的主干直接渲染它；
+         * 主干长出侧枝的节，由工厂以它为底拼侧向填充（{@code trunk/} 动态 id）。
+         * 不声明 = 该树种没有手作主干，动态主干整体由工厂合成。
+         */
+        public Builder trunkModelBase(String id) {
+            this.trunkModelBase = id;
             return this;
         }
 

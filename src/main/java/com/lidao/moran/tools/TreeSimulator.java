@@ -570,6 +570,8 @@ public final class TreeSimulator {
                         SimBlock limb = new SimBlock(SimType.BRANCH, Math.max(1, w.max - 2), d);
                         limb.trunk = false;
                         w.put(p, limb);
+                        // 同步引擎：主干记 FORK_SET 位（渲染侧向填充用，模拟内保持状态一致）
+                        s.forkMask |= 1 << slotOf(s.facing, d);
                         progressed = true;
                         break;   // 每拍一根
                     }
@@ -590,7 +592,7 @@ public final class TreeSimulator {
         return progressed;
     }
 
-    private static final int MAX_BRANCH_CHAIN = 3;
+    private static final int MAX_BRANCH_CHAIN = 6;
     private static final float BRANCH_EXTEND_CHANCE = 0.75F;
 
     /** 复刻 MoranBranchBlock.growBranch */

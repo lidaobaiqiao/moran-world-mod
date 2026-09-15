@@ -49,7 +49,10 @@ public class PeachSpecies extends TreeSpecies {
                 // #2 截断面 = thick_peach_trunk_side（轴端面，水平/竖直枝通用；
                 //   年轮贴图 thick_peach_trunk 只属于 trunk=true 的手作主干件）
                 .textures("moran_mod:block/peach_log",
-                          "moran_mod:item/thick_peach_trunk_side"));
+                          "moran_mod:item/thick_peach_trunk_side")
+                // 作者手作主干件（W:\桃树\1-8.json 导入）：forkset=none 的主干一字不动直接渲染；
+                // 长出侧枝的节由工厂以它为底拼侧向填充
+                .trunkModelBase("moran_mod:block/peach_branch_trunk"));
     }
 
     /** 链上侧腋开花概率：未长枝的侧位以花填充（现实桃树花芽满布一年生枝侧腋） */
