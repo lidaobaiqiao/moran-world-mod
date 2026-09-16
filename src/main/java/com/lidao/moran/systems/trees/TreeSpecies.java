@@ -133,6 +133,9 @@ public class TreeSpecies {
     private Block branchBlock;
     private Block budBlock;
     private Block leavesBlock;
+    // —— 性状注册的钩子（null = 用中性默认） ——
+    private BranchStopHook branchStopHook;
+    private BudMatureHook budMatureHook;
 
     protected TreeSpecies(Builder b) {
         this.id = b.id;
@@ -178,6 +181,8 @@ public class TreeSpecies {
         this.barkTexture = b.barkTexture;
         this.capTexture = b.capTexture;
         this.trunkModelBase = b.trunkModelBase;
+        this.branchStopHook = b.branchStopHook;
+        this.budMatureHook = b.budMatureHook;
         if (this.barkTexture == null || this.capTexture == null) {
             throw new IllegalStateException("树种 " + this.id + " 没有提交贴图：Builder.textures(bark, cap)");
         }
@@ -563,33 +568,56 @@ public class TreeSpecies {
         return gain;
     }
 
-    /**
-     * 侧枝停止生长时的开花方式。中性默认：仅末端生成一颗花苞。
-     * 树种覆写定制花芽着生方式（桃树范式见 PeachSpecies：末端与四周）。
-     */
-    public void onBranchStop(ServerWorld world, BlockPos pos, Direction facing, Random random, boolean natural) {
-        placeBudIfAir(world, pos.offset(facing), facing, natural);
+    // —— 可注册的开花/成熟钩子（由性状经 Builder 注册；中性默认见下） ——
+
+    /** 开花方式钩子：侧枝停止生长时的花芽着生（首参=宿主树种，供静态辅助取方块/贴图） */
+    @FunctionalInterface
+    public interface BranchStopHook {
+        void onStop(TreeSpecies self, ServerWorld world, BlockPos pos, Direction facing,
+                    Random random, boolean natural);
+    }
+
+    /** 成熟形态钩子：花苞成熟后的去向（先花后叶/小花团等） */
+    @FunctionalInterface
+    public interface BudMatureHook {
+        void onMature(TreeSpecies self, ServerWorld world, BlockPos pos, Direction facing, Random random);
     }
 
     /**
-     * 花苞完全成熟。中性默认：化为本树种树叶。
-     * 树种覆写定制成熟形态（桃树范式见 PeachSpecies：先花后叶 + 顶部带冠）。
+     * 侧枝停止生长时的开花方式。中性默认：仅末端生成一颗花苞；
+     * 性状可经 Builder.onBranchStop 注册定制着生方式（桃：末端+四周+侧腋回溯）。
+     */
+    public void onBranchStop(ServerWorld world, BlockPos pos, Direction facing, Random random, boolean natural) {
+        if (branchStopHook != null) {
+            branchStopHook.onStop(this, world, pos, facing, random, natural);
+            return;
+        }
+        placeBudIfAir(this, world, pos.offset(facing), facing, natural);
+    }
+
+    /**
+     * 花苞完全成熟。中性默认：化为本树种树叶；
+     * 性状可经 Builder.onBudMature 注册定制成熟形态（桃：先花后叶+顶部带冠）。
      */
     public void onBudMature(ServerWorld world, BlockPos pos, Direction facing, Random random) {
+        if (budMatureHook != null) {
+            budMatureHook.onMature(this, world, pos, facing, random);
+            return;
+        }
         world.setBlockState(pos, leavesBlock().getDefaultState(), Block.NOTIFY_ALL);
     }
 
-    protected void placeBudIfAir(ServerWorld world, BlockPos pos, Direction facing, boolean natural) {
+    static void placeBudIfAir(TreeSpecies self, ServerWorld world, BlockPos pos, Direction facing, boolean natural) {
         if (world.getBlockState(pos).isAir()) {
-            world.setBlockState(pos, budBlock.getDefaultState()
+            world.setBlockState(pos, self.budBlock.getDefaultState()
                     .with(com.lidao.moran.systems.blocks.MoranFlowerBudBlock.FACING, facing)
                     .with(com.lidao.moran.systems.blocks.MoranFlowerBudBlock.NATURAL, natural), Block.NOTIFY_ALL);
         }
     }
 
-    protected void placeLeafIfAir(ServerWorld world, BlockPos pos) {
+    static void placeLeafIfAir(TreeSpecies self, ServerWorld world, BlockPos pos) {
         if (world.getBlockState(pos).isAir()) {
-            world.setBlockState(pos, leavesBlock().getDefaultState(), Block.NOTIFY_ALL);
+            world.setBlockState(pos, self.leavesBlock().getDefaultState(), Block.NOTIFY_ALL);
         }
     }
 
@@ -632,6 +660,9 @@ public class TreeSpecies {
         private float gibberellinNorm = 1F;
         private final List<Phenotype> phenotypes = new ArrayList<>();
         private float hormoneVariation = 0.05F;
+        // 性状注册的钩子
+        private BranchStopHook branchStopHook;
+        private BudMatureHook budMatureHook;
         // 外观：没有默认值 —— 必须显式提交，否则模型会引用空贴图（渲染成紫黑格）
         private String barkTexture;
         private String capTexture;
@@ -714,6 +745,11 @@ public class TreeSpecies {
          * @param bark 树皮，贴长条侧面
          * @param cap  截断面，贴轴端面（正方形面；水平/竖直枝通用）
          */
+        /** 注册开花方式性状效果（顶腋/侧腋着生等；不注册=中性默认末端单苞） */
+        public Builder onBranchStop(BranchStopHook hook) { this.branchStopHook = hook; return this; }
+        /** 注册成熟形态性状效果（先花后叶/小花团等；不注册=中性默认化叶） */
+        public Builder onBudMature(BudMatureHook hook) { this.budMatureHook = hook; return this; }
+
         public Builder textures(String bark, String cap) {
             this.barkTexture = bark;
             this.capTexture = cap;

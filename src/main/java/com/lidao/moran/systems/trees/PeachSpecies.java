@@ -5,17 +5,14 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.random.Random;
 
+import java.util.List;
+
 /**
- * 桃树树种——从生长库延伸的第一个树种子类。
+ * 桃树——第一个以「性状集合」声明的品种（性状库模型，用户 2026-09-16 定稿）。
  *
- * 基类 {@link TreeSpecies} 只保留中性默认行为，桃树的全部范式在此定制：
- * - 参数：高大（环境评分定高 8-12）、密集侧芽（上限 6、首芽必出递减）；
- * - 开花方式（onBranchStop）：花芽着生一年生枝的末端与四周——上方 + 两侧，
- *   现实桃树花芽的顶腋着生；
- * - 花苞成熟（onBudMature）：先花后叶物候——化为桃花树叶，
- *   顶部花苞额外生成小树冠（四向必放 + 四角半数）。
- *
- * 后续树种同法：垂柳/劲松/寒梅/银杏各建子类，覆写差异点，共用生长引擎。
+ * <p>基因组 = 性状清单（粗粒度、全部组成型），读起来就是品种说明书；
+ * 引擎零改动，行为与旧子类覆写逐种子一致（simTrees 比对验证）。
+ * 诱导型性状（徒长诱发/避荫窜高）待表达上下文（环境快照/损伤史）接入后追加。
  */
 public class PeachSpecies extends TreeSpecies {
 
@@ -23,61 +20,59 @@ public class PeachSpecies extends TreeSpecies {
         super(builder);
     }
 
-    /** 桃树档案：整树 6-8 格（环境评分定高），主干半高 3-4 格、尽头四向定干，侧枝 2-3 级 */
-    public static PeachSpecies peach() {
-        return new PeachSpecies(TreeSpecies.builder("peach")
-                .biologicalTop(6, 8)
-                .branchStopChance(0.06F)
-                .subBranchChance(0.3F)
-                .forkMinChainPos(1)
-                .forkSpacing(1)
-                .growChance(0.5F)
-                .minLight(9)
-                .temperature(0.3F, 1.2F)
-                .minHydration(0)
-                .minHumidity(0.0F)
-                .soilPreference(4, 8, 3, 8, 2, 6)
-                .pruneResponseChance(0.5F)
-                // 表型原型：直立/开张两个离散亚型（树形是遗传性状，不是连续散点）。
-                // 直立 = 顶端优势强（向顶 bias 3、分叉概率 ×0.81、拔得快），权重 2:1 常见些；
-                // 开张 = 顶端优势弱（bias 2、分叉概率 ×1.44、爱出侧芽），呼应桃树开张冠层透光的栽培认知。
-                // 同原型的树彼此相似；个体只在原型内 ±5% 残差。
-                .phenotype("erect", 2F, 1.10F, 0.90F, 1.10F)
-                .phenotype("open",  1F, 0.80F, 1.20F, 0.90F)
-                // 树种提交的贴图（模型头部 textures 段）
-                // #0 树皮 = peach_log（长条侧面）
-                // #2 截断面 = thick_peach_trunk_side（轴端面，水平/竖直枝通用；
-                //   年轮贴图 thick_peach_trunk 只属于 trunk=true 的手作主干件）
-                .textures("moran_mod:block/peach_log",
-                          "moran_mod:item/thick_peach_trunk_side")
-                // 作者手作主干件（W:\桃树\1-8.json 导入）：forkset=none 的主干一字不动直接渲染；
-                // 长出侧枝的节由工厂以它为底拼侧向填充
-                .trunkModelBase("moran_mod:block/peach_branch_trunk"));
-    }
-
     /** 链上侧腋开花概率：未长枝的侧位以花填充（现实桃树花芽满布一年生枝侧腋） */
     private static final float AXILLARY_BUD_CHANCE = 0.6F;
     /** 开花回溯的链深（末三节的侧腋参与开花） */
     private static final int AXILLARY_DEPTH = 3;
 
-    /** 桃树开花：末端与四周花苞 + 链上未分枝侧腋开花填充——现实桃树花芽顶腋着生 */
-    @Override
-    public void onBranchStop(ServerWorld world, BlockPos pos, Direction facing, Random random, boolean natural) {
+    /** 桃的基因组：性状集合声明（整树 6-8 格，矮桩开心形，顶腋侧腋着花，先花后叶） */
+    public static PeachSpecies peach() {
+        TreeGenome genome = TreeGenome.of("peach", List.of(
+                TreeTrait.of("矮桩开心形潜能",
+                        b -> b.biologicalTop(6, 8)),
+                TreeTrait.of("主枝坚决生长",
+                        b -> b.branchStopChance(0.06F)),
+                TreeTrait.of("侧枝旺盛",
+                        b -> b.subBranchChance(0.3F).forkMinChainPos(1).forkSpacing(1)),
+                TreeTrait.of("栽培适应域广", b -> b.growChance(0.5F)
+                        .minLight(9)
+                        .temperature(0.3F, 1.2F)
+                        .minHydration(0)
+                        .minHumidity(0.0F)
+                        .soilPreference(4, 8, 3, 8, 2, 6)
+                        .pruneResponseChance(0.5F)),
+                TreeTrait.of("表型:直立(顶端优势强,权重2)",
+                        b -> b.phenotype("erect", 2F, 1.10F, 0.90F, 1.10F)),
+                TreeTrait.of("表型:开张(侧芽旺盛,权重1)",
+                        b -> b.phenotype("open", 1F, 0.80F, 1.20F, 0.90F)),
+                TreeTrait.of("顶腋侧腋着花",
+                        b -> b.onBranchStop(PeachSpecies::bloomingStop)),
+                TreeTrait.of("先花后叶带顶冠",
+                        b -> b.onBudMature(PeachSpecies::blossomIntoLeaf)),
+                TreeTrait.of("外观:桃皮与截断面", b -> b.textures(
+                                "moran_mod:block/peach_log",
+                                "moran_mod:item/thick_peach_trunk_side")
+                        .trunkModelBase("moran_mod:block/peach_branch_trunk"))
+        ));
+        return new PeachSpecies(genome.applyTo(TreeSpecies.builder("peach")));
+    }
+
+    /**
+     * 性状效果【顶腋侧腋着花】：末端 + 左右（水平）/四向（垂直） + 链上侧腋回溯。
+     * 上方要让位给上生子枝（冠层靠它抬起来）；垂直母枝取四水平向；
+     * rotateY 对 UP/DOWN 会抛异常/返回自身，垂直枝必须走另一条分支。
+     */
+    private static void bloomingStop(TreeSpecies self, ServerWorld world, BlockPos pos,
+                                     Direction facing, Random random, boolean natural) {
         // 末端花苞
-        placeBudIfAir(world, pos.offset(facing), facing, natural);
-        // 四周花苞：水平母枝取「左 + 右」—— 上方要让位给上生子枝（冠层靠它抬起来），
-        // 否则花苞占住上方，up 分叉候选判「非空气」被排除，冠层撑不出高度。
-        // 垂直母枝（上生/下生）仍是四个水平向，顶端方向留给链继续延伸。
-        // 注意 rotateYCounterclockwise/Clockwise 对 UP/DOWN 会抛 IllegalStateException，
-        // 不能无条件调用——垂直枝必须走另一条分支。
+        placeBudIfAir(self, world, pos.offset(facing), facing, natural);
         Direction[] around = facing.getAxis() == Direction.Axis.Y
                 ? HORIZONTALS
                 : new Direction[]{facing.rotateYCounterclockwise(), facing.rotateYClockwise()};
         for (Direction d : around) {
-            placeBudIfAir(world, pos.offset(d), d, natural);
+            placeBudIfAir(self, world, pos.offset(d), d, natural);
         }
-        // 链上回溯：未长出侧枝的侧位以花填充。
-        // 该回溯依赖「同朝向连续链」，只对水平链成立，垂直链跳过。
+        // 链上回溯：未长出侧枝的侧位以花填充（依赖同朝向连续链，垂直链跳过）
         if (facing.getAxis() == Direction.Axis.Y) {
             return;
         }
@@ -89,31 +84,31 @@ public class PeachSpecies extends TreeSpecies {
                 break;
             }
             if (random.nextFloat() < AXILLARY_BUD_CHANCE) {
-                placeBudIfAir(world, p.up(), Direction.UP, natural);
+                placeBudIfAir(self, world, p.up(), Direction.UP, natural);
             }
             if (random.nextFloat() < AXILLARY_BUD_CHANCE) {
                 Direction l = facing.rotateYCounterclockwise();
-                placeBudIfAir(world, p.offset(l), l, natural);
+                placeBudIfAir(self, world, p.offset(l), l, natural);
             }
             if (random.nextFloat() < AXILLARY_BUD_CHANCE) {
                 Direction r = facing.rotateYClockwise();
-                placeBudIfAir(world, p.offset(r), r, natural);
+                placeBudIfAir(self, world, p.offset(r), r, natural);
             }
             p = p.offset(facing.getOpposite());
         }
     }
 
-    /** 桃树花苞成熟：先花后叶——化为桃花树叶；顶部花苞生成小树冠（四向 + 四角半数） */
-    @Override
-    public void onBudMature(ServerWorld world, BlockPos pos, Direction facing, Random random) {
-        world.setBlockState(pos, leavesBlock().getDefaultState(), net.minecraft.block.Block.NOTIFY_ALL);
+    /** 性状效果【先花后叶带顶冠】：化为桃花树叶；顶部花苞生成小树冠（四向必放+四角半数） */
+    private static void blossomIntoLeaf(TreeSpecies self, ServerWorld world, BlockPos pos,
+                                        Direction facing, Random random) {
+        world.setBlockState(pos, self.leavesBlock().getDefaultState(), net.minecraft.block.Block.NOTIFY_ALL);
         if (facing == Direction.UP) {
             for (Direction d : HORIZONTALS) {
-                placeLeafIfAir(world, pos.offset(d));
+                placeLeafIfAir(self, world, pos.offset(d));
             }
             for (Direction d : HORIZONTALS) {
                 if (random.nextBoolean()) {
-                    placeLeafIfAir(world, pos.offset(d).up());
+                    placeLeafIfAir(self, world, pos.offset(d).up());
                 }
             }
         }
