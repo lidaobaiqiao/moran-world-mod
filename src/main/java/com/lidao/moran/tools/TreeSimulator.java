@@ -33,12 +33,12 @@ import java.util.TreeMap;
  *
  * <h2>找完美树的流程</h2>
  * 总览图里看中哪棵 → {@code --pick seed} 放大并打印它的激素档案 →
- * 把打印出的 {@code .phenotype(...)} 行粘进 PeachSpecies 作为基准原型 →
+ * 把打印出的激素配比写进基因文件(phenotypes 段)作为基准原型 →
  * 此后真实林子以它为常态，激素原型系统在基准附近给出「相似」的变体。
  *
  * <h2>同步责任（重要）</h2>
  * 生长决策是 {@link com.lidao.moran.systems.blocks.MoranBranchBlock} 与
- * {@link com.lidao.moran.systems.trees.PeachSpecies} 的<b>复刻</b>（方法名一一对应，
+ * 桃基因文件 bloomingStyle/maturationStyle 所指行为的<b>复刻</b>（方法名一一对应，
  * 见各方法注释的出处），结构参数全部实时读 {@link TreeSpecies} 档案实例——
  * 改引擎逻辑时必须同步本文件。<b>激素推导不走复刻</b>：直接调
  * {@link TreeSpecies#hormoneProfileForSeed(long)}，与游戏共用同一条代码路径，零漂移。
@@ -73,7 +73,7 @@ public final class TreeSimulator {
             }
         }
 
-        TreeSpecies species = com.lidao.moran.systems.trees.PeachSpecies.peach();
+        TreeSpecies species = com.lidao.moran.systems.trees.genes.SpeciesGeneLoader.load("peach");
         Files.createDirectories(Path.of(out));
 
         if (pick != Long.MIN_VALUE) {
@@ -128,13 +128,13 @@ public final class TreeSimulator {
         System.out.println();
     }
 
-    /** 打印「完美树基准」：把抽到的激素档案写成可直接粘进 PeachSpecies 的原型声明 */
+    /** 打印「完美树基准」：把抽到的激素档案写进基因文件 phenotypes 段作基准原型 */
     private static void printBaseline(TreeSpecies species, long seed, SimWorld w) {
         HormoneProfile h = w.hormones;
         System.out.println("===== 完美树基准（seed=" + seed + "）=====");
         System.out.printf(Locale.ROOT, "原型: %s   auxin=%.3f  cytokinin=%.3f  gibberellin=%.3f  target=%d%n",
                 w.phenotype.id(), h.auxin(), h.cytokinin(), h.gibberellin(), w.max);
-        System.out.println("粘进 PeachSpecies.peach()（作为基准原型，其他树在其附近变体）：");
+        System.out.println("写进基因文件 phenotypes 段(作为基准原型,其他树在其附近变体):");
         System.out.printf(Locale.ROOT,
                 ".phenotype(\"golden\", 1F, %.2fF, %.2fF, %.2fF)%n",
                 h.auxin(), h.cytokinin(), h.gibberellin());
@@ -681,7 +681,7 @@ public final class TreeSimulator {
         return false;
     }
 
-    /** 复刻 PeachSpecies.onBranchStop：末端 + 四周 + 链上侧腋开花 */
+    /** 复刻 bloomingStyle「peach_axillary」：末端 + 四周 + 链上侧腋开花 */
     private static void onBranchStop(SimWorld w, BlockPos pos, Direction facing) {
         placeBud(w, pos.offset(facing), facing);
         Direction[] around = facing.getAxis() == Direction.Axis.Y
@@ -732,7 +732,7 @@ public final class TreeSimulator {
         }
     }
 
-    /** 复刻 PeachSpecies.onBudMature：先花后叶；顶花苞生成小树冠（四向必放 + 四角半数）。
+    /** 复刻 maturationStyle「peach_canopy」：先花后叶；顶花苞小树冠+侧向小花团。
      *  【盛花 prototype，待与引擎同步】侧向花苞成熟时不再只长单块叶——长成小花团
      *  （水平 8 邻大半 + 上方强化 + 下方弱化），冠层连片成「盛花体量」，
      *  对标目标图的中国风满树繁花；否则等轴测下只是架子挂点、冠层空心。 */
@@ -1076,7 +1076,7 @@ public final class TreeSimulator {
                     s.height, s.width, spread(w), spread(w) / Math.max(1, s.height),
                     s.branches, s.leaves, s.forks, symmetry(w));
         }
-        System.out.println("粘进 PeachSpecies.peach()（取你挑中的一棵，作为基准原型；残差取整到两位小数）：");
+        System.out.println("写进基因文件 phenotypes 段(取你挑中的一棵作基准原型;残差取整两位):");
         for (SimWorld w : cands) {
             HormoneProfile h = w.hormones;
             System.out.printf(Locale.ROOT, "  .phenotype(\"golden\", 1F, %.2fF, %.2fF, %.2fF)  // #%d %s%n",

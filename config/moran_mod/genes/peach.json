@@ -1,0 +1,69 @@
+{
+  "_说明": "墨世界树种基因文件。修改后重启(或重跑 simTrees)生效;删掉本文件会自动抄出默认版。",
+  "_出处": "开心形主枝数:CN102715056A/美系Extension;表型3:1与激素方向:王冀蒙《垂枝桃树…内源激素变化》",
+  "format": 1,
+  "id": "peach",
+  "limbCount": 4,
+  "biologicalTop": [
+    6,
+    8
+  ],
+  "trunkMaxGrowth": 8,
+  "maxBuds": 4,
+  "budChanceDenom": 8,
+  "branchStopChance": 0.06,
+  "subBranchChance": 0.3,
+  "forkMinChainPos": 1,
+  "forkSpacing": 1,
+  "forkDecay": 0.5,
+  "forkMinGain": 4,
+  "growChance": 0.5,
+  "minLight": 9,
+  "temperature": [
+    0.3,
+    1.2
+  ],
+  "minHydration": 0,
+  "minHumidity": 0.0,
+  "soilPreference": [
+    4,
+    8,
+    3,
+    8,
+    2,
+    6
+  ],
+  "pruneResponseChance": 0.5,
+  "minSpacing": 4,
+  "branchNutritionDecay": 2,
+  "chainNutritionDecay": 1,
+  "hormones": {
+    "auxin": 1.0,
+    "cytokinin": 1.0,
+    "gibberellin": 1.0
+  },
+  "hormoneVariation": 0.05,
+  "phenotypes": [
+    {
+      "id": "erect",
+      "weight": 2.0,
+      "auxin": 1.1,
+      "cytokinin": 0.9,
+      "gibberellin": 1.1
+    },
+    {
+      "id": "open",
+      "weight": 1.0,
+      "auxin": 0.8,
+      "cytokinin": 1.2,
+      "gibberellin": 0.9
+    }
+  ],
+  "textures": {
+    "bark": "moran_mod:block/peach_log",
+    "cap": "moran_mod:item/thick_peach_trunk_side"
+  },
+  "trunkModelBase": "moran_mod:block/peach_branch_trunk",
+  "bloomingStyle": "peach_axillary",
+  "maturationStyle": "peach_canopy"
+}
