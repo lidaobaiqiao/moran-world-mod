@@ -136,6 +136,12 @@ public class TreeSpecies {
     // —— 性状注册的钩子（null = 用中性默认） ——
     private BranchStopHook branchStopHook;
     private BudMatureHook budMatureHook;
+    /**
+     * 定干主枝数。权威区间 2~5,经典开心形=3(平面夹角120°),美系推广 3~5;
+     * 方块网格下 4 向(90°)即「四主枝开心形」——《果树学报》有专文研究的主流树形。
+     * 出处:三主枝自然开心形整形规范(CN102715056A)、Penn State Extension、Illinois Extension。
+     */
+    private int limbCount = 4;
 
     protected TreeSpecies(Builder b) {
         this.id = b.id;
@@ -183,6 +189,7 @@ public class TreeSpecies {
         this.trunkModelBase = b.trunkModelBase;
         this.branchStopHook = b.branchStopHook;
         this.budMatureHook = b.budMatureHook;
+        this.limbCount = Math.max(2, Math.min(5, b.limbCount));
         if (this.barkTexture == null || this.capTexture == null) {
             throw new IllegalStateException("树种 " + this.id + " 没有提交贴图：Builder.textures(bark, cap)");
         }
@@ -202,6 +209,11 @@ public class TreeSpecies {
 
     public int trunkMaxGrowth() {
         return trunkMaxGrowth;
+    }
+
+    /** 定干主枝数(2~5)。见字段注释的权威出处 */
+    public int limbCount() {
+        return limbCount;
     }
 
     /**
@@ -663,6 +675,8 @@ public class TreeSpecies {
         // 性状注册的钩子
         private BranchStopHook branchStopHook;
         private BudMatureHook budMatureHook;
+        /** 定干主枝数(2~5;默认4=四主枝开心形) */
+        private int limbCount = 4;
         // 外观：没有默认值 —— 必须显式提交，否则模型会引用空贴图（渲染成紫黑格）
         private String barkTexture;
         private String capTexture;
@@ -745,6 +759,8 @@ public class TreeSpecies {
          * @param bark 树皮，贴长条侧面
          * @param cap  截断面，贴轴端面（正方形面；水平/竖直枝通用）
          */
+        /** 定干主枝数(2~5)。权威:经典开心形3主枝120°,美系3~5,网格自然4(四主枝开心形) */
+        public Builder limbCount(int v) { this.limbCount = v; return this; }
         /** 注册开花方式性状效果（顶腋/侧腋着生等；不注册=中性默认末端单苞） */
         public Builder onBranchStop(BranchStopHook hook) { this.branchStopHook = hook; return this; }
         /** 注册成熟形态性状效果（先花后叶/小花团等；不注册=中性默认化叶） */

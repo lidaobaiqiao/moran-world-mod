@@ -451,7 +451,7 @@ public class MoranBranchBlock extends Block implements Fertilizable {
             // 等干长满（growth 到 max）再定干。主枝出生档位 = max-2：
             // 既有一定粗度（现实主枝与干近乎等粗），又留出长到 max-1 的空间——
             // 出生即满档会被 isFullyGrown 判静默，冠层就长不出来。
-            if (top && growth >= max) {
+            if (top && growth >= max && world.getBlockState(pos).get(FORK_SET).count() < species.limbCount()) {
                 for (Direction d : TreeSpecies.HORIZONTALS) {
                     BlockPos p = pos.offset(d);
                     if (world.getBlockState(p).isAir() && !isCrowded(world, p)) {
@@ -780,12 +780,15 @@ public class MoranBranchBlock extends Block implements Fertilizable {
             BlockPos above = pos.up();
             boolean top = !(world.getBlockState(above).getBlock() instanceof MoranBranchBlock);
             if (top) {
-                // 定干分叉未完成（四向还有能落主枝的空位）→ 还需 tick。
-                // 全部占满或拥挤（放不出去）即视为完成；极端拥挤的死锁由 IDLE 兜底。
-                for (Direction d : TreeSpecies.HORIZONTALS) {
-                    BlockPos p = pos.offset(d);
-                    if (world.getBlockState(p).isAir() && !isCrowded(world, p)) {
-                        return false;
+                // 定干分叉未完成（主枝数未达 limbCount 且还有能落的空位）→ 还需 tick。
+                // 主枝数以 FORK_SET 位计数(权威:开心形主枝 2~5,见 TreeSpecies.limbCount);
+                // 全部占满或拥挤(放不出去)即视为完成;极端拥挤的死锁由 IDLE 兜底。
+                if (state.get(FORK_SET).count() < species.limbCount()) {
+                    for (Direction d : TreeSpecies.HORIZONTALS) {
+                        BlockPos p = pos.offset(d);
+                        if (world.getBlockState(p).isAir() && !isCrowded(world, p)) {
+                            return false;
+                        }
                     }
                 }
             }

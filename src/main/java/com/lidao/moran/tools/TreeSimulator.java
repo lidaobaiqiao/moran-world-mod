@@ -563,7 +563,7 @@ public final class TreeSimulator {
             // 定干分叉（开心形）：主干尽头四水平向逐拍抽主枝（等粗 max-1），
             // 无顶花苞；幂等判据 = 邻居本身，每拍一根
             // 等干长满（growth 到 max）再定干 —— 四根主枝档位统一 max-1，冠层齐整
-            if (top && growth >= w.max) {
+            if (top && growth >= w.max && Integer.bitCount(s.forkMask) < w.species.limbCount()) {
                 for (Direction d : HORIZONTALS) {
                     BlockPos p = pos.offset(d);
                     if (w.air(p) && !isCrowded(w, p)) {
@@ -953,10 +953,12 @@ public final class TreeSimulator {
             BlockPos above = pos.up();
             boolean top = !w.isBranch(above);
             if (top) {
-                // 定干分叉未完成（四向还有能落主枝的空位）→ 还需 tick；拥挤由 IDLE 兜底
-                for (Direction d : HORIZONTALS) {
-                    if (w.air(pos.offset(d)) && !isCrowded(w, pos.offset(d))) {
-                        return false;
+                // 定干分叉未完成（主枝数未达 limbCount 且还有能落的空位）→ 还需 tick
+                if (Integer.bitCount(s.forkMask) < w.species.limbCount()) {
+                    for (Direction d : HORIZONTALS) {
+                        if (w.air(pos.offset(d)) && !isCrowded(w, pos.offset(d))) {
+                            return false;
+                        }
                     }
                 }
             }

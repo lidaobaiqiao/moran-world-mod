@@ -28,8 +28,10 @@ public class PeachSpecies extends TreeSpecies {
     /** 桃的基因组：性状集合声明（整树 6-8 格，矮桩开心形，顶腋侧腋着花，先花后叶） */
     public static PeachSpecies peach() {
         TreeGenome genome = TreeGenome.of("peach", List.of(
-                TreeTrait.of("矮桩开心形潜能",
-                        b -> b.biologicalTop(6, 8)),
+                TreeTrait.of("四主枝开心形",
+                        b -> b.biologicalTop(6, 8).limbCount(4)),
+                        // 权威:开心形主枝经典=3(平面120°/开张45°,CN102715056A),美系3~5;
+                        // 网格四向90°即「四主枝开心形」(果树学报有专文),三主枝可改 limbCount(3)
                 TreeTrait.of("主枝坚决生长",
                         b -> b.branchStopChance(0.06F)),
                 TreeTrait.of("侧枝旺盛",
@@ -41,6 +43,10 @@ public class PeachSpecies extends TreeSpecies {
                         .minHumidity(0.0F)
                         .soilPreference(4, 8, 3, 8, 2, 6)
                         .pruneResponseChance(0.5F)),
+                // 文献锚定(王冀蒙《垂枝桃树生长过程中果实、枝条动态及内源激素变化》):
+                // 金叶桃×红垂枝 F1 全直立,F2 直立:垂枝≈3:1(垂枝为不完全隐性)——权重比由此来;
+                // 实测激素方向:直立=GA/IAA 上下比值高(梢部GA比值峰值5.22),垂枝=ZT 比值高
+                // ——与下方 auxin/gibberellin↑(直立)、cytokinin↑(开张)的配比方向一致
                 TreeTrait.of("表型:直立(顶端优势强,权重2)",
                         b -> b.phenotype("erect", 2F, 1.10F, 0.90F, 1.10F)),
                 TreeTrait.of("表型:开张(侧芽旺盛,权重1)",
@@ -103,6 +109,7 @@ public class PeachSpecies extends TreeSpecies {
                                         Direction facing, Random random) {
         world.setBlockState(pos, self.leavesBlock().getDefaultState(), net.minecraft.block.Block.NOTIFY_ALL);
         if (facing == Direction.UP) {
+            // 顶花苞:小树冠(四向必放+四角半数)
             for (Direction d : HORIZONTALS) {
                 placeLeafIfAir(self, world, pos.offset(d));
             }
@@ -110,6 +117,28 @@ public class PeachSpecies extends TreeSpecies {
                 if (random.nextBoolean()) {
                     placeLeafIfAir(self, world, pos.offset(d).up());
                 }
+            }
+        } else {
+            // 【盛花体量】侧向花苞:长成小花团(水平8邻大半+斜上强化+正上强+正下弱),
+            // 冠层连片成满树繁花——对标「中国风盛花桃树」目标图(模拟器 prototype 引擎同步)
+            for (int dx = -1; dx <= 1; dx++) {
+                for (int dz = -1; dz <= 1; dz++) {
+                    if (dx == 0 && dz == 0) {
+                        continue;
+                    }
+                    if (random.nextFloat() < 0.75F) {
+                        placeLeafIfAir(self, world, pos.add(dx, 0, dz));
+                    }
+                    if (random.nextFloat() < 0.40F) {
+                        placeLeafIfAir(self, world, pos.add(dx, 1, dz));
+                    }
+                }
+            }
+            if (random.nextFloat() < 0.85F) {
+                placeLeafIfAir(self, world, pos.up());
+            }
+            if (random.nextFloat() < 0.25F) {
+                placeLeafIfAir(self, world, pos.down());
             }
         }
     }
