@@ -4,6 +4,7 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.lidao.moran.systems.trees.BloomStyles;
+import com.lidao.moran.systems.trees.GrowthStyles;
 import com.lidao.moran.systems.trees.TreeSpecies;
 
 import java.nio.charset.StandardCharsets;
@@ -156,7 +157,7 @@ public final class SpeciesGeneLoader {
             if (!BloomStyles.hasBlooming(name)) {
                 System.err.println("[基因库] 未知 bloomingStyle: " + name + " —— 用中性默认");
             } else {
-                b.onBranchStop(BloomStyles.blooming(name));
+                b.bloomingStyle(name);
             }
         }
         if (root.has("maturationStyle")) {
@@ -164,9 +165,34 @@ public final class SpeciesGeneLoader {
             if (!BloomStyles.hasMaturation(name)) {
                 System.err.println("[基因库] 未知 maturationStyle: " + name + " —— 用中性默认");
             } else {
-                b.onBudMature(BloomStyles.maturation(name));
+                b.maturationStyle(name);
             }
         }
+        if (root.has("branchStyle")) {
+            String name = root.get("branchStyle").getAsString();
+            if (!GrowthStyles.hasBranchDir(name)) {
+                System.err.println("[基因库] 未知 branchStyle: " + name + " —— 用直线延伸");
+            } else {
+                b.branchStyle(name);
+            }
+        }
+        if (root.has("budPosStyle")) {
+            String name = root.get("budPosStyle").getAsString();
+            if (!GrowthStyles.hasBudPos(name)) {
+                System.err.println("[基因库] 未知 budPosStyle: " + name + " —— 无逐节侧芽");
+            } else {
+                b.budPosStyle(name);
+            }
+        }
+        if (root.has("forkGainStyle")) {
+            String name = root.get("forkGainStyle").getAsString();
+            if (!GrowthStyles.hasForkGain(name)) {
+                System.err.println("[基因库] 未知 forkGainStyle: " + name + " —— 用向光+向顶默认");
+            } else {
+                b.forkGainStyle(name);
+            }
+        }
+        if (num(root, "trunkRatio") != null) b.trunkRatio(num(root, "trunkRatio").floatValue());
         return b.build();
     }
 

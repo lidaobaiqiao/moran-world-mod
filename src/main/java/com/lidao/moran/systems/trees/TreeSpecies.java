@@ -112,6 +112,9 @@ public class TreeSpecies {
     private final int[] retentionRange;
     // —— 交互参数 ——
     private final float pruneResponseChance;
+    /** 树形系数(干性强弱):封顶高度 = max × trunkRatio。0.5=开心形(桃),1.0=主干形(松)。
+     *  出处:中央领导干 vs 开心形两套整形体系(见基因报告·树冠架构模型)。 */
+    private final float trunkRatio;
     private final int minSpacing;
     private final int branchNutritionDecay;
     private final int chainNutritionDecay;
@@ -133,9 +136,12 @@ public class TreeSpecies {
     private Block branchBlock;
     private Block budBlock;
     private Block leavesBlock;
-    // —— 性状注册的钩子（null = 用中性默认） ——
-    private BranchStopHook branchStopHook;
-    private BudMatureHook budMatureHook;
+    // —— 性状注册的行为风格名（null/未知 = 中性默认;实现在 BloomStyles/GrowthStyles） ——
+    private String bloomingStyle;
+    private String maturationStyle;
+    private String branchDirStyle;
+    private String budPosStyle;
+    private String forkGainStyle;
     /**
      * 定干主枝数。权威区间 2~5,经典开心形=3(平面夹角120°),美系推广 3~5;
      * 方块网格下 4 向(90°)即「四主枝开心形」——《果树学报》有专文研究的主流树形。
@@ -181,14 +187,18 @@ public class TreeSpecies {
         this.aerationRange = b.aerationRange;
         this.retentionRange = b.retentionRange;
         this.pruneResponseChance = b.pruneResponseChance;
+        this.trunkRatio = Math.max(0.3F, Math.min(1.0F, b.trunkRatio));
         this.minSpacing = b.minSpacing;
         this.branchNutritionDecay = b.branchNutritionDecay;
         this.chainNutritionDecay = b.chainNutritionDecay;
         this.barkTexture = b.barkTexture;
         this.capTexture = b.capTexture;
         this.trunkModelBase = b.trunkModelBase;
-        this.branchStopHook = b.branchStopHook;
-        this.budMatureHook = b.budMatureHook;
+        this.bloomingStyle = b.bloomingStyle;
+        this.maturationStyle = b.maturationStyle;
+        this.branchDirStyle = b.branchDirStyle;
+        this.budPosStyle = b.budPosStyle;
+        this.forkGainStyle = b.forkGainStyle;
         this.limbCount = Math.max(2, Math.min(5, b.limbCount));
         if (this.barkTexture == null || this.capTexture == null) {
             throw new IllegalStateException("树种 " + this.id + " 没有提交贴图：Builder.textures(bark, cap)");
@@ -245,9 +255,14 @@ public class TreeSpecies {
         return lo + r.nextInt(hi - lo + 1);
     }
 
-    /** 主干格数（半高封顶）：整树高 = 2 × 干高，桃 = 3-4 格干 + 冠层 = 6-8 格 */
+    /** 主干格数（树形系数封顶）：trunkRatio 0.5=开心形半高(桃 3-4 格干)、1.0=主干形全高(松) */
     public int trunkHalfHeight(int max) {
-        return Math.max(2, max / 2);
+        return Math.max(2, Math.round(max * trunkRatio));
+    }
+
+    /** 树形系数(干性强弱) */
+    public float trunkRatio() {
+        return trunkRatio;
     }
 
     public int maxBuds() {
@@ -528,11 +543,19 @@ public class TreeSpecies {
      * 需要逐节侧芽的树形（灌丛状）覆写本钩子，例如 {@code height * 4 > targetHeight}。
      */
     public boolean isBudPosition(ServerWorld world, BlockPos pos, int height, int targetHeight) {
+        TreeSpecies.BudPosHook hook = GrowthStyles.budPosition(budPosStyle);
+        if (hook != null) {
+            return hook.isBud(this, world, pos, height, targetHeight);
+        }
         return false;
     }
 
     /** 侧枝延伸时子枝的方向。默认：直线延伸（垂柳覆写为渐下垂） */
     public Direction branchChildDirection(ServerWorld world, BlockPos pos, Direction facing) {
+        TreeSpecies.BranchDirHook hook = GrowthStyles.branchDirection(branchDirStyle);
+        if (hook != null) {
+            return hook.dir(this, world, pos, facing);
+        }
         return facing;
     }
 
@@ -570,6 +593,10 @@ public class TreeSpecies {
      * 阴性树种把 {@code opennessAround} 的权重调低甚至取负。
      */
     public int branchForkGain(ServerWorld world, BlockPos pos, Direction facing, Direction candidate, HormoneProfile hormones) {
+        TreeSpecies.ForkGainHook fg = GrowthStyles.forkGain(forkGainStyle);
+        if (fg != null) {
+            return fg.gain(this, world, pos, facing, candidate, hormones);
+        }
         int gain = opennessAround(world, pos, candidate) * 2;
         int upBias = Math.round(5F * hormones.auxin());
         if (candidate == Direction.UP) {
@@ -578,6 +605,27 @@ public class TreeSpecies {
             gain -= upBias + 1;
         }
         return gain;
+    }
+
+    // —— 可注册的生长行为钩子（由性状经 Builder 注册；中性默认见各方法） ——
+
+    /** 枝条走向钩子：侧枝链下一节的走向（垂柳渐下垂/直线） */
+    @FunctionalInterface
+    public interface BranchDirHook {
+        Direction dir(TreeSpecies self, ServerWorld world, BlockPos pos, Direction facing);
+    }
+
+    /** 侧芽位钩子：该主干节是否处于可萌侧芽的位置（劲松轮生层性） */
+    @FunctionalInterface
+    public interface BudPosHook {
+        boolean isBud(TreeSpecies self, ServerWorld world, BlockPos pos, int height, int targetHeight);
+    }
+
+    /** 分叉收益钩子：候选方向的收益评分（劲松只认水平向） */
+    @FunctionalInterface
+    public interface ForkGainHook {
+        int gain(TreeSpecies self, ServerWorld world, BlockPos pos, Direction facing,
+                 Direction candidate, HormoneProfile hormones);
     }
 
     // —— 可注册的开花/成熟钩子（由性状经 Builder 注册；中性默认见下） ——
@@ -600,8 +648,9 @@ public class TreeSpecies {
      * 性状可经 Builder.onBranchStop 注册定制着生方式（桃：末端+四周+侧腋回溯）。
      */
     public void onBranchStop(ServerWorld world, BlockPos pos, Direction facing, Random random, boolean natural) {
-        if (branchStopHook != null) {
-            branchStopHook.onStop(this, world, pos, facing, random, natural);
+        TreeSpecies.BranchStopHook bloom = BloomStyles.blooming(bloomingStyle);
+        if (bloom != null) {
+            bloom.onStop(this, world, pos, facing, random, natural);
             return;
         }
         placeBudIfAir(this, world, pos.offset(facing), facing, natural);
@@ -612,8 +661,9 @@ public class TreeSpecies {
      * 性状可经 Builder.onBudMature 注册定制成熟形态（桃：先花后叶+顶部带冠）。
      */
     public void onBudMature(ServerWorld world, BlockPos pos, Direction facing, Random random) {
-        if (budMatureHook != null) {
-            budMatureHook.onMature(this, world, pos, facing, random);
+        TreeSpecies.BudMatureHook mature = BloomStyles.maturation(maturationStyle);
+        if (mature != null) {
+            mature.onMature(this, world, pos, facing, random);
             return;
         }
         world.setBlockState(pos, leavesBlock().getDefaultState(), Block.NOTIFY_ALL);
@@ -672,9 +722,14 @@ public class TreeSpecies {
         private float gibberellinNorm = 1F;
         private final List<Phenotype> phenotypes = new ArrayList<>();
         private float hormoneVariation = 0.05F;
-        // 性状注册的钩子
-        private BranchStopHook branchStopHook;
-        private BudMatureHook budMatureHook;
+        // 性状注册的行为风格名
+        private String bloomingStyle;
+        private String maturationStyle;
+        private String branchDirStyle;
+        private String budPosStyle;
+        private String forkGainStyle;
+        /** 树形系数(0.5=开心形,1.0=主干形;默认0.5) */
+        private float trunkRatio = 0.5F;
         /** 定干主枝数(2~5;默认4=四主枝开心形) */
         private int limbCount = 4;
         // 外观：没有默认值 —— 必须显式提交，否则模型会引用空贴图（渲染成紫黑格）
@@ -761,10 +816,18 @@ public class TreeSpecies {
          */
         /** 定干主枝数(2~5)。权威:经典开心形3主枝120°,美系3~5,网格自然4(四主枝开心形) */
         public Builder limbCount(int v) { this.limbCount = v; return this; }
-        /** 注册开花方式性状效果（顶腋/侧腋着生等；不注册=中性默认末端单苞） */
-        public Builder onBranchStop(BranchStopHook hook) { this.branchStopHook = hook; return this; }
-        /** 注册成熟形态性状效果（先花后叶/小花团等；不注册=中性默认化叶） */
-        public Builder onBudMature(BudMatureHook hook) { this.budMatureHook = hook; return this; }
+        /** 树形系数(0.3~1.0):0.5=开心形半高封顶(桃),1.0=主干形全高(松) */
+        public Builder trunkRatio(float v) { this.trunkRatio = v; return this; }
+        /** 枝条走向风格名(drooping=渐下垂;不设=直线) */
+        public Builder branchStyle(String name) { this.branchDirStyle = name; return this; }
+        /** 侧芽位风格名(whorled_pine=轮生;不设=无逐节侧芽) */
+        public Builder budPosStyle(String name) { this.budPosStyle = name; return this; }
+        /** 分叉收益风格名(horizontal_pine=只认水平;不设=向光+向顶默认) */
+        public Builder forkGainStyle(String name) { this.forkGainStyle = name; return this; }
+        /** 开花方式风格名(peach_axillary 等;不设=中性默认末端单苞) */
+        public Builder bloomingStyle(String name) { this.bloomingStyle = name; return this; }
+        /** 成熟形态风格名(peach_canopy 等;不设=中性默认化叶) */
+        public Builder maturationStyle(String name) { this.maturationStyle = name; return this; }
 
         public Builder textures(String bark, String cap) {
             this.barkTexture = bark;
