@@ -45,7 +45,9 @@
   },
   "features": [
     [],
-    [],
+    [
+      "moran_mod:water_lake_surface"
+    ],
     [],
     [],
     [],
