@@ -91,16 +91,8 @@ public final class BranchModelPlugin implements ModelLoadingPlugin {
      * <p>包内可见，供开发期的 {@link BranchModelDump} 复用同一套解析，
      * 避免两处各写一份、改一处漏一处。
      *
+     * @param trunk true=主干动态模型（trunk/ 前缀，手作底模+侧向填充）
      * @return 模型 JSON；id 非法时返回 null
-     */
-    @Nullable
-    static JsonObject parse(String spec) {
-        return parse(spec, false);
-    }
-
-    /**
-     * @param trunk true = 主干动态模型（{@code trunk/} 前缀，手作底模 + 侧向填充）；
-     *              false = 侧枝模型（{@code branch/} 前缀，纯工厂几何）
      */
     @Nullable
     static JsonObject parse(String spec, boolean trunk) {

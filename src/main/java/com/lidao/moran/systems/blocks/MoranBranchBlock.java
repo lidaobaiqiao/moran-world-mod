@@ -894,20 +894,6 @@ public class MoranBranchBlock extends Block implements Fertilizable {
         return height;
     }
 
-    private int trunkSegmentsAbove(ServerWorld world, BlockPos pos) {
-        int n = 0;
-        BlockPos p = pos.up();
-        while (n < species.biologicalTopMax()) {
-            BlockState s = world.getBlockState(p);
-            if (!(s.getBlock() instanceof MoranBranchBlock) || !s.get(TRUNK)) {
-                break;
-            }
-            n++;
-            p = p.up();
-        }
-        return n;
-    }
-
     /** 主干整列上已存在的侧芽数量（用于递减概率） */
     private int countBudsAroundTrunk(ServerWorld world, BlockPos trunkPos) {
         int count = 0;

@@ -62,14 +62,8 @@ public class MoranModClient implements ClientModInitializer {
         // === 透明像素方块的渲染层（cutout）：不注册会落入不透明层，透明像素显示为黑色 ===
         registerCutoutLayers();
 
-        // 初始化其他客户端功能（保持你原有的结构）
-        initializeClientRendering();
         initializeClientEvents();
-        initializeParticleEffects();
-
-        LOGGER.info("🖌️ 墨彩客户端渲染系统已就绪");
         LOGGER.info("🎮 客户端事件系统已激活");
-        LOGGER.info("🌸 桃花特效系统已加载");
         LOGGER.info("🎭 玩家将体验完整的墨世界视觉效果！");
     }
 
@@ -150,16 +144,6 @@ public class MoranModClient implements ClientModInitializer {
 
 
     /**
-     * 初始化客户端渲染系统
-     */
-    private void initializeClientRendering() {
-        LOGGER.info("🌈️ 初始化墨彩渲染系统...");
-        // 这里将添加水墨风格的视觉效果
-        // 桃花飘落效果
-        // 墨染粒子系统
-    }
-
-    /**
      * 初始化客户端事件系统
      */
     private void initializeClientEvents() {
@@ -208,16 +192,5 @@ public class MoranModClient implements ClientModInitializer {
         });
 
         LOGGER.info("🌸 桃花树叶落花事件监听器已注册！");
-    }
-
-    /**
-     * 初始化粒子效果系统
-     */
-    private void initializeParticleEffects() {
-        LOGGER.info("🎐 初始化粒子效果系统...");
-        // 桃花瓣飘落
-        // 墨滴扩散
-        // 水墨波纹
-        // 彩霞流动
     }
 }

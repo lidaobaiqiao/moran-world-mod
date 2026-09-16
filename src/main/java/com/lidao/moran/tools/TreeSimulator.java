@@ -455,7 +455,10 @@ public final class TreeSimulator {
             switch (s.type) {
                 case BRANCH -> {
                     branches++;
-                    forks += Integer.bitCount(s.forkMask);
+                    // 主干的 forkMask 是定干主枝位(渲染填充用),不是分叉;叉只统计侧枝
+                    if (!s.trunk) {
+                        forks += Integer.bitCount(s.forkMask);
+                    }
                 }
                 case LEAF -> leaves++;
                 case BUD -> buds++;
