@@ -1,0 +1,56 @@
+{
+  "_说明": "寒梅:矮桩疏枝、耐寒(温度下限0.15)、顶腋侧腋贴枝着花;寒梅/绿萼两品种",
+  "format": 1,
+  "id": "plum",
+  "limbCount": 4,
+  "biologicalTop": [
+    5,
+    7
+  ],
+  "trunkRatio": 0.45,
+  "trunkMaxGrowth": 8,
+  "branchStopChance": 0.1,
+  "subBranchChance": 0.28,
+  "forkMinChainPos": 1,
+  "forkSpacing": 1,
+  "growChance": 0.5,
+  "minLight": 8,
+  "temperature": [
+    0.15,
+    0.9
+  ],
+  "minHydration": 0,
+  "minHumidity": 0.3,
+  "soilPreference": [
+    4,
+    8,
+    3,
+    8,
+    2,
+    6
+  ],
+  "pruneResponseChance": 0.55,
+  "minSpacing": 3,
+  "bloomingStyle": "peach_axillary",
+  "maturationStyle": "peach_canopy",
+  "phenotypes": [
+    {
+      "id": "han",
+      "weight": 2.0,
+      "auxin": 1.05,
+      "cytokinin": 0.95,
+      "gibberellin": 0.85
+    },
+    {
+      "id": "lve",
+      "weight": 1.0,
+      "auxin": 0.95,
+      "cytokinin": 1.1,
+      "gibberellin": 0.9
+    }
+  ],
+  "textures": {
+    "bark": "moran_mod:block/plum_log",
+    "cap": "moran_mod:block/plum_log_top"
+  }
+}

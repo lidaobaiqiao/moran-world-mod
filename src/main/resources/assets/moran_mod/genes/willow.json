@@ -1,0 +1,55 @@
+{
+  "_说明": "垂柳:近水硬门槛(水度≥3)+渐下垂枝;青丝/立柳两品种",
+  "format": 1,
+  "id": "willow",
+  "limbCount": 4,
+  "biologicalTop": [
+    8,
+    11
+  ],
+  "trunkRatio": 0.6,
+  "trunkMaxGrowth": 8,
+  "branchStopChance": 0.05,
+  "subBranchChance": 0.35,
+  "forkMinChainPos": 1,
+  "forkSpacing": 1,
+  "growChance": 0.55,
+  "minLight": 8,
+  "temperature": [
+    0.5,
+    1.0
+  ],
+  "minHydration": 3,
+  "minHumidity": 0.4,
+  "soilPreference": [
+    4,
+    8,
+    3,
+    8,
+    4,
+    8
+  ],
+  "pruneResponseChance": 0.6,
+  "minSpacing": 4,
+  "branchStyle": "drooping",
+  "phenotypes": [
+    {
+      "id": "weeping",
+      "weight": 3.0,
+      "auxin": 0.85,
+      "cytokinin": 1.1,
+      "gibberellin": 1.05
+    },
+    {
+      "id": "upright",
+      "weight": 1.0,
+      "auxin": 1.15,
+      "cytokinin": 0.95,
+      "gibberellin": 1.0
+    }
+  ],
+  "textures": {
+    "bark": "moran_mod:block/willow_log",
+    "cap": "moran_mod:block/willow_log_top"
+  }
+}

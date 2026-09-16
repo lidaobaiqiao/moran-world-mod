@@ -84,32 +84,54 @@ public class BlockSystem {
             new PillarBlock(FabricBlockSettings.copyOf(Blocks.OAK_LOG)));
     public static final Block WILLOW_LEAVES = register("willow_leaves",
             new LeavesBlock(FabricBlockSettings.copyOf(Blocks.OAK_LEAVES)));
-    public static final Block WILLOW_SAPLING = register("willow_sapling",
-            new SaplingBlock(new MoranSaplingGenerator("willow_tree"),
-                    FabricBlockSettings.copyOf(Blocks.OAK_SAPLING).noCollision().breakInstantly()));
 
     public static final Block PINE_LOG = register("pine_log",
             new PillarBlock(FabricBlockSettings.copyOf(Blocks.OAK_LOG)));
     public static final Block PINE_LEAVES = register("pine_leaves",
             new LeavesBlock(FabricBlockSettings.copyOf(Blocks.SPRUCE_LEAVES)));
-    public static final Block PINE_SAPLING = register("pine_sapling",
-            new SaplingBlock(new MoranSaplingGenerator("pine_tree"),
-                    FabricBlockSettings.copyOf(Blocks.OAK_SAPLING).noCollision().breakInstantly()));
 
     public static final Block PLUM_LOG = register("plum_log",
             new PillarBlock(FabricBlockSettings.copyOf(Blocks.OAK_LOG)));
     public static final Block PLUM_LEAVES = register("plum_leaves",
             new LeavesBlock(FabricBlockSettings.copyOf(Blocks.OAK_LEAVES)));
-    public static final Block PLUM_SAPLING = register("plum_sapling",
-            new SaplingBlock(new MoranSaplingGenerator("plum_tree"),
-                    FabricBlockSettings.copyOf(Blocks.OAK_SAPLING).noCollision().breakInstantly()));
 
     public static final Block GINKGO_LOG = register("ginkgo_log",
             new PillarBlock(FabricBlockSettings.copyOf(Blocks.OAK_LOG)));
     public static final Block GINKGO_LEAVES = register("ginkgo_leaves",
             new LeavesBlock(FabricBlockSettings.copyOf(Blocks.OAK_LEAVES)));
-    public static final Block GINKGO_SAPLING = register("ginkgo_sapling",
-            new SaplingBlock(new MoranSaplingGenerator("ginkgo_tree"),
+
+    // 🌳 五树生长方块（垂柳/劲松/寒梅/银杏——生长树类接入,基因组走基因文件）
+    public static final Block WILLOW_BRANCH = register("willow_branch",
+            new MoranBranchBlock(Trees.WILLOW, FabricBlockSettings.copyOf(Blocks.OAK_PLANKS)
+                    .nonOpaque().strength(0.4f)));
+    public static final Block WILLOW_BUD = register("willow_bud",
+            new MoranFlowerBudBlock(Trees.WILLOW, FabricBlockSettings.copyOf(Blocks.OAK_SAPLING)));
+    public static final Block PINE_BRANCH = register("pine_branch",
+            new MoranBranchBlock(Trees.PINE, FabricBlockSettings.copyOf(Blocks.OAK_PLANKS)
+                    .nonOpaque().strength(0.5f)));
+    public static final Block PINE_BUD = register("pine_bud",
+            new MoranFlowerBudBlock(Trees.PINE, FabricBlockSettings.copyOf(Blocks.OAK_SAPLING)));
+    public static final Block PLUM_BRANCH = register("plum_branch",
+            new MoranBranchBlock(Trees.PLUM, FabricBlockSettings.copyOf(Blocks.OAK_PLANKS)
+                    .nonOpaque().strength(0.4f)));
+    public static final Block PLUM_BUD = register("plum_bud",
+            new MoranFlowerBudBlock(Trees.PLUM, FabricBlockSettings.copyOf(Blocks.OAK_SAPLING)));
+    public static final Block GINKGO_BRANCH = register("ginkgo_branch",
+            new MoranBranchBlock(Trees.GINKGO, FabricBlockSettings.copyOf(Blocks.OAK_PLANKS)
+                    .nonOpaque().strength(0.5f)));
+    public static final Block GINKGO_BUD = register("ginkgo_bud",
+            new MoranFlowerBudBlock(Trees.GINKGO, FabricBlockSettings.copyOf(Blocks.OAK_SAPLING)));
+public static final Block WILLOW_SAPLING = register("willow_sapling",
+            new SpeciesSaplingBlock(WILLOW_BRANCH,
+                    FabricBlockSettings.copyOf(Blocks.OAK_SAPLING).noCollision().breakInstantly()));
+public static final Block PINE_SAPLING = register("pine_sapling",
+            new SpeciesSaplingBlock(PINE_BRANCH,
+                    FabricBlockSettings.copyOf(Blocks.OAK_SAPLING).noCollision().breakInstantly()));
+public static final Block PLUM_SAPLING = register("plum_sapling",
+            new SpeciesSaplingBlock(PLUM_BRANCH,
+                    FabricBlockSettings.copyOf(Blocks.OAK_SAPLING).noCollision().breakInstantly()));
+public static final Block GINKGO_SAPLING = register("ginkgo_sapling",
+            new SpeciesSaplingBlock(GINKGO_BRANCH,
                     FabricBlockSettings.copyOf(Blocks.OAK_SAPLING).noCollision().breakInstantly()));
 
     // 🧪 临时测试方块组：验证各档位 / 各分叉方向的侧枝模型（确认后整组删除）
@@ -139,6 +161,10 @@ public class BlockSystem {
         }
         // 树种档案绑定方块实例（引擎 ↔ 档案 互相接通）
         Trees.PEACH.bind(PEACH_BRANCH, PEACH_FLOWER_BUD, PEACH_BLOSSOM_LEAVES);
+        Trees.WILLOW.bind(WILLOW_BRANCH, WILLOW_BUD, WILLOW_LEAVES);
+        Trees.PINE.bind(PINE_BRANCH, PINE_BUD, PINE_LEAVES);
+        Trees.PLUM.bind(PLUM_BRANCH, PLUM_BUD, PLUM_LEAVES);
+        Trees.GINKGO.bind(GINKGO_BRANCH, GINKGO_BUD, GINKGO_LEAVES);
         // 野生树种子特征类型注册（simple_block 的 schedule_tick 字段是死字段，必须自建特征）
         Registry.register(Registries.FEATURE, new Identifier(MoranMod.MOD_ID, "moran_tree_seed"),
                 com.lidao.moran.systems.worldgen.MoranTreeSeedFeature.INSTANCE);

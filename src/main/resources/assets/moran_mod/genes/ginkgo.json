@@ -1,0 +1,54 @@
+{
+  "_说明": "银杏:慢生长寿、高主干开张;雄株开张/塔型两品种",
+  "format": 1,
+  "id": "ginkgo",
+  "limbCount": 4,
+  "biologicalTop": [
+    9,
+    12
+  ],
+  "trunkRatio": 0.75,
+  "trunkMaxGrowth": 8,
+  "branchStopChance": 0.04,
+  "subBranchChance": 0.2,
+  "forkMinChainPos": 2,
+  "forkSpacing": 2,
+  "growChance": 0.3,
+  "minLight": 9,
+  "temperature": [
+    0.4,
+    1.0
+  ],
+  "minHydration": 0,
+  "minHumidity": 0.3,
+  "soilPreference": [
+    4,
+    8,
+    3,
+    8,
+    3,
+    7
+  ],
+  "pruneResponseChance": 0.35,
+  "minSpacing": 5,
+  "phenotypes": [
+    {
+      "id": "xiong",
+      "weight": 2.0,
+      "auxin": 1.1,
+      "cytokinin": 0.9,
+      "gibberellin": 1.0
+    },
+    {
+      "id": "ta",
+      "weight": 1.0,
+      "auxin": 1.2,
+      "cytokinin": 0.85,
+      "gibberellin": 1.05
+    }
+  ],
+  "textures": {
+    "bark": "moran_mod:block/ginkgo_log",
+    "cap": "moran_mod:block/ginkgo_log_top"
+  }
+}

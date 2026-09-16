@@ -41,7 +41,8 @@
   "features": [
     [],
     [
-      "moran_mod:water_lake_surface"
+      "moran_mod:water_lake_surface",
+      "moran_mod:water_lake_surface_dense"
     ],
     [],
     [],

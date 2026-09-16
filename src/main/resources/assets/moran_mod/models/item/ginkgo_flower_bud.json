@@ -1,0 +1,6 @@
+{
+  "parent": "minecraft:item/generated",
+  "textures": {
+    "layer0": "moran_mod:block/ginkgo_flower_bud_stage2"
+  }
+}

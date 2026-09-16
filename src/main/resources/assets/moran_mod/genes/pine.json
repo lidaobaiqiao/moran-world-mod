@@ -1,0 +1,56 @@
+{
+  "_说明": "劲松:主干形(全高封顶)+轮生层性+只认水平枝;劲松/矮松两品种",
+  "format": 1,
+  "id": "pine",
+  "limbCount": 4,
+  "biologicalTop": [
+    9,
+    13
+  ],
+  "trunkRatio": 1.0,
+  "trunkMaxGrowth": 8,
+  "branchStopChance": 0.05,
+  "subBranchChance": 0.25,
+  "forkMinChainPos": 1,
+  "forkSpacing": 2,
+  "growChance": 0.45,
+  "minLight": 10,
+  "temperature": [
+    0.2,
+    0.9
+  ],
+  "minHydration": 0,
+  "minHumidity": 0.2,
+  "soilPreference": [
+    2,
+    6,
+    2,
+    8,
+    1,
+    4
+  ],
+  "pruneResponseChance": 0.3,
+  "minSpacing": 5,
+  "budPosStyle": "whorled_pine",
+  "forkGainStyle": "horizontal_pine",
+  "phenotypes": [
+    {
+      "id": "jin",
+      "weight": 2.0,
+      "auxin": 1.2,
+      "cytokinin": 0.85,
+      "gibberellin": 0.95
+    },
+    {
+      "id": "ai",
+      "weight": 1.0,
+      "auxin": 0.9,
+      "cytokinin": 1.05,
+      "gibberellin": 0.8
+    }
+  ],
+  "textures": {
+    "bark": "moran_mod:block/pine_log",
+    "cap": "moran_mod:block/pine_log_top"
+  }
+}
