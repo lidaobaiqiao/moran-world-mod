@@ -72,5 +72,13 @@
   "block.moran_mod.test_g2_down": "T g2 Down",
   "block.moran_mod.test_g3_east": "T g3 East",
   "block.moran_mod.test_g5_east": "T g5 East",
-  "block.moran_mod.test_g7_east": "T g7 East"
+  "block.moran_mod.test_g7_east": "T g7 East",
+  "block.moran_mod.willow_branch": "Weeping Willow Branch",
+  "block.moran_mod.willow_bud": "Willow Bud",
+  "block.moran_mod.pine_branch": "Pine Branch",
+  "block.moran_mod.pine_bud": "Pine Bud",
+  "block.moran_mod.plum_branch": "Plum Branch",
+  "block.moran_mod.plum_bud": "Plum Flower Bud",
+  "block.moran_mod.ginkgo_branch": "Ginkgo Branch",
+  "block.moran_mod.ginkgo_bud": "Ginkgo Bud"
 }

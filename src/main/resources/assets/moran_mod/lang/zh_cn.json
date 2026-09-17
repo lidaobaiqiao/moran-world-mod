@@ -72,5 +72,13 @@
   "block.moran_mod.test_g2_down": "测·g2下(推导)",
   "block.moran_mod.test_g3_east": "测·g3东",
   "block.moran_mod.test_g5_east": "测·g5东",
-  "block.moran_mod.test_g7_east": "测·g7东(极限)"
+  "block.moran_mod.test_g7_east": "测·g7东(极限)",
+  "block.moran_mod.willow_branch": "垂柳枝",
+  "block.moran_mod.willow_bud": "垂柳花芽",
+  "block.moran_mod.pine_branch": "劲松枝",
+  "block.moran_mod.pine_bud": "劲松芽",
+  "block.moran_mod.plum_branch": "寒梅枝",
+  "block.moran_mod.plum_bud": "寒梅花苞",
+  "block.moran_mod.ginkgo_branch": "银杏枝",
+  "block.moran_mod.ginkgo_bud": "银杏芽"
 }
