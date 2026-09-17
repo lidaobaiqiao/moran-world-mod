@@ -227,6 +227,11 @@ public class TreeSpecies {
         return limbCount;
     }
 
+    /** 枝条走向风格名(模拟器复刻用) */
+    public String branchDirStyle() {
+        return branchDirStyle;
+    }
+
     /**
      * 本树成熟档位（「成熟标志成熟度」max）—— <b>档位体系全部相对它展开（max-i），
      * 不是每棵树都要长满 8 档</b>。

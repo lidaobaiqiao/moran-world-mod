@@ -73,7 +73,13 @@ public final class TreeSimulator {
             }
         }
 
-        TreeSpecies species = com.lidao.moran.systems.trees.genes.SpeciesGeneLoader.load("ginkgo");
+        String speciesId = "peach";
+        for (int i = 0; i < args.length; i++) {
+            if ("--species".equals(args[i]) && i + 1 < args.length) {
+                speciesId = args[++i];
+            }
+        }
+        TreeSpecies species = com.lidao.moran.systems.trees.genes.SpeciesGeneLoader.load(speciesId);
         Files.createDirectories(Path.of(out));
 
         if (pick != Long.MIN_VALUE) {
@@ -608,7 +614,25 @@ public final class TreeSimulator {
         int chainLimit = Math.min(MAX_BRANCH_CHAIN, Math.max(2, nutritionAt(w, pos, facing) - w.max / 4));
         if (growth >= 2 && chainPos < chainLimit && tipAir
                 && w.random.nextFloat() < BRANCH_EXTEND_CHANCE * w.hormones.gibberellin()) {
-            SimBlock next = new SimBlock(SimType.BRANCH, 1, facing);
+            // 同步引擎 GrowthStyles「drooping」:同向链第 2 节起转向下垂(垂柳)
+            Direction nextFacing = facing;
+            if ("drooping".equals(w.species.branchDirStyle()) && facing.getAxis() != Direction.Axis.Y) {
+                int chain = 0;
+                BlockPos p = pos;
+                while (chain < 16) {
+                    SimBlock back = w.get(p.offset(facing.getOpposite()));
+                    if (back != null && back.type == SimType.BRANCH && !back.trunk && back.facing == facing) {
+                        chain++;
+                        p = p.offset(facing.getOpposite());
+                    } else {
+                        break;
+                    }
+                }
+                if (chain >= 2) {
+                    nextFacing = Direction.DOWN;
+                }
+            }
+            SimBlock next = new SimBlock(SimType.BRANCH, 1, nextFacing);
             next.trunk = false;
             w.put(tip, next);
             return true;
