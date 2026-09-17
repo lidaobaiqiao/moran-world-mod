@@ -40,6 +40,12 @@
         "weight": 6,
         "minCount": 2,
         "maxCount": 4
+      },
+      {
+        "type": "minecraft:villager",
+        "weight": 4,
+        "minCount": 1,
+        "maxCount": 3
       }
     ]
   },
