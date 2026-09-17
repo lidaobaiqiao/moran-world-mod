@@ -58,6 +58,17 @@ public class MoranItemGroup {
                         entries.add(BlockSystem.GINKGO_LOG);
                         entries.add(BlockSystem.GINKGO_LEAVES);
                         entries.add(BlockSystem.GINKGO_SAPLING);
+                        // 五树生长方块（枝干+花苞）
+                        entries.add(BlockSystem.PEACH_BRANCH);
+                        entries.add(BlockSystem.PEACH_FLOWER_BUD);
+                        entries.add(BlockSystem.WILLOW_BRANCH);
+                        entries.add(BlockSystem.WILLOW_BUD);
+                        entries.add(BlockSystem.PINE_BRANCH);
+                        entries.add(BlockSystem.PINE_BUD);
+                        entries.add(BlockSystem.PLUM_BRANCH);
+                        entries.add(BlockSystem.PLUM_BUD);
+                        entries.add(BlockSystem.GINKGO_BRANCH);
+                        entries.add(BlockSystem.GINKGO_BUD);
                         // 地面系方块
                         entries.add(BlockSystem.PEACH_BLOSSOM_GRASS_BLOCK);
                         entries.add(BlockSystem.PEACH_BLOSSOM_DIRT);
