@@ -86,6 +86,10 @@ public final class AiTestBridge {
                         doEnv(server, line, out);
                         continue;
                     }
+                    if (line.startsWith("ENV ")) {
+                        doEnv(server, line, out);
+                        continue;
+                    }
                     if (line.startsWith("GETSTATE ")) {
                         doGetState(server, line, out);
                         continue;
@@ -175,9 +179,13 @@ public final class AiTestBridge {
         }
     }
 
-    /** ENV x y z [dimId]——环境四因子诊断(光/温/湿/水) */
+
+    /**
+     * ENV x y z [dimId]
+     * 环境四因子诊断(天光/温度/降水湿度/水度)——自然枝冻结时的排查入口
+     */
     private static void doEnv(MinecraftServer server, String line, StringBuilder out) {
-        String[] p = line.split("\s+");
+        String[] p = line.split("\n\ns+");
         if (p.length < 4) { out.append("ENV 参数不足\n"); return; }
         try {
             int x = Integer.parseInt(p[1]), y = Integer.parseInt(p[2]), z = Integer.parseInt(p[3]);
@@ -185,20 +193,19 @@ public final class AiTestBridge {
             if (world == null) { out.append("ENV 维度不存在\n"); return; }
             BlockPos pos = new BlockPos(x, y, z);
             int sky = world.getLightLevel(net.minecraft.world.LightType.SKY, pos);
-            int blk = world.getLightLevel(net.minecraft.world.LightType.BLOCK, pos);
             float temp = world.getBiome(pos).value().getTemperature();
             boolean precip = world.getBiome(pos).value().hasPrecipitation();
             String biome = world.getBiome(pos).getKey().map(k -> k.getValue().toString()).orElse("?");
             int water = com.lidao.moran.systems.trees.TreeSpecies.hydration(world, pos);
             float humidity = com.lidao.moran.systems.trees.TreeSpecies.biomeHumidity(world, pos);
-            out.append("ENV [").append(x).append(',').append(y).append(',').append(z)
+            out.append("ENV [").append(x).append(",").append(y).append(",").append(z)
                .append("] 群系=").append(biome)
-               .append(" 天光=").append(sky).append(" 块光=").append(blk)
+               .append(" 天光=").append(sky)
                .append(" 温度=").append(temp).append(" 降水=").append(precip)
                .append(" 湿度=").append(humidity).append(" 水度=").append(water)
-               .append('\n');
+               .append("\n");
         } catch (Exception e) {
-            out.append("ENV 异常: ").append(e).append('\n');
+            out.append("ENV 异常: ").append(e).append("\n");
         }
     }
 

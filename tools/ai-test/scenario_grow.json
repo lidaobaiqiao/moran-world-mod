@@ -1,0 +1,7 @@
+[
+  {"action": "log", "msg": "=== bot 进场,驻守五树平台 6 分钟(自然生长验收) ==="},
+  {"action": "chat", "msg": "/tp MoranTestBot 46 72 46", "waitMs": 1000},
+  {"action": "pos"},
+  {"action": "wait", "ms": 330000},
+  {"action": "log", "msg": "=== 生长观察结束 ==="}
+]

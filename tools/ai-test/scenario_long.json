@@ -1,0 +1,6 @@
+[
+  {"action": "log", "msg": "=== bot 进场待命(桥将在 50 秒后传送本 bot 驻场 5 分钟) ==="},
+  {"action": "wait", "ms": 360000},
+  {"action": "pos"},
+  {"action": "log", "msg": "=== 驻守结束 ==="}
+]
