@@ -534,8 +534,8 @@ public final class TreeSimulator {
         int growth = s.growth;
         // 复刻 growPart：档位相对本树 max（treeMaxGrowth=TARGET-4）；侧枝至 min(max-1, 营养)
         int max = w.max;
-        int cap = s.trunk ? max
-                : Math.min(max - 1, nutritionAt(w, pos, facing));
+        int cap = Math.min(s.trunk ? max
+                : Math.min(max - 1, nutritionAt(w, pos, facing)), 8);
         boolean progressed = false;
         if (growth < cap) {
             s.growth = ++growth;

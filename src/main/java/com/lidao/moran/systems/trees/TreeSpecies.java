@@ -153,7 +153,8 @@ public class TreeSpecies {
         this.id = b.id;
         this.biologicalTopMin = b.biologicalTopMin;
         this.biologicalTopMax = b.biologicalTopMax;
-        this.trunkMaxGrowth = b.trunkMaxGrowth;
+        // 档位硬上限夹取:trunkMaxGrowth > 8 会经由 treeMaxGrowth 产出非法档位(GROWTH 属性上限 8)
+        this.trunkMaxGrowth = Math.max(1, Math.min(8, b.trunkMaxGrowth));
         this.maxBuds = b.maxBuds;
         this.budChanceDenom = b.budChanceDenom;
         this.branchStopChance = b.branchStopChance;
@@ -250,7 +251,9 @@ public class TreeSpecies {
         seed ^= seed >>> 32;
         seed ^= 0x6A09E667F3BCC909L;
         Random r = Random.create(seed);
-        int lo = Math.max(3, biologicalTopMin);
+        // 双向夹取:档位上限绝不超过 trunkMaxGrowth(=方块 GROWTH 属性上限 8)。
+        // 崩服教训:松/银杏 biologicalTopMin=9>8,lo 未封顶 → max=9 → with(GROWTH,9) 崩服。
+        int lo = Math.min(Math.max(3, biologicalTopMin), trunkMaxGrowth);
         int hi = Math.max(lo, Math.min(trunkMaxGrowth, biologicalTopMax));
         return lo + r.nextInt(hi - lo + 1);
     }

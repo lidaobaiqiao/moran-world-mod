@@ -44,6 +44,8 @@ import java.util.concurrent.ConcurrentHashMap;
 public class MoranBranchBlock extends Block implements Fertilizable {
 
     public static final IntProperty GROWTH = IntProperty.of("growth", 1, 8);
+    /** 档位硬上限(=GROWTH 属性上限)——所有 cap 计算的最后一道闸 */
+    public static final int GROWTH_MAX = 8;
     public static final EnumProperty<Direction> FACING = EnumProperty.of("facing", Direction.class,
             List.of(Direction.UP, Direction.DOWN, Direction.NORTH, Direction.SOUTH,
                     Direction.WEST, Direction.EAST));
@@ -405,8 +407,8 @@ public class MoranBranchBlock extends Block implements Fertilizable {
         // 主干至 max；侧枝至 min(max-1, 养分值)——侧枝恒细于母干一档。
         // 养分从根部发起（主干=当前 growth），沿结构传递递减：
         // 同链每节距离损耗、换向分叉分流损耗，末梢天然细小
-        int cap = trunk ? max
-                : Math.min(max - 1, nutritionAt(world, pos, facing));
+        int cap = Math.min(trunk ? max
+                : Math.min(max - 1, nutritionAt(world, pos, facing)), GROWTH_MAX);
         boolean progressed = false;
         if (growth < cap) {
             growth += 1;
@@ -1020,8 +1022,8 @@ public class MoranBranchBlock extends Block implements Fertilizable {
     public void grow(ServerWorld world, Random random, BlockPos pos, BlockState state) {
         int growth = state.get(GROWTH);
         int max = species.treeMaxGrowth(treeOrigin(world, pos, state.get(FACING)).asLong());
-        int cap = state.get(TRUNK) ? max
-                : Math.min(max - 1, nutritionAt(world, pos, state.get(FACING)));
+        int cap = Math.min(state.get(TRUNK) ? max
+                : Math.min(max - 1, nutritionAt(world, pos, state.get(FACING))), GROWTH_MAX);
         if (growth < cap) {
             world.setBlockState(pos, state.with(GROWTH, growth + 1), Block.NOTIFY_ALL);
         }
