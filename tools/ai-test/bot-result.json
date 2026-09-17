@@ -1,0 +1,10 @@
+[
+  "已进入世界 @ {\"x\":-163.5,\"y\":76,\"z\":47.5}",
+  "=== bot 进场,驻守五树平台 75 秒(提供模拟距离) ===",
+  "动作异常: {\"action\":\"nearby\",\"block\":\"moran_mod:peach_branch\",\"r\":24} → 注册表无此 id: moran_mod:peach_branch",
+  "动作异常: {\"action\":\"nearby\",\"block\":\"moran_mod:willow_branch\",\"r\":24} → 注册表无此 id: moran_mod:willow_branch",
+  "动作异常: {\"action\":\"nearby\",\"block\":\"moran_mod:pine_branch\",\"r\":24} → 注册表无此 id: moran_mod:pine_branch",
+  "动作异常: {\"action\":\"nearby\",\"block\":\"moran_mod:plum_branch\",\"r\":24} → 注册表无此 id: moran_mod:plum_branch",
+  "动作异常: {\"action\":\"nearby\",\"block\":\"moran_mod:ginkgo_branch\",\"r\":24} → 注册表无此 id: moran_mod:ginkgo_branch",
+  "=== 生长观察结束 ==="
+]

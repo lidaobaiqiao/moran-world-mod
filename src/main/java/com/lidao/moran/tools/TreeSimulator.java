@@ -73,7 +73,7 @@ public final class TreeSimulator {
             }
         }
 
-        TreeSpecies species = com.lidao.moran.systems.trees.genes.SpeciesGeneLoader.load("peach");
+        TreeSpecies species = com.lidao.moran.systems.trees.genes.SpeciesGeneLoader.load("ginkgo");
         Files.createDirectories(Path.of(out));
 
         if (pick != Long.MIN_VALUE) {

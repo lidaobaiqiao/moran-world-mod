@@ -1,0 +1,8 @@
+{
+  "name": "moran-ai-test",
+  "version": "1.0.0",
+  "description": "墨世界自动化测试驱动器(Mineflayer bot)",
+  "main": "bot.js",
+  "scripts": { "start": "node bot.js" },
+  "dependencies": { "mineflayer": "^4.20.0" }
+}

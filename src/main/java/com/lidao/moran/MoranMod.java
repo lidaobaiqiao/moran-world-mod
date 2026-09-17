@@ -30,6 +30,8 @@ public class MoranMod implements ModInitializer, TerraBlenderApi {
     @Override
     public void onInitialize() {
         LOGGER.info("🎭 墨世界模组启动");
+        // AI 测试桥:文件命令通道,供外部程序自动化验收(详见 AiTestBridge)
+        com.lidao.moran.systems.test.AiTestBridge.register();
 
         initializeConfigSystem();
         initializeBlockSystem();

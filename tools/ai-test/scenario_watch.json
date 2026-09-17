@@ -1,0 +1,6 @@
+[
+  {"action": "log", "msg": "=== bot 进场待命(桥将传送本 bot 至平台) ==="},
+  {"action": "wait", "ms": 150000},
+  {"action": "pos"},
+  {"action": "log", "msg": "=== 驻守结束 ==="}
+]

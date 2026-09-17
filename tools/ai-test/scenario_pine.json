@@ -1,0 +1,12 @@
+[
+  {"action": "log", "msg": "=== bot 进场,传送到五树平台,驻守 90 秒提供模拟距离 ==="},
+  {"action": "chat", "msg": "/tp MoranTestBot 45 85 45", "waitMs": 800},
+  {"action": "pos"},
+  {"action": "wait", "ms": 90000},
+  {"action": "nearby", "block": "moran_mod:peach_branch", "r": 24},
+  {"action": "nearby", "block": "moran_mod:willow_branch", "r": 24},
+  {"action": "nearby", "block": "moran_mod:pine_branch", "r": 24},
+  {"action": "nearby", "block": "moran_mod:plum_branch", "r": 24},
+  {"action": "nearby", "block": "moran_mod:ginkgo_branch", "r": 24},
+  {"action": "log", "msg": "=== 生长观察结束 ==="}
+]
