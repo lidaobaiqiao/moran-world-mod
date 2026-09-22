@@ -59,8 +59,6 @@ public class MoranItemGroup {
                         entries.add(BlockSystem.GINKGO_LEAVES);
                         entries.add(BlockSystem.GINKGO_SAPLING);
                         // 五树生长方块（枝干+花苞）
-                        entries.add(BlockSystem.PEACH_BRANCH);
-                        entries.add(BlockSystem.PEACH_FLOWER_BUD);
                         entries.add(BlockSystem.WILLOW_BRANCH);
                         entries.add(BlockSystem.WILLOW_BUD);
                         entries.add(BlockSystem.PINE_BRANCH);
@@ -77,15 +75,6 @@ public class MoranItemGroup {
                         entries.add(BlockSystem.ANCIENT_PEACH_REALM_STONE);
                         // 生物
                         entries.add(EntitySystem.MOLING_SPAWN_EGG);
-                        // 🧪 临时测试方块组（确认渲染后连同 BlockSystem 的注册一起删）
-                        entries.add(BlockSystem.TEST_G1_EAST);
-                        entries.add(BlockSystem.TEST_G2_EAST);
-                        entries.add(BlockSystem.TEST_G2_WEST);
-                        entries.add(BlockSystem.TEST_G2_UP);
-                        entries.add(BlockSystem.TEST_G2_DOWN);
-                        entries.add(BlockSystem.TEST_G3_EAST);
-                        entries.add(BlockSystem.TEST_G5_EAST);
-                        entries.add(BlockSystem.TEST_G7_EAST);
                     })
                     .build()
     );

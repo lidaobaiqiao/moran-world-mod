@@ -37,15 +37,16 @@ import java.util.Map;
  * 个体只在原型内做小幅残差抖动（推导式状态，零存储）。
  * 见 {@link HormoneProfile} 与 {@link #hormones(WorldView, BlockPos, Direction)}。
  *
- * 现实物候由各档案的钩子表达：
- * - 桃（默认范式）：上半部萌芽、先营养后生殖、先花后叶、耐旱怕涝；
- * - 垂柳：覆写 {@link #branchChildDirection} 枝条渐下垂、{@link #checkEnvironment} 要求水度；
- * - 劲松：覆写 {@link #isBudPosition} 轮生枝、{@link #branchForkGain} 只认水平向、放宽温度下限；
- * - 寒梅：覆写 {@link #onBranchStop} 贴枝开花、耐寒；
+ * 现实物候由各档案的风格名指向 {@link GrowthStyles}／{@link BloomStyles} 注册表
+ * （树种无子类：五个树种都是本类的实例，基因文件写风格名，实现在注册表）：
+ * - 桃（默认范式）：上半部萌芽、先营养后生殖、先花后叶、耐旱怕涝（peach_axillary／peach_canopy）；
+ * - 垂柳：drooping 枝条渐下垂（同向链第 2 节起转向 DOWN）、要求水度；
+ * - 劲松：whorled 轮生枝 + 分叉只认水平向、放宽温度下限；
+ * - 寒梅：贴枝开花、耐寒；
  * - 银杏：调低 growChance、稀疏侧芽。
  *
  * <b>分叉的两个维度分属两处，别搞混</b>：
- * 「往哪长」是物种偏好，走 {@link #branchForkGain}（可覆写）；
+ * 「往哪长」是物种偏好，走 {@link #branchForkGain}（风格注册表）；
  * 「能长几根」是离根的代价，走 {@link #forkCapacity}（营养的函数）。
  * 引擎只负责把两者拼起来，不含任何树种偏好。
  */

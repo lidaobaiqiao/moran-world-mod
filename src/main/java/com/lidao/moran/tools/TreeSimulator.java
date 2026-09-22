@@ -757,9 +757,8 @@ public final class TreeSimulator {
     }
 
     /** 复刻 maturationStyle「peach_canopy」：先花后叶；顶花苞小树冠+侧向小花团。
-     *  【盛花 prototype，待与引擎同步】侧向花苞成熟时不再只长单块叶——长成小花团
-     *  （水平 8 邻大半 + 上方强化 + 下方弱化），冠层连片成「盛花体量」，
-     *  对标目标图的中国风满树繁花；否则等轴测下只是架子挂点、冠层空心。 */
+     *  侧向花苞成熟长成小花团（水平 8 邻大半 + 上方强化 + 下方弱化），冠层连片成
+     *  「盛花体量」——与引擎 {@code PeachBloom.canopyMature} 同款（2026-09-17 已同步）。 */
     private static void onBudMature(SimWorld w, BlockPos pos, Direction facing) {
         w.put(pos, new SimBlock(SimType.LEAF, 1, facing));
         if (facing == Direction.UP) {
