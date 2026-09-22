@@ -1,7 +1,7 @@
 # 墨世界 · 常用命令速查
 
 > 在项目目录 `moran-world-mod-master/moran-world-mod-master` 下执行。
-> JDK 17 已在 gradle.properties 里钉死，终端里的 java 版本不用管。
+> 使用 JDK 17；项目的 `gradle.properties` 没有固定本机 JDK 路径。
 
 ## 一、启动 / 构建（终端命令）
 

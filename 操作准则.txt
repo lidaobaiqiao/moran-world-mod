@@ -19,7 +19,7 @@ src/main/resources/data/moran_mod/
 
 ## 📂 项目结构 - 神圣不可侵犯
 
-test_mod-template-1.20.1/
+moran-world-mod-master/moran-world-mod-master/
 ├── .git/                     # Git版本控制 ✅
 ├── gradle/                   # Gradle配置 ✅
 ├── src/                      # 源码根目录 ✅
@@ -51,17 +51,17 @@ test_mod-template-1.20.1/
 
 ### 🎮 启动游戏
 
-cd E:\test_mod-template-1.20.1
+cd E:\moran-world-mod-master\moran-world-mod-master
 gradlew.bat runClient
 
 ### 🔧 清理项目
 
-cd E:\test_mod-template-1.20.1
+cd E:\moran-world-mod-master\moran-world-mod-master
 gradlew.bat clean
 
 ### 📝 检查编译
 
-cd E:\test_mod-template-1.20.1
+cd E:\moran-world-mod-master\moran-world-mod-master
 gradlew.bat compileJava
 
 --------

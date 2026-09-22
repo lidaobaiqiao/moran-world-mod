@@ -65,7 +65,8 @@ public final class AiTestBridge {
                 Files.delete(cmd);
                 StringBuilder out = new StringBuilder();
                 out.append("==== AI桥执行 ").append(LocalDateTime.now()).append(" ====\n");
-                for (String raw : lines) {
+                for (int lineIndex = 0; lineIndex < lines.size(); lineIndex++) {
+                    String raw = lines.get(lineIndex);
                     String line = raw.trim();
                     if (line.isEmpty() || line.startsWith("#")) {
                         continue;
@@ -86,17 +87,13 @@ public final class AiTestBridge {
                         doEnv(server, line, out);
                         continue;
                     }
-                    if (line.startsWith("ENV ")) {
-                        doEnv(server, line, out);
-                        continue;
-                    }
                     if (line.startsWith("GETSTATE ")) {
                         doGetState(server, line, out);
                         continue;
                     }
                     if (line.startsWith("WAIT ")) {
                         long ms = Long.parseLong(line.substring(5).trim());
-                        List<String> rest = lines.subList(lines.indexOf(raw) + 1, lines.size());
+                        List<String> rest = lines.subList(lineIndex + 1, lines.size());
                         Files.write(cmd, rest, StandardCharsets.UTF_8);
                         resumeAt = System.currentTimeMillis() + ms;
                         out.append("WAIT ").append(ms).append("ms(剩余 ").append(rest.size()).append(" 行延迟续跑)\n");
@@ -185,7 +182,7 @@ public final class AiTestBridge {
      * 环境四因子诊断(天光/温度/降水湿度/水度)——自然枝冻结时的排查入口
      */
     private static void doEnv(MinecraftServer server, String line, StringBuilder out) {
-        String[] p = line.split("\n\ns+");
+        String[] p = line.split("\\s+");
         if (p.length < 4) { out.append("ENV 参数不足\n"); return; }
         try {
             int x = Integer.parseInt(p[1]), y = Integer.parseInt(p[2]), z = Integer.parseInt(p[3]);
@@ -225,17 +222,21 @@ public final class AiTestBridge {
                 out.append("SCAN 维度不存在\n");
                 return;
             }
-            int dx = Math.abs(x2 - x1), dy = Math.abs(y2 - y1), dz = Math.abs(z2 - z1);
-            if ((long) dx * dy * dz > 4_000_000L) {
+            long dx = Math.abs((long) x2 - x1), dy = Math.abs((long) y2 - y1), dz = Math.abs((long) z2 - z1);
+            long width = dx + 1, height = dy + 1, depth = dz + 1;
+            long maxBlocks = 4_000_000L;
+            if (width > maxBlocks || height > maxBlocks || depth > maxBlocks
+                    || width * height > maxBlocks
+                    || width * height * depth > maxBlocks) {
                 out.append("SCAN 区域过大(上限400万方块)\n");
                 return;
             }
             int x0 = Math.min(x1, x2), y0 = Math.min(y1, y2), z0 = Math.min(z1, z2);
             int count = 0;
             BlockPos.Mutable m = new BlockPos.Mutable();
-            for (int x = 0; x <= dx; x++) {
-                for (int y = 0; y <= dy; y++) {
-                    for (int z = 0; z <= dz; z++) {
+            for (int x = 0; x < width; x++) {
+                for (int y = 0; y < height; y++) {
+                    for (int z = 0; z < depth; z++) {
                         m.set(x0 + x, y0 + y, z0 + z);
                         if (world.getBlockState(m).isOf(target)) {
                             count++;

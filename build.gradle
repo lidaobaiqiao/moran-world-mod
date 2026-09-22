@@ -23,34 +23,10 @@ repositories {
     }
     mavenCentral()
     
-    // Terrablender Repository
-    maven {
-        name = 'Terrablender'
-        url = 'https://maven.teamresourceful.com/repository/maven-public/'
-    }
-    
-    // 添加备用仓库
-    maven {
-        name = 'Modrinth'
-        url = 'https://api.modrinth.com/maven'
-    }
-    
-    // Geckolib Repository
-    maven {
-        name = 'Geckolib'
-        url = 'https://dl.cloudsmith.io/public/geckolib3/geckolib/maven/'
-    }
-    
     // Cloth Config Repository
     maven {
         name = 'Cloth Config'
         url = 'https://maven.shedaniel.me/'
-    }
-    
-    // Architectury Repository
-    maven {
-        name = 'Architectury'
-        url = 'https://maven.architectury.dev/'
     }
 }
 
@@ -60,19 +36,8 @@ dependencies {
     modImplementation "net.fabricmc:fabric-loader:0.15.11"
     modImplementation "net.fabricmc.fabric-api:fabric-api:0.92.0+1.20.1"
 
-    // TerraBlender（本地 mod 文件）
-    modImplementation files("libs/TerraBlender-fabric-1.20.1-3.0.1.10.jar")
-
-    // 其他库（网络下载）
+    // 模组配置使用 Cloth Config 的 AutoConfig。
     modImplementation "me.shedaniel.cloth:cloth-config-fabric:11.1.118"
-    modImplementation "dev.architectury:architectury-fabric:9.2.14"
-
-    // NightConfig 本地库（必须用 include 打包）
-    // 删除重复项，确保文件名与 libs/ 目录中完全一致
-    implementation files("libs/nightconfig-core-3.6.7.jar")
-    implementation files("libs/nightconfig-toml-3.6.7.jar")
-    include files("libs/nightconfig-core-3.6.7.jar")
-    include files("libs/nightconfig-toml-3.6.7.jar")
 }
 // datagen 生成资源的输出目录（gradlew runDatagen）
 sourceSets.main.resources { srcDir 'src/main/generated' }

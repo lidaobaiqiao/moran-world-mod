@@ -10,19 +10,14 @@ import com.lidao.moran.systems.items.ItemSystem;
 import com.lidao.moran.systems.items.MoranItemGroup;
 import com.lidao.moran.systems.blocks.BlockSystem;
 import com.lidao.moran.systems.entities.EntitySystem;
-import com.lidao.moran.core.terrablender.BiomeDataCreator;
-import com.lidao.moran.worldgen.PeachSurfaceRules;
+import com.lidao.moran.systems.test.AiTestBridge;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
-import net.minecraft.item.Item; // ✅ 新增导入
-import net.minecraft.registry.Registries; // ✅ 新增导入
-import net.minecraft.registry.Registry; // ✅ 新增导入
-import net.minecraft.util.Identifier; // ✅ 新增导入
+import net.fabricmc.loader.api.FabricLoader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import terrablender.api.TerraBlenderApi;
 
-public class MoranMod implements ModInitializer, TerraBlenderApi {
+public class MoranMod implements ModInitializer {
 
     public static final String MOD_ID = "moran_mod";
     public static final Logger LOGGER = LoggerFactory.getLogger(MOD_ID);
@@ -30,12 +25,13 @@ public class MoranMod implements ModInitializer, TerraBlenderApi {
     @Override
     public void onInitialize() {
         LOGGER.info("🎭 墨世界模组启动");
-        // AI 测试桥:文件命令通道,供外部程序自动化验收(详见 AiTestBridge)
-        com.lidao.moran.systems.test.AiTestBridge.register();
+        // 测试桥能以控制台权限执行文件命令，只在开发运行中注册。
+        if (FabricLoader.getInstance().isDevelopmentEnvironment()) {
+            AiTestBridge.register();
+        }
 
         initializeConfigSystem();
         initializeBlockSystem();
-        initializeBiomeSystem();
         initializeDimensionSystem();
         initializeItemSystem();
         initializeEntitySystem();
@@ -44,14 +40,6 @@ public class MoranMod implements ModInitializer, TerraBlenderApi {
         initializeRaftTeleportSystem();
         initializeWorldEventListener();
         initializeRespawnSystem();
-    }
-
-    @Override
-    public void onTerraBlenderInitialized() {
-        LOGGER.info("🌍 TerraBlender 初始化中...");
-        DimensionRegistry.registerTerraBlenderComponents();
-        PeachSurfaceRules.register();
-        LOGGER.info("✅ TerraBlender 组件注册完成");
     }
 
     // ... (后面的 initialize 方法保持不变) ...
@@ -65,12 +53,6 @@ public class MoranMod implements ModInitializer, TerraBlenderApi {
         LOGGER.info("⛏️ 初始化墨彩方块系统...");
         BlockSystem.initialize();
         LOGGER.info("✅ 方块系统就绪");
-    }
-
-    private void initializeBiomeSystem() {
-        LOGGER.info("🌍 初始化生物群系数据...");
-        BiomeDataCreator.initialize();
-        LOGGER.info("✅ 生物群系数据就绪");
     }
 
     private void initializeDimensionSystem() {

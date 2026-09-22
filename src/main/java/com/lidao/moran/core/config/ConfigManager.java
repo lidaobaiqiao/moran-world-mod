@@ -1,7 +1,6 @@
 package com.lidao.moran.core.config;
 
 import com.lidao.moran.MoranMod;
-import com.lidao.moran.core.DependencyManager;
 import me.shedaniel.autoconfig.AutoConfig;
 import me.shedaniel.autoconfig.serializer.GsonConfigSerializer;
 
@@ -17,11 +16,6 @@ public class ConfigManager {
      * 初始化配置系统
      */
     public static void initialize() {
-        if (!DependencyManager.isModLoaded(DependencyManager.CLOTH_CONFIG)) {
-            MoranMod.LOGGER.warn("⚠️ Cloth Config 未加载，使用默认配置");
-            return;
-        }
-        
         try {
             // 注册配置类
             AutoConfig.register(ModConfig.class, GsonConfigSerializer::new);

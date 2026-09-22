@@ -30,12 +30,14 @@ public class DimensionTeleportManager {
                 return false;
             }
 
+            // 与竹筏传送统一使用维度出生点，避免固定 y=100 把玩家送进空中或地下。
+            var spawn = targetWorld.getSpawnPos();
             // ✅ 现代传送 API（7 参数）
             player.teleport(
                     targetWorld,
-                    0.5,          // x
-                    100.0,        // y
-                    0.5,          // z
+                    spawn.getX() + 0.5,
+                    spawn.getY() + 1.0,
+                    spawn.getZ() + 0.5,
                     0.0f,         // yaw
                     0.0f          // pitch
             );

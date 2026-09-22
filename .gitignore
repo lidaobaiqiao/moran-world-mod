@@ -24,7 +24,7 @@ bin/
 
 # WorkBuddy 工作区数据（记忆、临时日志）
 .workbuddy/
-config/
+/config/
 
 # AI 测试驱动器本地依赖与产物
 tools/ai-test/node_modules/

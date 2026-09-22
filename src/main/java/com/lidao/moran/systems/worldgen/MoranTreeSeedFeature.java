@@ -1,7 +1,6 @@
 package com.lidao.moran.systems.worldgen;
 
 import com.lidao.moran.systems.blocks.MoranBranchBlock;
-import com.lidao.moran.systems.trees.Trees;
 import net.minecraft.block.BlockState;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.gen.feature.Feature;
@@ -38,7 +37,10 @@ public class MoranTreeSeedFeature extends Feature<SimpleBlockFeatureConfig> {
         if (!state.canPlaceAt(context.getWorld(), pos)) {
             return false;
         }
-        if (hasNearbyTrunk(context.getWorld(), pos, Trees.PEACH.minSpacing())) {
+        // 配置里的方块就是树种的唯一来源：不同树种的 minSpacing 由各自基因档案决定。
+        // 旧实现固定读取 Trees.PEACH，导致松/银杏/梅的间距参数在野生生成时失效。
+        if (!(state.getBlock() instanceof MoranBranchBlock branch)
+                || hasNearbyTrunk(context.getWorld(), pos, branch.species().minSpacing())) {
             return false; // 安全距离内已有树干，放弃该点
         }
         // 树的成熟档位（max）与激素档案一样由树基坐标确定性推导，无需评估存储。

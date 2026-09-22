@@ -21,6 +21,15 @@ jobs:
           distribution: 'microsoft'
       - name: make gradle wrapper executable
         run: chmod +x ./gradlew
+      - name: generate and verify block loot tables
+        run: |
+          set -o pipefail
+          ./gradlew runDatagen 2>&1 | tee "$RUNNER_TEMP/moran-datagen.log"
+          grep -q 'All providers took:' "$RUNNER_TEMP/moran-datagen.log"
+          if [ -n "$(git status --porcelain -- src/main/generated/data)" ]; then
+            git status --short -- src/main/generated/data
+            exit 1
+          fi
       - name: build
         run: ./gradlew build
       - name: capture build artifacts

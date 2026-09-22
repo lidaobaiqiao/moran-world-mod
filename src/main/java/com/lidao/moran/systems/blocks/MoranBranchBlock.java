@@ -412,7 +412,8 @@ public class MoranBranchBlock extends Block implements Fertilizable {
         boolean progressed = false;
         if (growth < cap) {
             growth += 1;
-            world.setBlockState(pos, state.with(GROWTH, growth), Block.NOTIFY_ALL);
+            state = state.with(GROWTH, growth);
+            world.setBlockState(pos, state, Block.NOTIFY_ALL);
             progressed = true;
         }
 
@@ -532,8 +533,11 @@ public class MoranBranchBlock extends Block implements Fertilizable {
         int chainLimit = Math.min(MAX_BRANCH_CHAIN, Math.max(2, nutritionAt(world, pos, facing) - max / 4));
         if (growth >= 2 && chainPos < chainLimit && tipAir
                 && random.nextFloat() < BRANCH_EXTEND_CHANCE * hormones.gibberellin()) {
+            // 枝条走向由树种性状决定：桃等保持直线，垂柳在横向链达到长度后转向下垂。
+            // 出生位置仍沿当前节的 facing 放置，下一节的 facing 决定后续链路方向。
+            Direction childFacing = species.branchChildDirection(world, pos, facing);
             world.setBlockState(tip, getDefaultState()
-                    .with(FACING, facing).with(TRUNK, false).with(NATURAL, state.get(NATURAL)), Block.NOTIFY_ALL);
+                    .with(FACING, childFacing).with(TRUNK, false).with(NATURAL, state.get(NATURAL)), Block.NOTIFY_ALL);
             return true;
         }
 

@@ -1,5 +1,5 @@
 {
-  "type": "minecraft:overworld",
+  "type": "moran_mod:peach_blossom_type",
   "generator": {
     "type": "minecraft:noise",
     "settings": "moran_mod:peach_blossom",
